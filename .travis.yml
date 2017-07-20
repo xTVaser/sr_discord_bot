@@ -2,6 +2,6 @@
 
 language: ruby
 rvm:
-  - 2.4.1-p111
+  - 2.4.1
 gemfile:
   - Gemfile
