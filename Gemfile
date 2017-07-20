@@ -6,5 +6,8 @@ git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 gemspec
 
 group :test do
-  rake
+  gem 'rake'
 end
+
+# Added at 2017-07-20 18:53:29 -0400 by tyler:
+gem "discordrb", "~> 3.2"
