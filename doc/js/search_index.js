@@ -1,0 +1,1 @@
+var search_data = {"index":{"searchIndex":["srdiscordbot"],"longSearchIndex":["srdiscordbot"],"info":[["SrDiscordBot","","SrDiscordBot.html","","<p>All code in the gem is namespaced under this module.\n"]]}}
