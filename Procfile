@@ -1,1 +1,1 @@
-worker: rake
+rake: rake
