@@ -11,6 +11,14 @@ Dotenv.load('vars.env')
 class DiscordBot
 
   bot = Discordrb::Bot.new token: ENV['TOKEN'], client_id: ENV['CLIENT_ID']
+  
+  bot.ready() do |event|
+    event.respond 'Bot is Online'
+  end
+  
+  
+  
+  
 
   bot.message(with_text: 'Bing!') do |event|
     event.respond 'Bing Bong!'
