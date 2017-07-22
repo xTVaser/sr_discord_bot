@@ -11,6 +11,10 @@ group :development, :test do
   gem 'rake'
 end
 
+group :production do
+  gem 'rake'
+end
+
 # Added at 2017-07-20 18:53:29 -0400 by tyler:
 gem "discordrb", "~> 3.2"
 
