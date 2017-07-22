@@ -15,7 +15,7 @@ class DiscordBot
   bot.ready() do |event|
     event.bot.servers.values.each do |server|
       if server.name == "Dev Server"
-        server.text_channels.values.each do |channel|
+        server.text_channels.each do |channel|
           if channel.name == "spam-the-bot"
             channel.send_message("!! Bot Back Online !!")
           end
