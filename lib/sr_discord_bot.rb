@@ -1,13 +1,16 @@
-require './sr_discord_bot/version'
+#  Gemfile plugins
 require 'dotenv'
 require 'discordrb'
 
-Dotenv.load('../vars.env')
+# Local files
+require 'sr_discord_bot/version'
+
+Dotenv.load('vars.env')
 
 #  All code in the gem is namespaced under this class.
 class DiscordBot
 
-  bot = Discordrb::Bot.new token: ENV['token'], client_id: ENV['client_id']
+  bot = Discordrb::Bot.new token: ENV['TOKEN'], client_id: ENV['CLIENT_ID']
 
   bot.message(with_text: 'Bing!') do |event|
     event.respond 'Bing Bong!'

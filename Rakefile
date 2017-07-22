@@ -1,12 +1,15 @@
 require "bundler/gem_tasks"
 require "rspec/core/rake_task"
 
-require 'dotenv/tasks'
+# Task Declarations
+task :default => %w[run]
+task :test => :spec
 
-task mytask: :dotenv do
-    # things that require .env
+# Task Definitions
+# Default task to run the program simply by calling 'rake'
+task :run do
+  ruby "./lib/sr_discord_bot.rb"
 end
 
-RSpec::Core::RakeTask.new(:spec)
 
-task :default => :spec
+RSpec::Core::RakeTask.new(:spec)
