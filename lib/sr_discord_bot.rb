@@ -13,12 +13,16 @@ class DiscordBot
   bot = Discordrb::Bot.new token: ENV['TOKEN'], client_id: ENV['CLIENT_ID']
   
   bot.ready() do |event|
-    event.respond 'Bot is Online'
+    event.bot.servers.values.each do |server|
+      if server.name == "Dev Server"
+        server.text_channels.values.each do |channel|
+          if channel.name == "spam-the-bot"
+            channel.send_message("!! Bot Back Online !!")
+          end
+        end
+      end
+    end
   end
-  
-  
-  
-  
 
   bot.message(with_text: 'Bing!') do |event|
     event.respond 'Bing Bong!'
