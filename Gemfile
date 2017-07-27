@@ -14,3 +14,6 @@ gem "discordrb", "~> 3.2"
 
 # Added at 2017-07-22 17:55:56 -0400 by tyler:
 gem "dotenv", "~> 2.2"
+
+# Added at 2017-07-26 20:54:44 -0400 by tyler:
+gem "redis", "~> 3.3"
