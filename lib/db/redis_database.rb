@@ -10,6 +10,8 @@ Dotenv.load('vars.env')
 # futures (aka performing an operation on a key without
 # having to worry about if its there yet), see the README of redis-rb
 
+# !! Unused as migrating to PostgreSQL.  See lib/db/psql_database.rb
+
 module RedisDatabase
 
   # Establish connection to redis database

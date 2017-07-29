@@ -28,6 +28,7 @@ GEM
     netrc (0.11.0)
     opus-ruby (1.0.1)
       ffi
+    pg (0.21.0)
     rake (12.0.0)
     rbnacl (3.4.0)
       ffi
@@ -64,6 +65,7 @@ DEPENDENCIES
   bundler (~> 1.15)
   discordrb (~> 3.2)
   dotenv (~> 2.2)
+  pg (~> 0.21.0)
   rake
   redis (~> 3.3)
   rspec (~> 3.0)

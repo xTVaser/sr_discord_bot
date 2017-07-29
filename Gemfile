@@ -17,3 +17,6 @@ gem "dotenv", "~> 2.2"
 
 # Added at 2017-07-26 20:54:44 -0400 by tyler:
 gem "redis", "~> 3.3"
+
+# Added at 2017-07-28 20:05:43 -0400 by tyler:
+gem "pg", "~> 0.21.0"

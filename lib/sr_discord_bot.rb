@@ -8,10 +8,12 @@ require 'db/database'
 
 Dotenv.load('vars.env')
 
-#  All code in the gem is namespaced under this module.
+# Bot Documentation - http://www.rubydoc.info/gems/discordrb
+
+# All code in the gem is namespaced under this module.
 module DiscordBot
 
-  # Establish Bot Connection
+  # Establish Discord Bot Connection
   bot = Discordrb::Bot.new token: ENV['TOKEN'], client_id: ENV['CLIENT_ID']
 
   bot.ready() do |event|
@@ -35,6 +37,10 @@ module DiscordBot
   bot.message(with_text: 'Bing Bing Bing!') do |event|
     event.respond 'Bing Bing Bong Bing!'
   end
+
+  # If the bot is connecting to the server for the first time
+  # it should establish the database schema
+
 
   bot.message(with_text: '!SingleKeyTest') do |event|
     event.respond RedisDatabase.databaseTestSingleKey
