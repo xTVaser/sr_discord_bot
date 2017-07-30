@@ -4,7 +4,7 @@ require 'discordrb'
 
 # Local files
 require 'sr_discord_bot/version'
-require 'db/database'
+require 'db/psql_database'
 
 Dotenv.load('vars.env')
 
@@ -39,14 +39,13 @@ module DiscordBot
   end
 
   # If the bot is connecting to the server for the first time
-  # it should establish the database schema
+  # it should establish the database schema, would be nice to
+  # not have to call this manually but whatever.
 
-
-  bot.message(with_text: '!SingleKeyTest') do |event|
-    event.respond RedisDatabase.databaseTestSingleKey
-  end
-  bot.message(with_text: '!JSONObjectTest') do |event|
-    event.respond RedisDatabase.databaseTestJSONObject
+  bot.message(with_text: '!CreateSchema') do |event|
+    event.respond "k 1 sec"
+    event.respond PostgresDB.generateSchema
+    event.respond "finished"
   end
 
   bot.run
