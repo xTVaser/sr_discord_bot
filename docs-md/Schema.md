@@ -1,11 +1,12 @@
 # Database Schema
 
 ## tracked-games
-| column name | type         | notes |  
-| ----------- | ------------ | ---   |  
-| game-id     | varchar(255) | PK    |
-| categories  | json         | ...   |
-| moderators  | json         | ...   |
+| column name      | type         | notes |  
+| ---------------- | ------------ | ---   |  
+| game-id          | varchar(255) | PK    |
+| announce-channel | integer      | ...   |
+| categories       | json         | ...   |
+| moderators       | json         | ...   |
 
 ## tracked-runners
 | column name            | type         | notes |

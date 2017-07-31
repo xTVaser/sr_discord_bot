@@ -41,6 +41,7 @@ module PostgresDB
     begin
       createTrackedGamesCmd = "CREATE TABLE IF NOT EXISTS public.\"tracked-games\" (" +
                                 "\"game-id\" character varying(255) NOT NULL," +
+                                "\"announce-channel\" integer NOT NULL," +
                                 "categories jsonb," +
                                 "moderators jsonb," +
                                 "PRIMARY KEY (\"game-id\"))" +
