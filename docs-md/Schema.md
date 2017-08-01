@@ -7,7 +7,7 @@
 | announce-channel | integer      | ...   |
 | categories       | json         | ...   |
 | moderators       | json         | ...   |
-
+## TODO add game_alias for tracked-games
 ## tracked-runners
 | column name            | type         | notes |
 | ---------------------- | ------------ | ---   |

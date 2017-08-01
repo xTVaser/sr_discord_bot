@@ -16,17 +16,10 @@ module RunTracker
   # Establish Discord Bot Connection
   RTBot = Discordrb::Commands::CommandBot.new token: ENV['TOKEN'], client_id: ENV['CLIENT_ID'], prefix: '!'
 
+  DevChannelID = 338452338912264192
+
   RTBot.ready() do |event|
-    event.bot.servers.values.each do |server|
-      if server.name == "Dev Server"
-        server.text_channels.each do |channel|
-          puts channel.id
-          if channel.name == "spam-the-bot"
-            channel.send_message("!! Bot Back Online !!")
-          end
-        end
-      end
-    end
+    RTBot.send_message(DevChannelID, "!! Bot Back Online !!")
   end
 
   # Require all files in run_tracker folder
