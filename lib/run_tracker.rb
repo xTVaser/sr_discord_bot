@@ -2,16 +2,12 @@
 require 'dotenv'
 require 'discordrb'
 
-# Local files
-require 'run_tracker/version'
-require 'db/psql_database'
-
-Dotenv.load('vars.env')
-
 # Bot Documentation - http://www.rubydoc.info/gems/discordrb
 
 # All code in the gem is namespaced under this module.
 module RunTracker
+
+  Dotenv.load('vars.env')
 
   # Establish Discord Bot Connection
   RTBot = Discordrb::Commands::CommandBot.new token: ENV['TOKEN'], client_id: ENV['CLIENT_ID'], prefix: '!'
@@ -26,6 +22,10 @@ module RunTracker
   Dir["#{File.dirname(__FILE__)}/run_tracker/*.rb"].each {
     |file| require file
   }
+
+
+  require_relative 'run_tracker/version'
+  require_relative 'db/psql_database'
 
   # Load up all the commands
   CommandLoader.loadCommands
