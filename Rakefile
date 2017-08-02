@@ -1,13 +1,17 @@
 # Task Declarations
-task :default => %w[test]
+task default: %w[test]
 
 # Task Definitions
 # Default task to run the program simply by calling 'rake'
 task :run do
-  ruby "./lib/run_tracker.rb"
+  ruby './lib/run_tracker.rb'
 end
 
-# TODO - Can add back in Travis support if it doesnt autorun task :run
-task :task do
+task :format do
+  sh 'rubocop -a -f simple --except Metrics'
+end
 
+# TODO: - Can add back in Travis support if it doesnt autorun task :run
+task :test do
+  puts 'good idea'
 end

@@ -1,8 +1,8 @@
 ruby '2.4.1'
 
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
+git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
 # Specify your gem's dependencies in sr_discord_bot.gemspec
 gemspec
@@ -10,13 +10,16 @@ gemspec
 gem 'rake'
 
 # Added at 2017-07-20 18:53:29 -0400 by tyler:
-gem "discordrb", "~> 3.2"
+gem 'discordrb', '~> 3.2'
 
 # Added at 2017-07-22 17:55:56 -0400 by tyler:
-gem "dotenv", "~> 2.2"
+gem 'dotenv', '~> 2.2'
 
 # Added at 2017-07-26 20:54:44 -0400 by tyler:
-gem "redis", "~> 3.3"
+gem 'redis', '~> 3.3'
 
 # Added at 2017-07-28 20:05:43 -0400 by tyler:
-gem "pg", "~> 0.21.0"
+gem 'pg', '~> 0.21.0'
+
+# Added at 2017-08-01 22:44:13 -0400 by tyler:
+gem 'rubocop', '~> 0.49.1'
