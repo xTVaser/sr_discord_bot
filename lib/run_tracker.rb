@@ -1,6 +1,7 @@
 #  Gemfile plugins
 require 'dotenv'
 require 'discordrb'
+require 'pp'
 
 # Bot Documentation - http://www.rubydoc.info/gems/discordrb
 
@@ -10,7 +11,9 @@ module RunTracker
   Dotenv.load('vars.env')
 
   # Establish Discord Bot Connection
-  RTBot = Discordrb::Commands::CommandBot.new token: ENV['TOKEN'], client_id: ENV['CLIENT_ID'], prefix: '!'
+  RTBot = Discordrb::Commands::CommandBot.new(token: ENV['TOKEN'],
+                                              client_id: ENV['CLIENT_ID'],
+                                              prefix: '!')
 
   DevChannelID = 338452338912264192
 
@@ -23,6 +26,7 @@ module RunTracker
     |file| require file
   }
 
+  require_relative 'run_tracker/models/tracked_game'
 
   require_relative 'run_tracker/version'
   require_relative 'db/psql_database'

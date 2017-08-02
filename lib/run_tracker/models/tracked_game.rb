@@ -1,12 +1,15 @@
 module RunTracker
   class TrackedGame
 
-    def initialize (id, game_alias, channel, categories, moderators)
-      @game_id = id
-      @game_alias = game_alias
-      @announce_channel = channel
-      @categories = categories
-      @moderators = moderators
+    attr_accessor :id, :name, :categories, :game_alias, :announce_channel, :moderators
+
+    def initialize (id, name, categories, moderators, options = {})
+      self.id = id
+      self.name = name
+      self.categories = categories # TODO stub need category model
+      self.moderators = moderators # TODO stub need moderator model
+      self.game_alias = options[:game_alias] || ''
+      self.announce_channel = options[:announce_channel] || ''
     end
 
   end
