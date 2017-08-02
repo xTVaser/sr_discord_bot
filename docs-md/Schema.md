@@ -4,10 +4,12 @@
 | column name      | type         | notes |  
 | ---------------- | ------------ | ---   |  
 | game-id          | varchar(255) | PK    |
-| announce-channel | integer      | ...   |
+| game-alias       | varchar(255) | Req   |
+| game-name        | text         | Req   |
+| announce-channel | integer      | Req   |
 | categories       | json         | ...   |
 | moderators       | json         | ...   |
-## TODO add game_alias for tracked-games
+
 ## tracked-runners
 | column name            | type         | notes |
 | ---------------------- | ------------ | ---   |
@@ -19,4 +21,4 @@
 | column name  | type         | notes |
 | ------------ | ------------ | ----- |
 | user-id      | varchar(255) | PK    |
-| access-level | integer      | ..... |
+| access-level | integer      | Req   |

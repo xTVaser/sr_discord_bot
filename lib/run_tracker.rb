@@ -38,10 +38,15 @@ module RunTracker
   # it should establish the database schema, would be nice to
   # not have to call this manually but whatever.
 
+  # TODO Temporary commands below, remove after devel or move to safe environment with permissions checking
   RTBot.message(with_text: '!CreateSchema') do |event|
     event.respond "k 1 sec"
     event.respond PostgresDB.generateSchema
-    event.respond "finished"
+  end
+
+  RTBot.message(with_text: '!DestroySchema yesiamsure') do |event|
+    event.respond "k hope you know what you're doing"
+    event.respond PostgresDB.destroySchema
   end
 
   RTBot.run

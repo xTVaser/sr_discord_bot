@@ -41,6 +41,8 @@ module PostgresDB
     begin
       createTrackedGamesCmd = "CREATE TABLE IF NOT EXISTS public.\"tracked-games\" (" +
                                 "\"game-id\" character varying(255) NOT NULL," +
+                                "\"game-alias\" character varying(255) NOT NULL," +
+                                "\"game-name\" text NOT NULL," +
                                 "\"announce-channel\" integer NOT NULL," +
                                 "categories jsonb," +
                                 "moderators jsonb," +
@@ -56,7 +58,7 @@ module PostgresDB
                                   "OIDS = FALSE);"
       createCommandPermissionsCmd = "CREATE TABLE IF NOT EXISTS public.\"managers\"(" +
                                       "\"user-id\" character varying(255) NOT NULL," +
-                                      "\"access-level\" integer," +
+                                      "\"access-level\" integer NOT NULL," +
                                       "PRIMARY KEY (\"user-id\"))" +
                                     "WITH (" +
                                       "OIDS = FALSE);"
@@ -68,4 +70,15 @@ module PostgresDB
       return "Table Creation Unsuccessful: " + e.message
     end
   end
+
+  def self.destroySchema
+    begin
+      @@psql.exec("DROP SCHEMA public CASCADE;")
+      @@psql.exec("CREATE SCHEMA public;")
+    return "Schema Destroyed!"
+    rescue PG::Error => e
+      return "Schema Destruction Unsuccessful: " + e.message
+    end
+  end
+
 end
