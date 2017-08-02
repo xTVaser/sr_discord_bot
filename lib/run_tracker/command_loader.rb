@@ -8,7 +8,8 @@ module RunTracker
     # Add Command module names here
     @commands = [
       AddGame,
-      List
+      List,
+      Set
     ]
 
     def self.loadCommands
