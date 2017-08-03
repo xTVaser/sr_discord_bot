@@ -28,7 +28,9 @@ module RunTracker
     require file
   end
 
+  require_relative 'run_tracker/models/jsonable'
   require_relative 'run_tracker/models/tracked_game'
+  require_relative 'run_tracker/models/moderator'
 
   # Load up all the commands
   CommandLoader.loadCommands

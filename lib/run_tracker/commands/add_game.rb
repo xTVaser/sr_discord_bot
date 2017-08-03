@@ -51,12 +51,17 @@ module RunTracker
         end
         trackedGame.announce_channel = event.channel
 
-        # TODO: Add game to database
-        PostgresDB::Conn.prepare('statement1', 'insert into public."tracked_games"
-          ("game_id", "game_alias", "game_name", "announce_channel", categories, moderators)
-          values ($1, $2, $3, $4, $5, $6)')
-        PostgresDB::Conn.exec_prepared('statement1', [trackedGame.id, trackedGame.game_alias,
-                                                      trackedGame.name, trackedGame.announce_channel.id, JSON.generate(trackedGame.categories), JSON.generate(trackedGame.moderators)])
+        begin
+          PostgresDB::Conn.prepare('statement1', 'insert into public."tracked_games"
+            ("game_id", "game_alias", "game_name", "announce_channel", categories, moderators)
+            values ($1, $2, $3, $4, $5, $6)')
+          PostgresDB::Conn.exec_prepared('statement1', [trackedGame.id, trackedGame.game_alias,
+                                                        trackedGame.name, trackedGame.announce_channel.id,
+                                                        JSON.generate(trackedGame.categories),
+                                                        JSON.generate(trackedGame.moderators)])
+        rescue PG::UniqueViolation
+          RTBot.send_message(DevChannelID, "That game is already being tracked")
+        end
 
         # Announce to user
         RTBot.send_message(DevChannelID, "Found `#{trackedGame.name}` with ID: `#{trackedGame.id}`")
