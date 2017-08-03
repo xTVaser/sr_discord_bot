@@ -1,7 +1,6 @@
 module RunTracker
   class Moderator < JSONable
 
-
     attr_accessor :src_id,
                   :src_name,
                   :discord_id,
@@ -18,6 +17,7 @@ module RunTracker
       self.secret_key = Util.genRndStr(8)
       self.last_verified_run = ''
       self.total_verified_runs = ''
+      
     end
   end
 end

@@ -28,9 +28,10 @@ module RunTracker
     require file
   end
 
-  require_relative 'run_tracker/models/jsonable'
-  require_relative 'run_tracker/models/tracked_game'
-  require_relative 'run_tracker/models/moderator'
+  # Require all model files
+  Dir["#{File.dirname(__FILE__)}/run_tracker/models/*.rb"].each do |file|
+    require file
+  end
 
   # Load up all the commands
   CommandLoader.loadCommands

@@ -29,7 +29,7 @@ module RunTracker
       foundGame = gameData['data']
       categoryLink = getFwdLink('categories', foundGame['links'])
       return TrackedGame.new(foundGame['id'], foundGame['names']['international'],
-                            Util.jsonRequest(categoryLink)['data'],
+                            getGameCategories(Util.jsonRequest(categoryLink)['data']),
                             getGameMods(foundGame['moderators']),
                             game_alias: foundGame['abbreviation'])
     end
@@ -37,13 +37,22 @@ module RunTracker
     ##
     # Resolves all of the moderators user names
     def self.getGameMods(mods)
-
       modList = Hash.new
       mods.each do |id, _|
         mod = Util.jsonRequest("#{API_URL}users/#{id}")['data']
         modList[mod['names']['international']] = Moderator.new(id, mod['names']['international'])
       end
       return modList
+    end
+
+    ##
+    # Resolves all of the categories
+    def self.getGameCategories(categories)
+      categoryList = Hash.new
+      categories.each do |category|
+        categoryList[category['name']] = Category.new(category['id'], category['name'], category['rules'])
+      end
+      return categoryList
     end
 
     ##
