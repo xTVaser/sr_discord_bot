@@ -6,7 +6,7 @@ module RunTracker
       self.id = id
       self.name = name
       self.categories = categories # TODO: stub need category model
-      self.moderators = moderators # TODO stub need moderator model
+      self.moderators = moderators
       self.game_alias = options[:game_alias] || ''
       self.announce_channel = options[:announce_channel] || ''
     end

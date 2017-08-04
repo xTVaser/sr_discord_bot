@@ -5,6 +5,16 @@ module RunTracker
     API_URL = 'http://www.speedrun.com/api/v1/'.freeze
 
     ##
+    # Returns the forward link given the rel key
+    def self.getFwdLink(key, links)
+      links.each do |link|
+        if link['rel'].casecmp(key).zero?
+          return link['uri']
+        end
+      end
+    end
+
+    ##
     # We should only have 1 game information in this case
     # as ID requests only return 1 result
     def self.getGameInfoFromID(gameData)
@@ -17,11 +27,50 @@ module RunTracker
       end
 
       foundGame = gameData['data']
-      categoryLink = foundGame['links'][3]['uri'] # HACK: for now TODO need to search for rel key
-      TrackedGame.new(foundGame['id'], foundGame['names']['international'],
-                      Util.jsonRequest(categoryLink)['data'],
-                      foundGame['moderators'],
-                      game_alias: foundGame['abbreviation'])
+      categoryLink = getFwdLink('categories', foundGame['links'])
+      return TrackedGame.new(foundGame['id'], foundGame['names']['international'],
+                            getGameCategories(Util.jsonRequest(categoryLink)['data']),
+                            getGameMods(foundGame['moderators']),
+                            game_alias: foundGame['abbreviation'])
     end
+
+    ##
+    # Resolves all of the moderators user names
+    def self.getGameMods(mods)
+      modList = Hash.new
+      mods.each do |id, _|
+        mod = Util.jsonRequest("#{API_URL}users/#{id}")['data']
+        modList[mod['names']['international']] = Moderator.new(id, mod['names']['international'])
+      end
+      return modList
+    end
+
+    ##
+    # Resolves all of the categories
+    def self.getGameCategories(categories)
+      categoryList = Hash.new
+      categories.each do |category|
+        categoryList[category['name']] = Category.new(category['id'], category['name'], category['rules'])
+      end
+      return categoryList
+    end
+
+    ##
+    # Given a game's category API link, return
+
+    ##
+    # Will pull all current data from a game's leaderboard
+    def self.seedDatabaseNewGame(gameID)
+
+      # NOTE as of right now, we are not supporting ILs
+
+      # Need to get all the categories
+      # Need to get all the runners
+      # Need to get all the runner's runs
+      # runs....orderby.....direction
+
+
+    end
+
   end
 end
