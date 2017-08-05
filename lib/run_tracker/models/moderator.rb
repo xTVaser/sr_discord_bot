@@ -6,7 +6,7 @@ module RunTracker
                   :discord_id,
                   :should_notify,
                   :secret_key,
-                  :last_verified_run,
+                  :last_verified_run_date,
                   :total_verified_runs
 
     def initialize(id, name)
@@ -15,9 +15,9 @@ module RunTracker
       self.discord_id = ''
       self.should_notify = false
       self.secret_key = Util.genRndStr(8)
-      self.last_verified_run = ''
+      self.last_verified_run_date = ''
       self.total_verified_runs = ''
-      
+
     end
   end
 end

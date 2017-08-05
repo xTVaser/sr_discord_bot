@@ -1,5 +1,8 @@
 module RunTracker
   module Util
+
+    MaxInteger = 2 ** (N_BITS - 2) - 1
+    
     ##
     # Retrives JSON given a url
     # Returns the parsed JSON object

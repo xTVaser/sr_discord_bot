@@ -42,7 +42,7 @@ This is essentially a DB + Object combined schema for a complete overview of wha
       - **STATS**
         - `num_submitted_runs` Integer
         - `num_previous_wrs` Integer
-        - `longest_held_wr` Integer (hours)
+        - `total_time_overall` Long (hours)
 
     - **STATS**
       - `total_time_overall` Long (seconds)
