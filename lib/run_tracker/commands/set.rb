@@ -59,7 +59,6 @@ module RunTracker
           e.backtrace.inspect + e.message
         end
 
-
       end
     end
   end
