@@ -17,13 +17,17 @@ module RunTracker
         level = -1
         if permission.casecmp('admin')
           level = :administrator
+          RTBot.send_message(DevChannelID, 'Admin Permission Selected')
         elsif permission.casecmp('mod')
           level = :kick_members
-        elsif permission.casecmp('user')
+          RTBot.send_message(DevChannelID, 'Mod Permission Selected')
+        elsif permission.casecmp('user') # NOTE default not needed to be set on user
           level = :create_instant_invite
+          RTBot.send_message(DevChannelID, 'User Permission Selected')
         end
 
         user = event.bot.parse_mention(mention)
+        RTBot.send_message(DevChannelID, 'Admin Permission Selected')
         begin
           if level != -1
             RTBot.set_user_permission(user, level)
