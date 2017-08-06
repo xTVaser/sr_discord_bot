@@ -14,6 +14,7 @@
 | column name            | type         | notes |
 | ---------------------- | ------------ | ---   |
 | user_id                | varchar(255) | PK    |
+| user_name              | varchar(255) | ...   |
 | current_personal_bests | json         | ...   |
 | historic_runs          | json         | ...   |
 

@@ -49,6 +49,7 @@ module RunTracker
                               'OIDS = FALSE);'
       createTrackedRunnersCmd = 'CREATE TABLE IF NOT EXISTS public."tracked_runners"(' \
                                 '"user_id" character varying(255) NOT NULL,' \
+                                '"user_name" character varying(255) NOT NULL,' \
                                 '"current_personal_bests" jsonb,' \
                                 '"historic_runs" jsonb,' \
                                 'PRIMARY KEY ("user_id"))' \
@@ -75,5 +76,17 @@ module RunTracker
     rescue PG::Error => e
       return 'Schema Destruction Unsuccessful: ' + e.message
     end
+
+    # TODO might not fully parse JSON?
+    def self.getCurrentRunners()
+      runners = Hash.new
+      queryResults = PostgresDB::Conn.exec('SELECT * FROM public."tracked_runners"')
+
+      queryResults.each do |runner|
+        runners["#{runner.user_id}"] = runner # might have to do more than this
+      end
+      return runners
+    end
+    
   end
 end

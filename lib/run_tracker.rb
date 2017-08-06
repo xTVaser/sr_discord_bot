@@ -23,6 +23,8 @@ module RunTracker
     RTBot.send_message(DevChannelID, '!! Bot Back Online !!')
   end
 
+  require_relative 'run_tracker/models/jsonable.rb'
+
   # Require all files in run_tracker folder
   Dir["#{File.dirname(__FILE__)}/run_tracker/*.rb"].each do |file|
     require file

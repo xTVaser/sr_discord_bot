@@ -15,6 +15,10 @@ module RunTracker
       self.src_id = id
       self.src_name = name
       self.game_alias = game_alias
+      self.categories = Hash.new
+      self.num_previous_wrs = 0
+      self.num_submitted_runs = 0
+      self.total_time_overall = 0
     end
 
   end

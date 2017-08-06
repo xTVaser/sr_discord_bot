@@ -32,7 +32,7 @@ module RunTracker
       categoryLink = getFwdLink('categories', foundGame['links'])
       categoryList = getGameCategories(Util.jsonRequest(categoryLink))
       modList = getGameMods(foundGame['moderators'])
-      getGameRunners(foundGame['id'], categoryList, modList)
+      getGameRunners(foundGame['id'], foundGame['names']['international'], foundGame['abbreviation'], categoryList, modList)
 
       return TrackedGame.new(foundGame['id'],
                              foundGame['names']['international'],
@@ -64,14 +64,16 @@ module RunTracker
     end
 
     ##
+    # TODO this needs to be significantly refactored after it works
     # Gathers all of the runners, their runs, their current stats
     # At the same time it also counts the moderators verified runs, and last verified run date
     # Also determines the current stats for each category
     # Will pull all current data from a game's leaderboard
     # categoryList and modList are expected to be hashes keyed with their respective SRC ids
-    def self.getGameRunners(gameID, categoryList, modList)
+    def self.getGameRunners(gameID, gameName, gameAbbrv, categoryList, modList)
 
-      runnerList = Hash.new
+      currentRunnerList = PostgresDB.getCurrentRunners()
+      newRunnerList = Hash.new
       # TODO when add in subcategory support, this will only have to change
       # by allowing to include the variable into the API call
       categoryList.each do |category| # Loop through every category
@@ -87,18 +89,66 @@ module RunTracker
         longestHeldWRID = ''
 
         categoryRuns = Util.jsonRequest("#{API_URL}runs
-        ?game=#{gameID}
-        &category=#{category['id']}
-        &orderby=date&direction=asc&max=200")['data']
+                                        ?game=#{gameID}
+                                        &category=#{category.category_id}
+                                        &orderby=date&direction=asc&max=200")['data']
+
+        # Add to runner information
+        # NOTE this causes a problem if the runner ever gets a SRC account in the future
+        runnerKey = ''
+        if run['players']['rel'] == 'guest'
+          runnerKey = run['players']['name']
+        else
+          runnerKey = run['players']['id']
+        end
+        # If we havnt started tracking this runner before, init
+        runner = nil
+        if !currentRunnerList.key?(runnerKey)
+          runner = Runner.new()
+          runner.historic_runs[gameID] = RunnerGame.new(gameID, gameName, gameAbbrv)
+          runner.historic_runs[gameID][category.category_id] = RunnerCategory.new(category.category_id, category.category_name)
+        else
+          runner = currentRunnerList['runnerKey']
+          # Has this runner ran this game before, init the game and category
+          if !runner.historic_runs.key?(gameID)
+            runner.historic_runs[gameID] = RunnerGame.new(gameID, gameName, gameAbbrv)
+            runner.historic_runs[gameID][category.category_id] = RunnerCategory.new(category.category_id, category.category_name)
+          # If the runner has ran the game before, but not the category yet
+          elsif !runner.historic_runs[gameID].key?(category_id)
+            runner.historic_runs[gameID][category.category_id] = RunnerCategory.new(category.category_id, category.category_name)
+          end # else its fine
+        end
 
         loop do
-
           categoryRuns.each do |run|
 
             numSubmittedRuns += 1
+            runner.num_submitted_runs += 1
+            runner.num_submitted_wrs += 1
+            runner.total_time_overall += run['times']['primary_t']
+            runner.historic_runs[gameID].num_submitted_runs += 1
+            runner.historic_runs[gameID].total_time_overall += run['times']['primary_t'] # TODO probably convert these to hours here, util function
+            runner.historic_runs[gameID][category.category_id].total_time_overall += run['times']['primary_t']
+
+            # Check if the run is a new milestone for this runner
+            nextMilestone = Util.nextMilestone(runner.historic_runs[gameID][category.total_time_overall])
+            if nextMilestone >= run['times']['primary_t']
+              runner.historic_runs[gameID][category.category_id].milestones["#{nextMilestone}"] = run['id']
+            end
+
+            # Update if PB
+            if run['times']['primary_t'] < runner.historic_runs[gameID][category.category_id].current_pb_time
+              runner.historic_runs[gameID][category.category_id].current_pb_time = run['times']['primary_t']
+              runner.historic_runs[gameID][category.category_id].current_pb_id = run['id']
+            end
+
             # Check if new WR
             # TODO, support ties
             if currentWRTime > run['times']['primary_t']
+
+              runner.historic_runs[gameID].num_previous_wrs += 1
+              runner.historic_runs[gameID][category.category_id].num_previous_wrs += 1
+
               # Update state
               currentWRTime = run['times']['primary_t']
 
@@ -132,37 +182,19 @@ module RunTracker
                   mod.last_verified_run_date = run['status']['verify-date']
                 end
               end
-
-              # Add to runner information
-              runnerKey = ''
-              if run['players']['rel'] == 'guest'
-                runnerKey = run['players']['name']
-              else
-                runnerKey = run['players']['id']
-              end
-              # If we havnt started tracking this runner before, init
-              runner = nil
-              if !runnerList.key?(runnerKey)
-                runner = Runner.new() # TODO make runner oject
-              else
-                runner = runnerList['runnerKey']
-              end
-
-
-
-
             end
           end
 
-
           # If no more pages to loop through
           break if categoryRuns['links'] == []
-          # get next page
-        end
-      end
+          categoryRuns = Util.jsonRequest(getFwdLink('next'), categoryRuns['links'])['data']
+        end # end of category's runs loop
+      end # end of category loop
 
-
+      # Update current runners
+      #PostgresDB.updateCurrentRunners(currentRunners)
+      # Insert new runners
+      #PostgresDB.insertNewRunners(c)
     end
-
   end
 end
