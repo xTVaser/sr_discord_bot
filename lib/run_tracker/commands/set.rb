@@ -1,10 +1,6 @@
 module RunTracker
   module CommandLoader
     module Set
-      # Require all command files.
-      Dir["#{File.dirname(__FILE__)}/commands/*.rb"].each do |file|
-        require file
-      end
       extend Discordrb::Commands::CommandContainer
 
       # Bucket for rate limiting. Limits to x uses every y seconds at z intervals.
@@ -13,31 +9,31 @@ module RunTracker
 
       command(:set, bucket: :limiter,
                     description: 'Allows the setting and changing of access level requirements for certain commands server-wide.',
-                    usage: '!set <command> <value> ()',
+                    usage: '!set <user> <permission> ()',
                     rate_limit_message: 'Andy Gavin says to wait %time% more second(s)!',
-                    min_args: 2) do |event, command, value|
+                    min_args: 2) do |event, mention, permission|
 
         # Command Body
-        #begin
-          #if (value > 2 || value < 0)
-          #  RTBot.send_message(event.channel, "Invalid value! Values can range from 0 to 2 (0 = User, 1 = Mod, 2 = Admin)")
-          if command.casecmp('addgame')
-            command = AddGame
-            command.permission_level(value)
-            RTBot.send_message(event.channel, "Permissions set for `addgame`!")
+        level = -1
+        if permission.casecmp('admin')
+          level = :administrator
+        elsif permission.casecmp('mod')
+          level = :kick_members
+        elsif permission.casecmp('user')
+          level = :create_instant_invite
+        end
+
+        user = event.bot.parse_mention(mention)
+        begin
+          if level != -1
+            RTBot.set_user_permission(user, level)
+            event << "Permission set for user #{user.name}!"
+            event << "#{RTBot.permission?(user, level, event.server)}"
           end
-        #rescue
-          #RTBot.send_message(_event.channel, "Command Not Found!")
-        #end
+        rescue Exception => e
+          e.backtrace.inspect + e.message
+        end
 
-
-        #@commands.each do |command|
-        #  if type.casecmp('command').zero?
-        #    RTBot.send_message(_event.channel, "Invalid Command! Type `!list commands` to see the list of commands this bot has.")
-        #  end
-        #end
-
-        #RTBot.send_message(DevChannelID, "Test")
 
       end
     end

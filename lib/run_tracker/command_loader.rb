@@ -14,7 +14,8 @@ module RunTracker
     @commands = [
       AddGame,
       List,
-      Set
+      Set,
+      RemoveGame
     ]
 
     def self.getCommands
