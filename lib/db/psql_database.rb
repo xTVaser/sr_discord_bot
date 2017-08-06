@@ -41,7 +41,7 @@ module RunTracker
                               '"game_id" character varying(255) NOT NULL,' \
                               '"game_alias" character varying(255) NOT NULL,' \
                               '"game_name" text NOT NULL,' \
-                              '"announce_channel" character varying(255) NOT NULL,' \
+                              '"announce_channel" bigint NOT NULL,' \
                               'categories jsonb,' \
                               'moderators jsonb,' \
                               'PRIMARY KEY ("game_id"))' \
@@ -50,8 +50,10 @@ module RunTracker
       createTrackedRunnersCmd = 'CREATE TABLE IF NOT EXISTS public."tracked_runners"(' \
                                 '"user_id" character varying(255) NOT NULL,' \
                                 '"user_name" character varying(255) NOT NULL,' \
-                                '"current_personal_bests" jsonb,' \
                                 '"historic_runs" jsonb,' \
+                                '"num_submitted_wrs" integer, ' \
+                                '"num_submitted_runs" integer, ' \
+                                '"total_time_overall" bigint, ' \
                                 'PRIMARY KEY ("user_id"))' \
                                 'WITH (' \
                                 'OIDS = FALSE);'
@@ -87,6 +89,46 @@ module RunTracker
       end
       return runners
     end
-    
+
+    ##
+    # Updates current runners with the new objects
+    # primary key for runners is their ID field
+    def self.updateCurrentRunners(currentRunners)
+
+      # Update Statement
+      PostgresDB::Conn.prepare('statement1', 'update public."tracked_games"
+        set user_id = $1, user_name = $2, historic_runs = $3, num_submitted_runs = $4, num_submitted_wrs = $5, total_time_overall = $6
+        where user_id = $1')
+      currentRunners.each do |runner|
+
+        begin
+          PostgresDB::Conn.exec_prepared('statement1', [runner.src_id, runner.src_name,
+                                                        runner.historic_runs, runner.num_submitted_runs,
+                                                        runner.num_submitted_wrs, runner.total_time_overall])
+        rescue Exception => e
+          puts e.message + e.backtrace
+        end
+      end
+    end
+
+    ##
+    # Inserts brand new runners into DB
+    def self.insertNewRunners(newRunner)
+
+      # Update Statement
+      PostgresDB::Conn.prepare('statement1', 'insert into public."tracked_games"
+        (user_id, user_name, historic_runs, num_submitted_runs, num_submitted_wrs, total_time_overall)
+        values ($1, $2, $3, $4, $5, $6)')
+      newRunners.each do |runner|
+        begin
+          PostgresDB::Conn.exec_prepared('statement1', [runner.src_id, runner.src_name,
+                                                        runner.historic_runs, runner.num_submitted_runs,
+                                                        runner.num_submitted_wrs, runner.total_time_overall])
+        rescue Exception => e
+          puts e.message + e.backtrace
+        end
+      end
+    end # end of module
+
   end
 end

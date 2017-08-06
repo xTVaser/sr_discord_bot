@@ -6,7 +6,7 @@
 | game_id          | varchar(255) | PK    |
 | game_alias       | varchar(255) | Req   |
 | game_name        | text         | Req   |
-| announce_channel | varchar(255) | Req, Text but is a number   |
+| announce_channel | bigint       | Req   |
 | categories       | json         | ...   |
 | moderators       | json         | ...   |
 
@@ -15,8 +15,10 @@
 | ---------------------- | ------------ | ---   |
 | user_id                | varchar(255) | PK    |
 | user_name              | varchar(255) | ...   |
-| current_personal_bests | json         | ...   |
 | historic_runs          | json         | ...   |
+| num_submitted_wrs      | integer      | ...   |
+| num_submitted_runs     | integer      | ...   |
+| total_time_overall     | bigint       | ...   |
 
 ## managers
 | column name  | type         | notes |

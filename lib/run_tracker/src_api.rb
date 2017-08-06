@@ -192,9 +192,9 @@ module RunTracker
       end # end of category loop
 
       # Update current runners
-      #PostgresDB.updateCurrentRunners(currentRunners)
+      PostgresDB.updateCurrentRunners(currentRunners)
       # Insert new runners
-      #PostgresDB.insertNewRunners(c)
+      PostgresDB.insertNewRunners(newRunners)
     end
   end
 end
