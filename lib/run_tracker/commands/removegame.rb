@@ -5,11 +5,11 @@ module RunTracker
 
       command(:removegame, description: "Removes a game from the list of tracked games.",
                            usage: "!removegame <id/name>",
-                           required_permissions: [:administrator],
+                           permission_level: 3, # NOTE hardcoded
                            min_args: 1,
                            max_args: 1) do |event, search_field|
 
-        RTBot.send_message(event.channel, "Test")
+        RTBot.send_message(event.channel, "You da baus")
 
       end
     end
