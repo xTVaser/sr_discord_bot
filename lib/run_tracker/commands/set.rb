@@ -8,10 +8,11 @@ module RunTracker
 
 
       command(:set, bucket: :limiter,
-                    description: 'Allows the setting and changing of access level requirements for certain commands server-wide.',
+                    description: 'Allows the setting and changing of access levels for users of the server through @ mentions.',
                     usage: '!set <user> <permission> (permission levels: `admin`, `mod`, `user`).',
                     rate_limit_message: 'Andy Gavin says to wait %time% more second(s)!',
-                    min_args: 2) do |event, mention, permission|
+                    min_args: 2,
+                    max_args: 2) do |event, mention, permission|
 
         # Command Body
         level = 0
@@ -48,7 +49,7 @@ module RunTracker
 
               PostgresDB::Conn.prepare('statement2', 'update public."managers" set access_level = $1 where user_id = $2')
               PostgresDB::Conn.exec_prepared('statement2', [level, user.id])
-              
+
             end
 
             # Send verbal confirmation of access level setting.
