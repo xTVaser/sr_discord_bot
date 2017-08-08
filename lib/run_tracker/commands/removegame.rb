@@ -15,10 +15,10 @@ module RunTracker
           event << '`game-alias` field is empty. Please enter a game alias to remove said game.'
         end
 
-        def removeGameById(event, alias)
+        def removeGameById(event, name)
           begin
             PostgresDB::Conn.prepare('statement1', 'select "game_id" from public."tracked_games" where "game_alias" = $1')
-            id = PostgresDB::Conn.exec_prepared('statement1', [alias])
+            id = PostgresDB::Conn.exec_prepared('statement1', [name])
 
             if id.empty? # If no ID's were found with entered ID.
               event << 'No games found with this ID.'
