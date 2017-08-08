@@ -44,7 +44,7 @@ module RunTracker
 
             if row.empty? # If no ID's were found with entered ID.
               event << 'No games found with this ID.'
-            else # Else remove game. ID is PK so it is garunteed to be unique.
+            else # Else remove game. ID is PK so it is guaranteed to be unique.
               PostgresDB::Conn.prepare('statement2', 'delete * from public."tracked_games" where "game_id" = $1')
               PostgresDB::Conn.exec_prepared('statement2', [id])
             end
