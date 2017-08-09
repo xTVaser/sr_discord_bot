@@ -29,5 +29,25 @@ module RunTracker
       return time / 60 * 60 - 1
     end
 
+    ##
+    # Given the composite key for the category, return its subcategory componenets
+    def self.getSubCategoryVar(key)
+      subComponent = key.split('-').last
+      return [subComponent.first, subComponent.last]
+    end
+
+    ##
+    #
+    def self.sendBulkMessage(message)
+      if message.length <= 5000
+        RTBot.send_message(DevChannelID, message)
+      else
+        multipleMessages = message.scan(/.{1,5000}/) # divides into strings every 5000characters
+        multipleMessages.each do |msg|
+          RTBot.send_message(DevChannelID, msg)
+        end
+      end
+    end
+
   end
 end
