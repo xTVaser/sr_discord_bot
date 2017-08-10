@@ -10,8 +10,12 @@ module RunTracker
     # categoryList and modList are expected to be hashes keyed with their respective SRC ids
     def self.getGameRunners(gameID, gameName, gameAbbrv, categoryList, modList)
 
-      currentRunnerList = PostgresDB.getCurrentRunners()
+      currentRunnerList = PostgresDB.getCurrentRunners() # NOTE unverified implementation
       newRunnerList = Hash.new
+
+      count = 0
+      RTBot.send_message(DevChannelID, "Archiving Existing Runs...This can Take a While...")
+
       categoryList.each do |key, category| # Loop through every category
 
       currentWRTime = Util::MaxInteger
@@ -34,14 +38,13 @@ module RunTracker
         # as you cannot do an API call for just a subcategories' runs
         # Remove the subcategory component of the key
         requestResults = Util.jsonRequest(requestLink)
-        pp requestLink # TODO remove
+        pp "[JSON] #{requestLink}"
         categoryRuns = requestResults['data']
         pagination = requestResults['pagination']
-        count = 0 # TODO remove
+        count += categoryRuns.length
+
         categoryRuns.each do |run|
 
-          puts "Run #{count}" # TODO remove
-          count += 1
           # Add to runner information
           # NOTE this causes a problem if the runner ever gets a SRC account in the future
           # the fix is probably to check on the heartbeat updating if their name overwrite the previous guest name and then update accordingly
@@ -55,9 +58,9 @@ module RunTracker
           end
           # If we havnt started tracking this runner before, init
           runner = nil
-          if !currentRunnerList.key?(runnerKey) or !newRunnerList.key?(runnerKey)
+          if !currentRunnerList.key?(runnerKey) and !newRunnerList.key?(runnerKey)
             if !runnerName.casecmp('guest').zero? # only call API for name if new runner and not a guest
-              #runnerName = SrcAPI.getUserName(runnerKey) # TODO this is being called way too much for some reason, fix after rest is fixed
+              runnerName = SrcAPI.getUserName(runnerKey)
             end
             runner = Runner.new(runnerKey, runnerName)
             runner.historic_runs[gameID] = RunnerGame.new(gameID, gameName, gameAbbrv)
@@ -68,6 +71,7 @@ module RunTracker
           else
             runner = currentRunnerList[runnerKey]
           end
+
           # Has this runner ran this game before, init the game and category
           if !runner.historic_runs.key?(gameID)
             runner.historic_runs[gameID] = RunnerGame.new(gameID, gameName, gameAbbrv)
@@ -87,10 +91,10 @@ module RunTracker
 
           numSubmittedRuns += 1
           runner.num_submitted_runs += 1
-          runner.total_time_overall += run['times']['primary_t']
+          runner.total_time_overall += Integer(run['times']['primary_t'])
           runner.historic_runs[gameID].num_submitted_runs += 1
-          runner.historic_runs[gameID].total_time_overall += run['times']['primary_t'] # TODO probably convert these to hours here, util function
-          runner.historic_runs[gameID].categories[category.category_id].total_time_overall += run['times']['primary_t']
+          runner.historic_runs[gameID].total_time_overall += Integer(run['times']['primary_t']) # TODO probably convert these to hours here, util function
+          runner.historic_runs[gameID].categories[category.category_id].total_time_overall += Integer(run['times']['primary_t'])
 
           # Check if the run is a new milestone for this runner
           runnerCurrentPB = runner.historic_runs[gameID].categories[category.category_id].current_pb_time
@@ -98,27 +102,27 @@ module RunTracker
           if runnerCurrentPB == Util::MaxInteger
             runner.historic_runs[gameID].categories[category.category_id]
               .milestones["First Run"] = run['id']
-          elsif nextMilestone >= run['times']['primary_t']
+          elsif nextMilestone >= Integer(run['times']['primary_t'])
             runner.historic_runs[gameID].categories[category.category_id]
-              .milestones["#{Util.currentMilestoneStr(run['times']['primary_t'])}"] = run['id']
+              .milestones["#{Util.currentMilestoneStr(Integer(run['times']['primary_t']))}"] = run['id']
           end
 
           # Update if PB
-          if run['times']['primary_t'] < runner.historic_runs[gameID].categories[category.category_id].current_pb_time
-            runner.historic_runs[gameID].categories[category.category_id].current_pb_time = run['times']['primary_t']
+          if Integer(run['times']['primary_t']) < runner.historic_runs[gameID].categories[category.category_id].current_pb_time
+            runner.historic_runs[gameID].categories[category.category_id].current_pb_time = Integer(run['times']['primary_t'])
             runner.historic_runs[gameID].categories[category.category_id].current_pb_id = run['id']
           end
 
           # Check if new WR
           # TODO, support ties
-          if currentWRTime > run['times']['primary_t']
+          if currentWRTime > Integer(run['times']['primary_t'])
 
             runner.num_submitted_wrs += 1
             runner.historic_runs[gameID].num_previous_wrs += 1
             runner.historic_runs[gameID].categories[category.category_id].num_previous_wrs += 1
 
             # Update state
-            currentWRTime = run['times']['primary_t']
+            currentWRTime = Integer(run['times']['primary_t'])
 
             runDate = nil
             # If the run has no date, fallback to the verified date
@@ -174,13 +178,12 @@ module RunTracker
       end # end of category's runs loop
     end # end of category loop
 
-    pp "Current Runners Found - #{currentRunnerList.length}"
-    pp "New Runners Found - #{newRunnerList.length}"
-
     # Update current runners
     PostgresDB.updateCurrentRunners(currentRunnerList)
     # Insert new runners
     PostgresDB.insertNewRunners(newRunnerList)
+
+    RTBot.send_message(DevChannelID, "Archived #{count} Runs!")
 
     end # ends seed function
   end # ends seedDB module
