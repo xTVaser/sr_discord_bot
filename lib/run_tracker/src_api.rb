@@ -13,6 +13,13 @@ module RunTracker
           return link['uri']
         end
       end
+      return nil
+    end
+
+    ##
+    # Given a user's ID, return their name
+    def self.getUserName(id)
+      return Util.jsonRequest("#{API_URL}users/#{id}")['data']['names']['international']
     end
 
     ##
@@ -46,8 +53,7 @@ module RunTracker
     def self.getGameMods(mods)
       modList = Hash.new
       mods.each do |id, _|
-        mod = Util.jsonRequest("#{API_URL}users/#{id}")['data']
-        modList[mod['id']] = Moderator.new(id, mod['names']['international'])
+        modList[id] = Moderator.new(id, getUserName(id))
       end
       return modList
     end
@@ -60,6 +66,12 @@ module RunTracker
 
       categoryList = Hash.new
       categories.each do |category|
+
+        # NOTE We are not supporting ILs (individual levels) right now, skip them
+        if category['type'].casecmp('per-level').zero?
+          next
+        end
+
         # Get the categories subcategories variables
         variableResults = Util.jsonRequest(getFwdLink('variables', category['links']))['data']
         subCategories = Hash.new

@@ -1,5 +1,5 @@
 module RunTracker
-  class Runner
+  class Runner < JSONable
 
     attr_accessor :src_id,
                   :src_name,

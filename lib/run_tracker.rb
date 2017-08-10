@@ -43,14 +43,11 @@ module RunTracker
   # not have to call this manually but whatever.
 
   # TODO: Temporary commands below, remove after devel or move to safe environment with permissions checking
-  RTBot.message(with_text: '!CreateSchema') do |event|
+  RTBot.message(with_text: '!ResetDB DOIT') do |event|
     event.respond 'k 1 sec'
-    event.respond PostgresDB.generateSchema
-  end
-
-  RTBot.message(with_text: '!DestroySchema yesiamsure') do |event|
-    event.respond "k hope you know what you're doing"
+    event.respond "hope you know what you're doing"
     event.respond PostgresDB.destroySchema
+    event.respond PostgresDB.generateSchema
   end
 
   RTBot.run

@@ -30,9 +30,17 @@ module RunTracker
     end
 
     ##
+    # Given a time in seconds, gives the current milestone
+    # For example, given 1:04:01, means Sub 1:04
+    def self.currentMilestoneStr(time)
+
+      return Time.at(time).strftime("Sub %H:%M")
+    end
+
+    ##
     # Given the composite key for the category, return its subcategory componenets
     def self.getSubCategoryVar(key)
-      subComponent = key.split('-').last
+      subComponent = key.split('-').last.split(':')
       return [subComponent.first, subComponent.last]
     end
 
