@@ -21,8 +21,8 @@ module RunTracker
               gameAlias = row['alias']
             end
           end
-
-          messages.push("Alias: #{gameAlias} | Name: #{game['game_name']} | Announce Channel: #{game['announce_channel']}")
+          channel = JSON.parse(Discordrb::API::Channel.resolve(RTBot.token, game['announce_channel'])) # NOTE not sure if this is the easiest way
+          messages.push("Alias: #{gameAlias} | Name: #{game['game_name']} | Announce Channel: #{channel['name']}")
         end
 
         _event << Util.arrayToCodeBlock(messages)
