@@ -14,6 +14,7 @@ module RunTracker
     @commands = [
       AddGame,
       List,
+      ListFirstRow,
       Set,
       RemoveGame
     ]

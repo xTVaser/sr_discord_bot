@@ -17,7 +17,7 @@ module RunTracker
       self.src_id = id
       self.src_name = name
       self.category_alias = '' # TODO make a method to simplify names from their full names
-      self.current_pb_time = MaxInteger
+      self.current_pb_time = Util::MaxInteger
       self.current_pb_id = ''
       self.milestones = Hash.new
       self.num_previous_wrs = 0

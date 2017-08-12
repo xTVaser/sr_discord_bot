@@ -85,7 +85,12 @@ module RunTracker
       queryResults = PostgresDB::Conn.exec('SELECT * FROM public."tracked_runners"')
 
       queryResults.each do |runner|
-        runners["#{runner.user_id}"] = runner # might have to do more than this
+        currentRunner = Runner.new(runner['user_id'], runner['user_name'])
+        currentRunner.num_submitted_runs = Integer(runner['num_submitted_runs'])
+        currentRunner.num_submitted_wrs = Integer(runner['num_submitted_wrs'])
+        currentRunner.total_time_overall = Integer(runner['total_time_overall'])
+        currentRunner.fromJSON(runner['historic_runs'])
+        runners["#{runner['user_id']}"] = currentRunner # might have to do more than this
       end
       return runners
     end
@@ -96,39 +101,43 @@ module RunTracker
     def self.updateCurrentRunners(currentRunners)
 
       # Update Statement
-      PostgresDB::Conn.prepare('statement1', 'update public."tracked_games"
+      PostgresDB::Conn.prepare('Update Current Runner', 'update public."tracked_runners"
         set user_id = $1, user_name = $2, historic_runs = $3, num_submitted_runs = $4, num_submitted_wrs = $5, total_time_overall = $6
         where user_id = $1')
-      currentRunners.each do |runner|
-
+      currentRunners.each do |key, runner|
         begin
-          PostgresDB::Conn.exec_prepared('statement1', [runner.src_id, runner.src_name,
-                                                        runner.historic_runs, runner.num_submitted_runs,
-                                                        runner.num_submitted_wrs, runner.total_time_overall])
+          PostgresDB::Conn.exec_prepared('Update Current Runner', [runner.src_id, runner.src_name,
+                                                                  JSON.generate(runner.historic_runs), runner.num_submitted_runs,
+                                                                  runner.num_submitted_wrs, runner.total_time_overall])
         rescue Exception => e
-          puts e.message + e.backtrace
+          puts "#{e.message} #{e.backtrace}"
         end
       end
     end
 
     ##
     # Inserts brand new runners into DB
-    def self.insertNewRunners(newRunner)
+    def self.insertNewRunners(newRunners)
 
       # Update Statement
-      PostgresDB::Conn.prepare('statement1', 'insert into public."tracked_games"
+      PostgresDB::Conn.prepare('Insert New Runner', 'insert into public."tracked_runners"
         (user_id, user_name, historic_runs, num_submitted_runs, num_submitted_wrs, total_time_overall)
         values ($1, $2, $3, $4, $5, $6)')
-      newRunners.each do |runner|
+      newRunners.each do |key, runner|
         begin
-          PostgresDB::Conn.exec_prepared('statement1', [runner.src_id, runner.src_name,
-                                                        runner.historic_runs, runner.num_submitted_runs,
-                                                        runner.num_submitted_wrs, runner.total_time_overall])
+          PostgresDB::Conn.exec_prepared('Insert New Runner', [runner.src_id, runner.src_name,
+                                                              JSON.generate(runner.historic_runs), runner.num_submitted_runs,
+                                                              runner.num_submitted_wrs, runner.total_time_overall])
         rescue Exception => e
-          puts e.message + e.backtrace
+          puts "#{e.message} #{e.backtrace}"
         end
       end
     end # end of module
+    # TODO test that adding with existing runners doesnt add duplicates
+    # TODO test that all information it is gathering is accurate
+    # TODO test that it doesnt break when adding the same game twice
+    # TODO test adding a game without subcategories
+    # TODO runners are having subcategories appended to them even if they havnt done a run of them
 
   end
 end
