@@ -61,10 +61,21 @@ module RunTracker
     def self.codeBlock(*lines, highlighting: '') # This is a variadic function
       message = "```#{highlighting}\n" # Start of Code block
       lines.each do |line|
-        message += line + "\n"
+        message += "#{line}\n"
       end
       message += '```'
       message
     end # End self.codeBlock
+
+    ##
+    # Given an array of lines, do the same as self.codeBlock
+    def self.arrayToCodeBlock(lines, highlighting: '') # This is a variadic function
+      message = "```#{highlighting}\n" # Start of Code block
+      lines.each do |line|
+        message += "#{line}\n"
+      end
+      message += '```'
+      message
+    end # End self.arrayToCodeBlock
   end
 end

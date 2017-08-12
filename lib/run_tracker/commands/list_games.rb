@@ -9,15 +9,24 @@ module RunTracker
                           max_args: 0) do |_event|
 
         # Command Body
+        aliases = PostgresDB::Conn.exec("SELECT * FROM public.\"aliases\" WHERE type='game'")
         results = PostgresDB::Conn.exec('SELECT * FROM public."tracked_games"')
-        RTBot.send_message(DevChannelID, "`#{results.ntuples}` Currently Tracked Game(s):")
+        _event << "`#{results.ntuples}` Currently Tracked Game(s):"
 
-        count = 1
+        messages = Array.new
         results.each do |game|
-          return RTBot.send_message(DevChannelID, "[#{count}] #{game['game_name']} - ID: `#{game['game_id']}`  " \
-                                                  "Alias: `#{game['game_alias']}`  Announce Channel: `#{game['announce_channel']}`")
-          count += 1
+          gameAlias = ''
+          aliases.each do |row|
+            if row['id'] == game['game_id']
+              gameAlias = row['alias']
+            end
+          end
+
+          messages.push("Alias: #{gameAlias} | Name: #{game['game_name']} | Announce Channel: #{game['announce_channel']}")
         end
+
+        _event << Util.arrayToCodeBlock(messages)
+
       end # end of command body
     end # end of module
   end
