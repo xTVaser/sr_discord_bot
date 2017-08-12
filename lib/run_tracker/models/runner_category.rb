@@ -3,7 +3,6 @@ module RunTracker
 
     attr_accessor :src_id,
                   :src_name,
-                  :category_alias,
                   :current_pb_time,
                   :current_pb_id,
                   :milestones, # Hash of time(k) and date and runID
@@ -16,7 +15,6 @@ module RunTracker
     def initialize(id, name)
       self.src_id = id
       self.src_name = name
-      self.category_alias = '' # TODO make a method to simplify names from their full names
       self.current_pb_time = Util::MaxInteger
       self.current_pb_id = ''
       self.milestones = Hash.new

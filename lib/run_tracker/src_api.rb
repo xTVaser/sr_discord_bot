@@ -38,14 +38,25 @@ module RunTracker
 
       foundGame = gameData['data']
       categoryLink = getFwdLink('categories', foundGame['links'])
-      categoryList = getGameCategories(Util.jsonRequest(categoryLink)['data'], foundGame['id'])
-      modList = getGameMods(foundGame['moderators'])
-      SeedDB.getGameRunners(foundGame['id'], foundGame['names']['international'], foundGame['abbreviation'], categoryList, modList)
 
-      return TrackedGame.new(foundGame['id'],
+      categoryResults = getGameCategories(Util.jsonRequest(categoryLink)['data'], foundGame['id'])
+      categoryList = categoryResults.first
+      # Add the aliases to the alias table
+      aliasList = categoryResults.last
+      # remove all whitespace for default game alias
+      gameAlias = foundGame['abbreviation']
+      if gameAlias == nil
+        gameAlias = foundGame['names']['international'].gsub(/\s+/, "")
+      end
+      aliasList[gameAlias] = ['game', foundGame['id']]
+      PostgresDB.insertNewAliases(aliasList)
+
+      modList = getGameMods(foundGame['moderators'])
+      SeedDB.getGameRunners(foundGame['id'], foundGame['names']['international'], categoryList, modList)
+
+      return [gameAlias, TrackedGame.new(foundGame['id'],
                              foundGame['names']['international'],
-                             categoryList, modList,
-                             game_alias: foundGame['abbreviation'])
+                             categoryList, modList)]
     end
 
     ##
@@ -65,6 +76,7 @@ module RunTracker
     def self.getGameCategories(categories, gameID)
 
       categoryList = Hash.new
+      aliasList = Hash.new
       categories.each do |category|
 
         # NOTE We are not supporting ILs (individual levels) right now, skip them
@@ -82,18 +94,23 @@ module RunTracker
             end
           end
         end
+        categoryKey = ''
         if subCategories.length <= 0 # if there are no subcategories then just do it normally
+          categoryKey = "#{category['id']}-:"
           categoryList["#{category['id']}-:"] = Category.new(category['id'], category['name'], category['rules'], nil)
         else # else there are, so concat the id, name, and rules onto the category
           subCategories.each do |key, value|
+            categoryKey = "#{category['id']}-#{key}"
             categoryList["#{category['id']}-#{key}"] = Category.new("#{category['id']}-#{key}",
                                                          "#{category['name']}#{value.first}",
                                                          "#{category['rules']}#{value.last}",
                                                          subCategories)
           end
         end
+        # remove all whitespace for default alias
+        aliasList[categoryKey] = ['category', category['name'].gsub(/\s+/, "")]
       end # end category loop
-      return categoryList
+      return [categoryList, aliasList]
     end
 
   end # end SRC_API module

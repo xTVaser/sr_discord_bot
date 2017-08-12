@@ -8,7 +8,7 @@ module RunTracker
     # Also determines the current stats for each category
     # Will pull all current data from a game's leaderboard
     # categoryList and modList are expected to be hashes keyed with their respective SRC ids
-    def self.getGameRunners(gameID, gameName, gameAbbrv, categoryList, modList)
+    def self.getGameRunners(gameID, gameName, categoryList, modList)
 
       currentRunnerList = PostgresDB.getCurrentRunners() # NOTE unverified implementation
       newRunnerList = Hash.new
@@ -63,7 +63,7 @@ module RunTracker
               runnerName = SrcAPI.getUserName(runnerKey)
             end
             runner = Runner.new(runnerKey, runnerName)
-            runner.historic_runs[gameID] = RunnerGame.new(gameID, gameName, gameAbbrv)
+            runner.historic_runs[gameID] = RunnerGame.new(gameID, gameName)
             runner.historic_runs[gameID].categories[category.category_id] = RunnerCategory.new(category.category_id, category.category_name)
             newRunnerList[runnerKey] = runner
           elsif newRunnerList.key?(runnerKey)
@@ -74,7 +74,7 @@ module RunTracker
 
           # Has this runner ran this game before, init the game and category
           if !runner.historic_runs.key?(gameID)
-            runner.historic_runs[gameID] = RunnerGame.new(gameID, gameName, gameAbbrv)
+            runner.historic_runs[gameID] = RunnerGame.new(gameID, gameName)
             runner.historic_runs[gameID].categories[category.category_id] = RunnerCategory.new(category.category_id, category.category_name)
           # If the runner has ran the game before, but not the category yet
           elsif !runner.historic_runs[gameID].categories.key?(category.category_id)

@@ -45,7 +45,8 @@ module RunTracker
     end
 
     ##
-    #
+    # Given a very long string, will split it so it is under the 5000 character limit
+    # TODO make this generic by taking in the event as well
     def self.sendBulkMessage(message)
       if message.length <= 5000
         RTBot.send_message(DevChannelID, message)
@@ -56,6 +57,18 @@ module RunTracker
         end
       end
     end
+
+    ##
+    # Given potentially many strings, surround them in a codeblock and return that string
+    # Lines must be under 5000 characters long as that is not guaranteed here
+    def self.codeBlock(*lines, highlighting: '') # This is a variadic function
+        message = "```#{highlighting}\n" # Start of Code block
+        lines.each do |line|
+          message += line + "\n"
+        end
+        message += "```"
+        return message
+    end # End self.codeBlock
 
   end
 end
