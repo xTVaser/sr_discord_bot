@@ -13,6 +13,7 @@ module RunTracker
     # Add Command module names here
     @commands = [
       AddGame,
+      ListCategories,
       ListGames,
       ListFirstRow,
       Set,

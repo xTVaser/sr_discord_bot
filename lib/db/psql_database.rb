@@ -87,7 +87,6 @@ module RunTracker
       return 'Schema Destruction Unsuccessful: ' + e.message
     end
 
-    # TODO: might not fully parse JSON?
     def self.getCurrentRunners
       runners = {}
       queryResults = PostgresDB::Conn.exec('SELECT * FROM public."tracked_runners"')
@@ -158,5 +157,29 @@ module RunTracker
       end
       PostgresDB::Conn.exec('DEALLOCATE insert_new_alias')
     end # end of self.insertNewAliases
+
+    ##
+    # Given an alias, return the ID equivalent
+    # TODO add check on type here
+    def self.findID(game_alias)
+
+      PostgresDB::Conn.prepare('find_alias', "SELECT * FROM public.aliases WHERE alias=$1")
+      results = PostgresDB::Conn.exec_prepared('find_alias', [game_alias])
+      PostgresDB::Conn.exec('DEALLOCATE find_alias')
+
+      return results.first['id']
+    end
+
+    ##
+    # Get tracked game by alias, returns object representation
+    def self.getTrackedGame(game_id)
+      gameResult = PostgresDB::Conn.exec("SELECT * FROM public.\"tracked_games\" WHERE \"game_id\"='#{game_id}'").first
+
+      game = TrackedGame.new(gameResult['game_id'], gameResult['game_name'], Hash.new, Hash.new)
+      game.announce_channel = gameResult['announce_channel']
+      game.fromJSON(gameResult['categories'], gameResult['moderators'])
+
+      return game
+    end
   end # end of module
 end

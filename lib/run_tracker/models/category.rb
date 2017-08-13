@@ -17,7 +17,7 @@ module RunTracker
       self.subcategories = subcategories
       self.current_wr_run_id = ''
       self.current_wr_time = 0
-      self.longest_held_wr = ''
+      self.longest_held_wr = 0
       self.number_submitted_runs = 0
       self.number_submitted_wrs = 0
     end

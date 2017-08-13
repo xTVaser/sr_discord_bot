@@ -12,7 +12,7 @@ module RunTracker
     def initialize(id, name)
       self.src_id = id
       self.src_name = name
-      self.discord_id = ''
+      self.discord_id = 0
       self.should_notify = false
       self.secret_key = Util.genRndStr(8)
       self.last_verified_run_date = nil

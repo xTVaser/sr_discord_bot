@@ -158,10 +158,11 @@ module RunTracker
             if run['status']['verify-date'].nil?
               next
             # If the moderator doesnt have a recent verified run date
-            elsif mod.last_verified_run_date.nil?
+          elsif mod.last_verified_run_date.nil?
               mod.last_verified_run_date = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
             # If the verified date is more recent (epoch, greater is closer)
-            elsif mod.last_verified_run_date < Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d') # NOTE dont need time here
+            # NOTE dont need time here
+            elsif mod.last_verified_run_date < Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
               mod.last_verified_run_date = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
             end
             # end WR IF statement
