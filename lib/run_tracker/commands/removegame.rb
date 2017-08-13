@@ -3,8 +3,8 @@ module RunTracker
     module RemoveGame
       extend Discordrb::Commands::CommandContainer
 
-      command(:removegame, description: "Removes a game from the list of tracked games.",
-                           usage: "!removegame <game-alias>",
+      command(:removegame, description: 'Removes a game from the list of tracked games.',
+                           usage: '!removegame <game-alias>',
                            permission_level: 3, # NOTE hardcoded
                            min_args: 1,
                            max_args: 1) do |event, search_field|
@@ -21,6 +21,7 @@ module RunTracker
           PostgresDB::Conn.prepare('get_game_id', 'select "game_id" from public."tracked_games" where "game_alias" = $1')
           id = PostgresDB::Conn.exec_prepared('get_game_id', [name])
 
+<<<<<<< e14bd8c87d38efbc947f63c93c1d620adf3706fd
           if id.ntuples != 1 # If no ID's were found with entered ID.
             event << 'No games found with this alias.'
           else # Else remove game. ID is PK so it is guaranteed to be unique.
@@ -31,6 +32,20 @@ module RunTracker
           end
         rescue Exception => e
            RTBot.send_message(DevChannelID, e.backtrace.inspect + e.message)
+=======
+        def removeGameById(event, name)
+          PostgresDB::Conn.prepare('statement1', 'select "game_id" from public."tracked_games" where "game_alias" = $1')
+          id = PostgresDB::Conn.exec_prepared('statement1', [name])
+
+          if id.empty? # If no ID's were found with entered ID.
+            event << 'No games found with this ID.'
+          else # Else remove game. ID is PK so it is guaranteed to be unique.
+            PostgresDB::Conn.prepare('statement2', 'delete * from public."tracked_games" where "game_id" = $1')
+            PostgresDB::Conn.exec_prepared('statement2', [id])
+          end
+        rescue
+          event << e.backtrace + e.message
+>>>>>>> rake format
         end
       end
 

@@ -13,7 +13,7 @@ module RunTracker
     # Add Command module names here
     @commands = [
       AddGame,
-      List,
+      ListGames,
       ListFirstRow,
       Set,
       SetAlias,
@@ -26,15 +26,11 @@ module RunTracker
 
     def self.checkCommands(_command)
       @commands.each do |command|
-        if _command == command
-          return true
-        end
+        return true if _command == command
       end
 
-      return false
+      false
     end
-
-
 
     def self.loadCommands
       @commands.each do |command|

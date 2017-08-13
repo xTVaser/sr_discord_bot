@@ -4,9 +4,9 @@ module RunTracker
       extend Discordrb::Commands::CommandContainer
 
       command(:listfirstrow, description: '',
-                        usage: '',
-                        min_args: 1,
-                        max_args: 1) do |_event, _table| # TODO: remove this from help command
+                             usage: '',
+                             min_args: 1,
+                             max_args: 1) do |_event, _table| # TODO: remove this from help command
 
         # Command Body
         begin
@@ -16,7 +16,6 @@ module RunTracker
             rowMessage += "#{field} | "
           end
           puts rowMessage # NOTE discord doesnt seem to like printing out this raw text, probably some characters it doesnt like
-
         rescue Exception => e
           RTBot.send_message(DevChannelID, e.backtrace.inspect + e.message) # TODO: remove stacktrace stuff
         end

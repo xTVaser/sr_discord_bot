@@ -1,6 +1,5 @@
 module RunTracker
   class Category < JSONable
-
     attr_accessor :category_id,
                   :category_name,
                   :rules,
@@ -21,8 +20,6 @@ module RunTracker
       self.longest_held_wr = ''
       self.number_submitted_runs = 0
       self.number_submitted_wrs = 0
-
     end
-
   end
 end

@@ -8,7 +8,7 @@ module RunTracker
                         min_args: 2,
                         max_args: 2) do |event, type, search_field|
 
-        # TODO technically this should all be wrapped in a transaction so it can be rollbacked.
+        # TODO: technically this should all be wrapped in a transaction so it can be rollbacked.
 
         # Command Body
         # Check to see if the command syntax was valid
@@ -60,19 +60,18 @@ module RunTracker
             ("game_id", "game_name", "announce_channel", categories, moderators)
             values ($1, $2, $3, $4, $5)')
           PostgresDB::Conn.exec_prepared('Add Tracked Games', [trackedGame.id,
-                                                        trackedGame.name, trackedGame.announce_channel.id,
-                                                        JSON.generate(trackedGame.categories),
-                                                        JSON.generate(trackedGame.moderators)])
+                                                               trackedGame.name, trackedGame.announce_channel.id,
+                                                               JSON.generate(trackedGame.categories),
+                                                               JSON.generate(trackedGame.moderators)])
         rescue PG::UniqueViolation
-          RTBot.send_message(DevChannelID, "That game is already being tracked")
+          RTBot.send_message(DevChannelID, 'That game is already being tracked')
         end
 
         # Announce to user
         event << Util.codeBlock("Found `#{trackedGame.name}` with ID: `#{trackedGame.id}`",
                                 "`#{trackedGame.categories.length}` categories and `#{trackedGame.moderators.length}` current moderators",
                                 "To change the alias `!setalias game #{gameAlias} or announce channel `!setannounce #{gameAlias} <channel_name>`",
-                                "If incorrect, remove with : `stub`") # TODO add remove command
-
+                                'If incorrect, remove with : `stub`') # TODO: add remove command
       end # end self.trackGame
     end
   end

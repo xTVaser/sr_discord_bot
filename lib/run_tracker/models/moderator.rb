@@ -1,6 +1,5 @@
 module RunTracker
   class Moderator < JSONable
-
     attr_accessor :src_id,
                   :src_name,
                   :discord_id,
@@ -19,7 +18,6 @@ module RunTracker
       self.last_verified_run_date = nil
       self.total_verified_runs = 0
       self.past_moderator = false
-
     end
   end
 end

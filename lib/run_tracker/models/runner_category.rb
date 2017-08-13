@@ -1,6 +1,5 @@
 module RunTracker
   class RunnerCategory < JSONable
-
     attr_accessor :src_id,
                   :src_name,
                   :current_pb_time,
@@ -17,11 +16,10 @@ module RunTracker
       self.src_name = name
       self.current_pb_time = Util::MaxInteger
       self.current_pb_id = ''
-      self.milestones = Hash.new
+      self.milestones = ({})
       self.num_previous_wrs = 0
       self.num_submitted_runs = 0
       self.total_time_overall = 0
     end
-
   end
 end

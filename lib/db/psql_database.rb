@@ -87,9 +87,9 @@ module RunTracker
       return 'Schema Destruction Unsuccessful: ' + e.message
     end
 
-    # TODO might not fully parse JSON?
-    def self.getCurrentRunners()
-      runners = Hash.new
+    # TODO: might not fully parse JSON?
+    def self.getCurrentRunners
+      runners = {}
       queryResults = PostgresDB::Conn.exec('SELECT * FROM public."tracked_runners"')
 
       queryResults.each do |runner|
@@ -98,56 +98,53 @@ module RunTracker
         currentRunner.num_submitted_wrs = Integer(runner['num_submitted_wrs'])
         currentRunner.total_time_overall = Integer(runner['total_time_overall'])
         currentRunner.fromJSON(runner['historic_runs'])
-        runners["#{runner['user_id']}"] = currentRunner # might have to do more than this
+        runners[(runner['user_id']).to_s] = currentRunner # might have to do more than this
       end
-      return runners
+      runners
     end
 
     ##
     # Updates current runners with the new objects
     # primary key for runners is their ID field
     def self.updateCurrentRunners(currentRunners)
-
       # Update Statement
       PostgresDB::Conn.prepare('update_current_runner', 'update public."tracked_runners"
         set user_id = $1, user_name = $2, historic_runs = $3, num_submitted_runs = $4, num_submitted_wrs = $5, total_time_overall = $6
         where user_id = $1')
-      currentRunners.each do |key, runner|
+      currentRunners.each do |_key, runner|
         begin
           PostgresDB::Conn.exec_prepared('update_current_runner', [runner.src_id, runner.src_name,
-                                                                  JSON.generate(runner.historic_runs), runner.num_submitted_runs,
-                                                                  runner.num_submitted_wrs, runner.total_time_overall])
+                                                                   JSON.generate(runner.historic_runs), runner.num_submitted_runs,
+                                                                   runner.num_submitted_wrs, runner.total_time_overall])
         rescue Exception => e
           puts "#{e.message} #{e.backtrace}"
         end
       end
-      PostgresDB::Conn.exec("DEALLOCATE update_current_runner")
+      PostgresDB::Conn.exec('DEALLOCATE update_current_runner')
     end
 
     ##
     # Inserts brand new runners into DB
     def self.insertNewRunners(newRunners)
-
       # Update Statement
       PostgresDB::Conn.prepare('insert_new_runner', 'insert into public."tracked_runners"
         (user_id, user_name, historic_runs, num_submitted_runs, num_submitted_wrs, total_time_overall)
         values ($1, $2, $3, $4, $5, $6)')
-      newRunners.each do |key, runner|
+      newRunners.each do |_key, runner|
         begin
           PostgresDB::Conn.exec_prepared('insert_new_runner', [runner.src_id, runner.src_name,
-                                                              JSON.generate(runner.historic_runs), runner.num_submitted_runs,
-                                                              runner.num_submitted_wrs, runner.total_time_overall])
+                                                               JSON.generate(runner.historic_runs), runner.num_submitted_runs,
+                                                               runner.num_submitted_wrs, runner.total_time_overall])
         rescue Exception => e
           puts "#{e.message} #{e.backtrace}"
         end
       end
-      PostgresDB::Conn.exec("DEALLOCATE insert_new_runner")
+      PostgresDB::Conn.exec('DEALLOCATE insert_new_runner')
     end
 
     ##
     # Insert new aliases into the table
     def self.insertNewAliases(newAliases)
-
       # Update Statement
       PostgresDB::Conn.prepare('insert_new_alias', 'insert into public."aliases"
                                (alias, type, id)
@@ -159,7 +156,7 @@ module RunTracker
           puts "#{e.message} #{e.backtrace}"
         end
       end
-      PostgresDB::Conn.exec("DEALLOCATE insert_new_alias")
+      PostgresDB::Conn.exec('DEALLOCATE insert_new_alias')
     end # end of self.insertNewAliases
   end # end of module
 end
