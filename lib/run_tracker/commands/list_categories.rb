@@ -19,7 +19,6 @@ module RunTracker
         trackedGame.categories.each do |categoryID, categoryData|
           categoryAlias = ''
           aliases.each do |row|
-            pp row
             if row['id'].casecmp(categoryID).zero?
               categoryAlias = row['alias']
             end

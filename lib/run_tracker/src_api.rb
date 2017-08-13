@@ -36,15 +36,16 @@ module RunTracker
       foundGame = gameData['data']
       categoryLink = getFwdLink('categories', foundGame['links'])
 
-      categoryResults = getGameCategories(Util.jsonRequest(categoryLink)['data'], foundGame['id'])
-      categoryList = categoryResults.first
-      # Add the aliases to the alias table
-      aliasList = categoryResults.last
       # remove all whitespace for default game alias
       gameAlias = foundGame['abbreviation']
       if gameAlias.nil?
         gameAlias = foundGame['names']['international'].gsub(/\s+/, '')
       end
+
+      categoryResults = getGameCategories(Util.jsonRequest(categoryLink)['data'], foundGame['id'], gameAlias)
+      categoryList = categoryResults.first
+      # Add the category aliases to the alias table
+      aliasList = categoryResults.last
       aliasList[gameAlias] = ['game', foundGame['id']]
       PostgresDB.insertNewAliases(aliasList)
 
@@ -70,7 +71,7 @@ module RunTracker
     # Resolves all of the categories
     # Subcategories are made into their own categories with a composite key of [id-variableID:variableValue]
     # This category ID can be resolved with a seperate method when the user calls
-    def self.getGameCategories(categories, _gameID)
+    def self.getGameCategories(categories, _gameID, gameAlias)
       categoryList = {}
       aliasList = {}
       categories.each do |category|
@@ -89,7 +90,7 @@ module RunTracker
         if subCategories.length <= 0 # if there are no subcategories then just do it normally
           categoryList["#{category['id']}-:"] = Category.new(category['id'], category['name'], category['rules'], nil)
           # remove all whitespace for default alias
-          aliasList[category['name'].gsub(/\s+/, '')] = ['category', "#{category['id']}-:"]
+          aliasList["#{gameAlias}-#{category['name'].gsub(/\s+/, '')}"] = ['category', "#{category['id']}-:"]
         else # else there are, so concat the id, name, and rules onto the category
           subCategories.each do |key, value|
             categoryList["#{category['id']}-#{key}"] = Category.new("#{category['id']}-#{key}",
@@ -97,7 +98,8 @@ module RunTracker
                                                                     "#{category['rules']}#{value.last}",
                                                                     subCategories)
             # remove all whitespace for default alias
-            aliasList["#{category['name']}#{value.first}".gsub(/\s+/, '')] = ['category', "#{category['id']}-#{key}"]
+            subCategoryAlias = "#{category['name']}#{value.first}"
+            aliasList["#{gameAlias}-#{subCategoryAlias.gsub(/\s+/, '')}"] = ['category', "#{category['id']}-#{key}"]
           end
         end
 
