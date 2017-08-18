@@ -18,22 +18,6 @@ module RunTracker
 
       def self.removeGameById(event, name)
         begin
-          PostgresDB::Conn.prepare('get_game_id', 'select "game_id" from public."tracked_games" where "game_alias" = $1')
-          id = PostgresDB::Conn.exec_prepared('get_game_id', [name])
-
-<<<<<<< e14bd8c87d38efbc947f63c93c1d620adf3706fd
-          if id.ntuples != 1 # If no ID's were found with entered ID.
-            event << 'No games found with this alias.'
-          else # Else remove game. ID is PK so it is guaranteed to be unique.
-            PostgresDB::Conn.prepare('delete_game', 'delete * from public."tracked_games" where "game_id" = $1')
-            PostgresDB::Conn.exec_prepared('delete_game', [id])
-
-            event << "Game succesfully removed."
-          end
-        rescue Exception => e
-           RTBot.send_message(DevChannelID, e.backtrace.inspect + e.message)
-=======
-        def removeGameById(event, name)
           PostgresDB::Conn.prepare('statement1', 'select "game_id" from public."tracked_games" where "game_alias" = $1')
           id = PostgresDB::Conn.exec_prepared('statement1', [name])
 
@@ -43,12 +27,10 @@ module RunTracker
             PostgresDB::Conn.prepare('statement2', 'delete * from public."tracked_games" where "game_id" = $1')
             PostgresDB::Conn.exec_prepared('statement2', [id])
           end
-        rescue
-          event << e.backtrace + e.message
->>>>>>> rake format
+        rescue Exception => e
+           RTBot.send_message(DevChannelID, e.backtrace.inspect + e.message)
         end
       end
-
     end
   end
 end

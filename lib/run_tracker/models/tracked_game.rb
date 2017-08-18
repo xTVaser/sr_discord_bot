@@ -14,10 +14,12 @@ module RunTracker
 
       categories = JSON.parse(categories)
       categories.each do |key, value|
+        pp value
         category = Category.new(value['@category_id'], value['@category_name'], value['@rules'], value['@subcategories'])
         category.current_wr_run_id = value['@current_wr_run_id']
         category.current_wr_time = Integer(value['@current_wr_time'])
-        category.longest_held_wr = Integer(value['@longest_held_wr'])
+        category.longest_held_wr_time = Integer(value['@longest_held_wr_time'])
+        category.longest_held_wr_id = value['@longest_held_wr_id']
         category.number_submitted_runs = Integer(value['@number_submitted_runs'])
         category.number_submitted_wrs = Integer(value['@number_submitted_wrs'])
         self.categories[key] = category

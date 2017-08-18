@@ -111,61 +111,67 @@ module RunTracker
 
             # Check if new WR
             # TODO, support ties
-            next unless currentWRTime > Integer(run['times']['primary_t'])
+            if currentWRTime > Integer(run['times']['primary_t'])
 
-            runner.num_submitted_wrs += 1
-            runner.historic_runs[gameID].num_previous_wrs += 1
-            runner.historic_runs[gameID].categories[category.category_id].num_previous_wrs += 1
+              runner.num_submitted_wrs += 1
+              runner.historic_runs[gameID].num_previous_wrs += 1
+              runner.historic_runs[gameID].categories[category.category_id].num_previous_wrs += 1
 
-            # Update state
-            currentWRTime = Integer(run['times']['primary_t'])
+              # Update state
+              currentWRTime = Integer(run['times']['primary_t'])
 
-            runDate = nil
-            # If the run has no date, fallback to the verified date
-            if !run['date'].nil?
-              runDate = Date.strptime(run['date'], '%Y-%m-%d')
-            elsif !run['status']['verify-date'].nil?
-              runDate = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d') # TODO: cant strp date and time at same time? loses accuracy, fix
-            end
-
-            # Before we scrap the old date, see if it's the new longest WR
-            if currentWRDate.nil? && !runDate.nil?
-              currentWRDate = runDate
-            elsif !currentWRDate.nil? && !runDate.nil?
-              if (runDate - currentWRDate).to_i > longestHeldWR
-                longestHeldWR = (runDate - currentWRDate).to_i
-                longestHeldWRID = currentWRID
+              runDate = nil
+              # If the run has no date, fallback to the verified date
+              if !run['date'].nil?
+                runDate = Date.strptime(run['date'], '%Y-%m-%d')
+              elsif !run['status']['verify-date'].nil?
+                runDate = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d') # TODO: cant strp date and time at same time? loses accuracy, fix
               end
-            end
 
-            currentWRID = run['id']
-            currentWRDate = runDate
-            numSubmittedWRs += 1
+              # Before we scrap the old date, see if it's the new longest WR
+              if currentWRDate.nil? && !runDate.nil?
+                currentWRDate = runDate
+              elsif !currentWRDate.nil? && !runDate.nil?
+                if (runDate - currentWRDate).to_i > longestHeldWR
+                  longestHeldWR = (runDate - currentWRDate).to_i
+                  longestHeldWRID = currentWRID
+                  category.longest_held_wr_id = currentWRID
+                  category.longest_held_wr_time = longestHeldWR
+                end
+              end
+
+              currentWRID = run['id']
+              currentWRDate = runDate
+              numSubmittedWRs += 1
+
+              category.current_wr_run_id = currentWRID
+              category.current_wr_time = currentWRTime
+            end # end WR IF statement
 
             # Moderator stuff
-            next if run['status']['examiner'].nil?
-            modKey = run['status']['examiner']
-            # If the moderator is no longer a moderator, create them
-            unless modList.key?(modKey)
-              modList[modKey] = Moderator.new(modKey, SrcAPI.getUserName(modKey))
-              modList[modKey].past_moderator = true
-            end
+            if !run['status']['examiner'].nil?
+              modKey = run['status']['examiner']
+              # If the moderator is no longer a moderator, create them
+              unless modList.key?(modKey)
+                modList[modKey] = Moderator.new(modKey, SrcAPI.getUserName(modKey))
+                modList[modKey].past_moderator = true
+              end
 
-            mod = modList[modKey]
-            mod.total_verified_runs += 1
+              mod = modList[modKey]
+              mod.total_verified_runs += 1
 
-            # If there is no verify date, skip it
-            if run['status']['verify-date'].nil?
-              next
-            # If the moderator doesnt have a recent verified run date
-          elsif mod.last_verified_run_date.nil?
-              mod.last_verified_run_date = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
-            # If the verified date is more recent (epoch, greater is closer)
-            # NOTE dont need time here
-            elsif mod.last_verified_run_date < Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
-              mod.last_verified_run_date = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
-            end
-            # end WR IF statement
+              # If there is no verify date, skip it
+              if run['status']['verify-date'].nil?
+                next
+              # If the moderator doesnt have a recent verified run date
+              elsif mod.last_verified_run_date.nil?
+                mod.last_verified_run_date = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
+              # If the verified date is more recent (epoch, greater is closer)
+              # NOTE dont need time here
+              elsif mod.last_verified_run_date < Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
+                mod.last_verified_run_date = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
+              end
+            end # end of moderator stuff check
           end # end run loop
 
           # If no more pages to loop through
@@ -180,6 +186,7 @@ module RunTracker
       PostgresDB.insertNewRunners(newRunnerList)
 
       RTBot.send_message(DevChannelID, "Archived #{count} Runs!")
+
     end # ends seed function
   end # ends seedDB module
 end

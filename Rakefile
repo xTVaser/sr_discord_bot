@@ -8,7 +8,7 @@ task :run do
 end
 
 task :format do
-  sh 'rubocop -a -f simple --except Metrics'
+  # broke my code sh 'rubocop -a -f simple --except Metrics'
 end
 
 task :update do
