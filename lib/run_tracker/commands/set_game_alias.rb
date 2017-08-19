@@ -13,16 +13,18 @@ module RunTracker
           return :usage
         end
 
-        # Check to see if alias even exists
-        aliasResults = PostgresDB::Conn.exec("SELECT * FROM public.\"aliases\" WHERE alias='#{_oldAlias}' and type='game'")
-        if aliasResults.ntuples < 1
-          return "Game Alias not found use !listgames to see the current aliases"
-        end
-
         PostgresDB::Conn.transaction do |conn|
 
+          # Check to see if alias even exists
+          conn.prepare("find_alias", "SELECT * FROM public.\"aliases\" WHERE alias= $1 and type='game'")
+          aliasResults = conn.exec_prepared('find_alias', _oldAlias)
+          if aliasResults.ntuples < 1
+            return "Game Alias not found use !listgames to see the current aliases"
+          end
+          conn.exec('DEALLOCATE find_alias')
+
           # Set the alias for the game, and then change the prefix for any category aliases
-          conn.prepare("update_game_alias", "update public.aliases set alias = $1 where alias = $2 and type = 'game'")
+          conn.prepare("update_game_alias", "update public.aliases set alias=$1 where alias=$2 and type = 'game'")
           conn.exec_prepared('update_game_alias', [_newAlias, _oldAlias])
           conn.exec('DEALLOCATE update_game_alias')
 

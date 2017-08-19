@@ -30,11 +30,11 @@ module RunTracker
         moderator.discord_id = Integer(value['@discord_id'])
         moderator.should_notify = value['@should_notify'] == 'true'
         moderator.secret_key = value['@secret_key']
-        if value['@last_verify_run_date'] != nil
-          moderator.last_verify_run_date = Date.strptime(value['@last_verify_run_date'], '%Y-%m-%d')
+        if value['@last_verified_run_date'] != nil
+          moderator.last_verified_run_date = Date.strptime(value['@last_verified_run_date'], '%Y-%m-%d')
         end
         moderator.total_verified_runs = Integer(value['@total_verified_runs'])
-        moderator.past_moderator = value['@past_moderator'] == 'true'
+        moderator.past_moderator = value['@past_moderator']
         self.moderators[key] = moderator
       end
     end # end of fromJson

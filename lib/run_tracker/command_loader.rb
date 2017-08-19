@@ -15,6 +15,7 @@ module RunTracker
       AddGame,
       ListCategories,
       ListGames,
+      ListMods,
       ListFirstRow,
       Set,
       SetCategoryAlias,
