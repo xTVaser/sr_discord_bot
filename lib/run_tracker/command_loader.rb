@@ -17,6 +17,7 @@ module RunTracker
       ListGames,
       ListFirstRow,
       Set,
+      SetCategoryAlias,
       SetGameAlias,
       RemoveGame
     ]

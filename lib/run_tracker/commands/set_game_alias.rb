@@ -42,7 +42,6 @@ module RunTracker
         end
         # TODO add some output for errors
 
-        _event << "ye"
         return
       end # end command body
     end # end SetGameAlias module

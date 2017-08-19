@@ -14,7 +14,6 @@ module RunTracker
 
       categories = JSON.parse(categories)
       categories.each do |key, value|
-        pp value
         category = Category.new(value['@category_id'], value['@category_name'], value['@rules'], value['@subcategories'])
         category.current_wr_run_id = value['@current_wr_run_id']
         category.current_wr_time = Integer(value['@current_wr_time'])
