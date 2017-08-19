@@ -16,10 +16,10 @@ module RunTracker
       ListCategories,
       ListGames,
       ListMods,
-      ListFirstRow,
       Set,
       SetCategoryAlias,
       SetGameAlias,
+      StatsRunner,
       RemoveGame
     ]
 

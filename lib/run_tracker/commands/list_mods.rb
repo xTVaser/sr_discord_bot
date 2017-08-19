@@ -24,7 +24,8 @@ module RunTracker
 
 
           game = PostgresDB.getTrackedGame(aliasResults.first['id'])
-          modListing.push("Moderators for #{game.name}:\n")
+          modListing.push("Moderators for #{game.name}:")
+          modListing.push("Name | Total Verified Runs | Last Verified Run Date")
           modList = game.moderators
 
           # Sort moderators by their date first, and then there amount of verified runs second

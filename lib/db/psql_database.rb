@@ -88,16 +88,21 @@ module RunTracker
     end
 
     def self.getCurrentRunners
-      runners = {}
-      queryResults = PostgresDB::Conn.exec('SELECT * FROM public."tracked_runners"')
 
-      queryResults.each do |runner|
-        currentRunner = Runner.new(runner['user_id'], runner['user_name'])
-        currentRunner.num_submitted_runs = Integer(runner['num_submitted_runs'])
-        currentRunner.num_submitted_wrs = Integer(runner['num_submitted_wrs'])
-        currentRunner.total_time_overall = Integer(runner['total_time_overall'])
-        currentRunner.fromJSON(runner['historic_runs'])
-        runners[(runner['user_id']).to_s] = currentRunner # might have to do more than this
+      runners = {}
+
+      PostgresDB::Conn.transaction do |conn|
+
+        queryResults = conn.exec('SELECT * FROM public."tracked_runners"')
+
+        queryResults.each do |runner|
+          currentRunner = Runner.new(runner['user_id'], runner['user_name'])
+          currentRunner.num_submitted_runs = Integer(runner['num_submitted_runs'])
+          currentRunner.num_submitted_wrs = Integer(runner['num_submitted_wrs'])
+          currentRunner.total_time_overall = Integer(runner['total_time_overall'])
+          currentRunner.fromJSON(runner['historic_runs'])
+          runners[(runner['user_id']).to_s] = currentRunner
+        end
       end
       runners
     end
@@ -161,10 +166,10 @@ module RunTracker
     ##
     # Given an alias, return the ID equivalent
     # TODO add check on type here
-    def self.findID(game_alias)
+    def self.findID(theAlias)
 
       PostgresDB::Conn.prepare('find_alias', "SELECT * FROM public.aliases WHERE alias=$1")
-      results = PostgresDB::Conn.exec_prepared('find_alias', [game_alias])
+      results = PostgresDB::Conn.exec_prepared('find_alias', [theAlias])
       PostgresDB::Conn.exec('DEALLOCATE find_alias')
 
       return results.first['id']

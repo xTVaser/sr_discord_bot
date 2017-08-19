@@ -11,7 +11,10 @@ module RunTracker
     # TODO periodically check to see if a user has updated
     def initialize(id, name)
       self.src_id = id
-      self.src_name = name
+      self.src_name = name.downcase
+      if src_name.casecmp('guest').zero?
+        self.src_id = self.src_id.downcase
+      end
       self.historic_runs = ({}) # Game > Categories
       self.num_submitted_wrs = 0
       self.num_submitted_runs = 0
@@ -22,7 +25,7 @@ module RunTracker
       games = JSON.parse(games)
 
       games.each do |key, value|
-        runnerGame = RunnerGame.new(value['@src_id'], value['@src_name'], value['@game_alias'])
+        runnerGame = RunnerGame.new(value['@src_id'], value['@src_name'])
         runnerGame.num_previous_wrs = Integer(value['@num_previous_wrs'])
         runnerGame.num_submitted_runs = Integer(value['@num_submitted_runs'])
         runnerGame.total_time_overall = Integer(value['@total_time_overall'])
@@ -31,7 +34,6 @@ module RunTracker
           category = RunnerCategory.new(catValue['@src_id'], catValue['@src_name'])
           category.current_pb_id = catValue['@current_pb_id']
           category.current_pb_time = Integer(catValue['@current_pb_time'])
-          category.category_alias = catValue['@category_alias']
           category.num_previous_wrs = Integer(catValue['@num_previous_wrs'])
           category.num_submitted_runs = Integer(catValue['@num_submitted_runs'])
           category.total_time_overall = Integer(catValue['@total_time_overall'])
