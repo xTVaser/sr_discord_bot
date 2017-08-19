@@ -22,7 +22,8 @@ module RunTracker
       SetCategoryAlias,
       SetGameAlias,
       StatsRunner,
-      RemoveGame
+      RemoveGame,
+      Resource
     ]
 
     def self.getCommands
