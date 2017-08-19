@@ -17,7 +17,7 @@ module RunTracker
 
           # Check to see if alias even exists
           conn.prepare("find_alias", "SELECT * FROM public.\"aliases\" WHERE alias= $1 and type='game'")
-          aliasResults = conn.exec_prepared('find_alias', _oldAlias)
+          aliasResults = conn.exec_prepared('find_alias', [_oldAlias])
           if aliasResults.ntuples < 1
             return "Game Alias not found use !listgames to see the current aliases"
           end
@@ -41,7 +41,14 @@ module RunTracker
           end
           conn.exec('DEALLOCATE update_category_prefix')
 
+          # Set the alias for any existing resources
+          conn.prepare('update_resource_aliases', "update public.resources set game_alias=$1 where game_alias=$2")
+          conn.exec_prepared('update_resource_aliases', [_newAlias, _oldAlias])
+          conn.exec('DEALLOCATE update_resource_aliases')
+
         end
+
+        _event << "Alias updated from #{_oldAlias} to #{_newAlias}"
         # TODO add some output for errors
 
         return
