@@ -23,6 +23,7 @@ module RunTracker
       SetGameAlias,
       StatsRunner,
       RemoveGame,
+      RemoveResource,
       Resource
     ]
 

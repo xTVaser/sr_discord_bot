@@ -4,9 +4,9 @@ module RunTracker
       extend Discordrb::Commands::CommandContainer
 
       command(:resource, description: 'Displays the content of a particular games resource',
-                          usage: '!resource <gameAlias> <name>',
-                          min_args: 2,
-                          max_args: 2) do |_event, _gameAlias, _name|
+                         usage: '!resource <gameAlias> <name>',
+                         min_args: 2,
+                         max_args: 2) do |_event, _gameAlias, _name|
 
         # Command Body
         PostgresDB::Conn.prepare('get_resource', "SELECT * FROM public.resources WHERE game_alias=$1 and resource=$2")
