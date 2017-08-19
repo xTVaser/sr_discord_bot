@@ -16,6 +16,7 @@ module RunTracker
       AddResource,
       ListCategories,
       ListGames,
+      ListResources,
       ListMods,
       Set,
       SetCategoryAlias,
