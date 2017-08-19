@@ -69,11 +69,19 @@ module RunTracker
                          'PRIMARY KEY ("alias"))' \
                          'WITH (' \
                          'OIDS = FALSE);'
+      createResourcesTable = 'CREATE TABLE IF NOT EXISTS public.resources(' \
+                             '"resource" character varying(255) NOT NULL,' \
+                             '"game_alias" character varying(255) NOT NULL,' \
+                             '"content" text NOT NULL,' \
+                             'PRIMARY KEY ("resource", "game_alias"))' \
+                             'WITH (' \
+                             'OIDS = FALSE);'
 
       Conn.exec(createTrackedGamesCmd)
       Conn.exec(createTrackedRunnersCmd)
       Conn.exec(createCommandPermissionsCmd)
       Conn.exec(createAliasTable)
+      Conn.exec(createResourcesTable)
       return 'Tables Created Succesfully'
     rescue PG::Error => e
       return 'Table Creation Unsuccessful: ' + e.message
