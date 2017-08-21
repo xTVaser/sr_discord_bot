@@ -30,8 +30,14 @@ module RunTracker
     ##
     # Given a time in seconds, gives the current milestone
     # For example, given 1:04:01, means Sub 1:04
-    def self.currentMilestoneStr(time)
-      Time.at(time).strftime('Sub %H:%M')
+    def self.currentMilestoneStr(achievedMilestone)
+      achievedMilestone += 1
+      pp "Achieved Milestone #{achievedMilestone}"
+      minutes = achievedMilestone / 60
+      hours = minutes / 60
+      minutes = minutes - (hours * 60)
+      pp "Hours #{hours} Minutes #{minutes}"
+      return sprintf('Sub %02d:%02d', hours, minutes)
     end
 
     ##

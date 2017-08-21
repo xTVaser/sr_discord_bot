@@ -46,7 +46,7 @@ module RunTracker
             # the fix is probably to check on the heartbeat updating if their name overwrite the previous guest name and then update accordingly
             runnerKey = ''
             runnerName = ''
-            if run['players'].first['rel'].casecmp('guest').zero?
+            if run['players'].first['rel'].downcase.casecmp('guest').zero?
               runnerKey = run['players'].first['name']
               runnerName = 'guest'
             else
@@ -55,7 +55,7 @@ module RunTracker
             # If we havnt started tracking this runner before, init
             runner = nil
             if !currentRunnerList.key?(runnerKey) && !newRunnerList.key?(runnerKey)
-              unless runnerName.casecmp('guest').zero? # only call API for name if new runner and not a guest
+              unless runnerName.downcase.casecmp('guest').zero? # only call API for name if new runner and not a guest
                 runnerName = SrcAPI.getUserName(runnerKey)
               end
               runner = Runner.new(runnerKey, runnerName)
@@ -68,6 +68,14 @@ module RunTracker
               runner = currentRunnerList[runnerKey]
             end
 
+            # Check if this run is for the subcategory we are looking for right now
+            # If the run has no subcategories, then it changes nothing here (i hope)
+            # anything in the variables section will be unrelated, or a new change, in which case, delete and add the game again to update schema
+            if !category.subcategories.empty? &&
+               run['values'][Util.getSubCategoryVar(category.category_id).first] != Util.getSubCategoryVar(category.category_id).last
+              next # skip the run
+            end
+
             # Has this runner ran this game before, init the game and category
             if !runner.historic_runs.key?(gameID)
               runner.historic_runs[gameID] = RunnerGame.new(gameID, gameName)
@@ -77,30 +85,23 @@ module RunTracker
               runner.historic_runs[gameID].categories[category.category_id] = RunnerCategory.new(category.category_id, category.category_name)
             end # else its fine
 
-            # Check if this run is for the subcategory we are looking for right now
-            # If the run has no subcategories, then it changes nothing here (i hope)
-            # anything in the variables section will be unrelated, or a new change, in which case, delete and add the game again to update schema
-            if !category.subcategories.empty? &&
-               run['values'][Util.getSubCategoryVar(category.category_id).first] != Util.getSubCategoryVar(category.category_id).last
-              next # skip the run
-            end
-
-            numSubmittedRuns += 1
             runner.num_submitted_runs += 1
             runner.total_time_overall += Integer(run['times']['primary_t'])
             runner.historic_runs[gameID].num_submitted_runs += 1
-            runner.historic_runs[gameID].total_time_overall += Integer(run['times']['primary_t']) # TODO: probably convert these to hours here, util function
+            runner.historic_runs[gameID].total_time_overall += Integer(run['times']['primary_t'])
+            runner.historic_runs[gameID].categories[category.category_id].num_submitted_runs += 1
             runner.historic_runs[gameID].categories[category.category_id].total_time_overall += Integer(run['times']['primary_t'])
 
             # Check if the run is a new milestone for this runner
             runnerCurrentPB = runner.historic_runs[gameID].categories[category.category_id].current_pb_time
             nextMilestone = Util.nextMilestone(runnerCurrentPB)
+            pp "Milestone#{nextMilestone}"
             if runnerCurrentPB == Util::MaxInteger
               runner.historic_runs[gameID].categories[category.category_id]
-                    .milestones['First Run'] = run['id']
+                    .milestones['First Run'] = run['weblink']
             elsif nextMilestone >= Integer(run['times']['primary_t'])
               runner.historic_runs[gameID].categories[category.category_id]
-                    .milestones[Util.currentMilestoneStr(Integer(run['times']['primary_t'])).to_s] = run['id']
+                    .milestones[Util.currentMilestoneStr(nextMilestone)] = run['weblink']
             end
 
             # Update if PB

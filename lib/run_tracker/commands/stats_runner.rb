@@ -52,6 +52,7 @@ module RunTracker
           PostgresDB::Conn.prepare("find_alias", "SELECT * FROM public.\"aliases\" WHERE alias= $1 and type='game'")
           aliasResults = PostgresDB::Conn.exec_prepared('find_alias', [_alias])
           if aliasResults.ntuples < 1
+            PostgresDB::Conn.exec('DEALLOCATE find_alias')
             _event << "Game Alias not found use !listgames to see the current aliases"
             next
           end
@@ -94,6 +95,7 @@ module RunTracker
           PostgresDB::Conn.prepare("find_alias", "SELECT * FROM public.\"aliases\" WHERE alias= $1 and type='category'")
           aliasResults = PostgresDB::Conn.exec_prepared('find_alias', [_alias])
           if aliasResults.ntuples < 1
+            PostgresDB::Conn.exec('DEALLOCATE find_alias')
             _event << "Category Alias not found use !listcategories <gameAlias> to see the current aliases"
             next
           end
@@ -117,7 +119,7 @@ module RunTracker
 
           # Check to see if that runner has done runs of that category
           category = foundGame.categories[aliasResults.first['id']]
-          if category.num_submitted_runs > 0
+          if category.num_submitted_runs <= 0
             _event << "That runner has not done a run of that category for that category!"
             next
           end
