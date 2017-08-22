@@ -5,16 +5,17 @@ module RunTracker
 
       command(:removegame, description: 'Removes a game from the list of tracked games.',
                            usage: '!removegame <game-alias>',
-                           permission_level: 3, # NOTE hardcoded
+                           permission_level: PERM_ADMIN,
                            min_args: 1,
                            max_args: 1) do |event, search_field|
 
-        if search_field.empty?
-          event << '`game-alias` field is empty. Please enter a game alias to remove said game.'
-        else
-          removeGameById(event, search_field)
-        end
-      end
+        "yes"
+        # if search_field.empty?
+        #   #event << '`game-alias` field is empty. Please enter a game alias to remove said game.'
+        # else
+        #   #removeGameById(event, search_field)
+        # end
+      end # end of command body
 
       def self.removeGameById(event, name)
         begin

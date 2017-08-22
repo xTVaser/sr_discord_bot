@@ -215,5 +215,18 @@ module RunTracker
       return self.findID(results.first['alias'].split('-').first)
     end # end of func
 
+    ##
+    # Initialize everyones permissions
+    def self.initPermissions()
+      begin
+        userPermissions = PostgresDB::Conn.exec('select * from public.managers') # Grab each user ID from the database
+        userPermissions.each do |user|
+          RTBot.set_user_permission(user['user_id'], user['access_level'])
+        end
+      rescue Exception=>e
+        _event << e.backtrace.inspect + e.message + "lol sick spam"
+      end
+    end # end of func
+
   end # end of module
 end

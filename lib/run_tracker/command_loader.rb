@@ -5,11 +5,6 @@ module RunTracker
       require file
     end
 
-    # Constants
-    CONST_MANAGER = 2
-    CONST_MOD = 1
-    CONST_USER = 0
-
     # Add Command module names here
     @commands = [
       AddGame,
@@ -18,7 +13,7 @@ module RunTracker
       ListGames,
       ListResources,
       ListMods,
-      Set,
+      Grant,
       SetCategoryAlias,
       SetGameAlias,
       StatsCategory,

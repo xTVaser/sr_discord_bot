@@ -18,34 +18,14 @@ module RunTracker
                                               prefix: '!')
 
   DevChannelID = 338_452_338_912_264_192
+  # Constants
+  PERM_ADMIN = 2
+  PERM_MOD = 1
+  PERM_USER = 0
 
   RTBot.ready do |_event|
+    PostgresDB.initPermissions()
     RTBot.send_message(DevChannelID, '!! Bot Back Online !!')
-
-
-    begin
-      PostgresDB::Conn.prepare('select_user_id','select user_id from public."managers"') # Grab each user ID from the database
-      users = PostgresDB::Conn.exec_prepared('select_user_id')
-
-      # Put each user id into an array
-      userArray = []
-      index = 0
-      users.each do |user|
-        userArray[index] = user
-        index += 1
-      end
-
-      # For each user, set their respective access level
-      userArray.each do |user|
-        PostgresDB::Conn.prepare('select_acl', 'SELECT access_level from public."managers" where user_id = $1') # Grab the access level of the user
-        acl = PostgresDB::Conn.exec_prepared('select_acl', [user])
-
-        RTBot.set_user_permission(user, acl) # Set the access level of the user.
-      end
-    rescue Exception=>e
-      _event << e.backtrace.inspect + e.message + "lol sick spam"
-    end
-
   end
 
   require_relative 'run_tracker/models/jsonable.rb'
