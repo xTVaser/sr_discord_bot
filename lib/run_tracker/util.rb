@@ -6,6 +6,7 @@ module RunTracker
     # Retrives JSON given a url
     # Returns the parsed JSON object
     def self.jsonRequest(url)
+      pp "[JSON] #{url}"
       jsonURI = URI(url)
       response = Net::HTTP.get(jsonURI)
 

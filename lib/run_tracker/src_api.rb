@@ -122,7 +122,7 @@ module RunTracker
       runInfo['time'] = Util.secondsToTime(info['times']['primary_t'])
       # name
       if info['players'].first['rel'].casecmp('guest').zero?
-        runInfo['name'] = info['players']['id']
+        runInfo['name'] = info['players'].first['name']
       else
         runInfo['name'] = self.getUserName(info['players'].first['id'])
       end

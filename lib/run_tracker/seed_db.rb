@@ -35,10 +35,8 @@ module RunTracker
           # as you cannot do an API call for just a subcategories' runs
           # Remove the subcategory component of the key
           requestResults = Util.jsonRequest(requestLink)
-          pp "[JSON] #{requestLink}"
           categoryRuns = requestResults['data']
           pagination = requestResults['pagination']
-          count += categoryRuns.length
 
           categoryRuns.each do |run|
             # Add to runner information
@@ -71,7 +69,7 @@ module RunTracker
             # Check if this run is for the subcategory we are looking for right now
             # If the run has no subcategories, then it changes nothing here (i hope)
             # anything in the variables section will be unrelated, or a new change, in which case, delete and add the game again to update schema
-            if !category.subcategories.empty? &&
+            if category.subcategories != nil && !category.subcategories.empty? &&
                run['values'][Util.getSubCategoryVar(category.category_id).first] != Util.getSubCategoryVar(category.category_id).last
               next # skip the run
             end
@@ -85,6 +83,7 @@ module RunTracker
               runner.historic_runs[gameID].categories[category.category_id] = RunnerCategory.new(category.category_id, category.category_name)
             end # else its fine
 
+            count += 1
             category.number_submitted_runs += 1
             runner.num_submitted_runs += 1
             runner.total_time_overall += Integer(run['times']['primary_t'])
@@ -180,6 +179,7 @@ module RunTracker
           # If no more pages to loop through
           break if pagination['links'].length <= 0
           requestLink = SrcAPI.getFwdLink('next', pagination['links'])
+          break if requestLink == nil # i dont feel like thinking so another break
         end # end of category's runs loop
       end # end of category loop
 

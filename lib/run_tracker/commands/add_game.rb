@@ -6,7 +6,7 @@ module RunTracker
       command(:addgame, description: 'Add a game to the list of tracked games.',
                         usage: '!addgame <id/name> <game-name/game-id>',
                         min_args: 2,
-                        max_args: 2) do |event, type, search_field|
+                        max_args: 2) do |_event, type, search_field|
 
         # TODO: technically this should all be wrapped in a transaction so it can be rollbacked.
 
@@ -20,7 +20,7 @@ module RunTracker
         # If the user wants to search by ID, check for ID with SRC API
         # http://www.speedrun.com/api/v1/games/<id>
         if type.casecmp('id').zero?
-          trackGame(event, search_field)
+          trackGame(_event, search_field)
         # However if the user wants to lookup by game, we just get all the results, and make them re-query if >1.
         # http://www.speedrun.com/api/v1/games?name=<name>
         elsif type.casecmp('name').zero?
@@ -35,7 +35,7 @@ module RunTracker
               count += 1
             end
           else # only 1 result
-            trackGame(event, results.first['id'])
+            trackGame(_event, results.first['id'])
           end
         else
           RTBot.send_message(DevChannelID, 'Usage: `!addgame <id/name> <game-name/game-id>`')
@@ -43,8 +43,14 @@ module RunTracker
       end
 
       # Adds a single game to the tracked-games DB
-      def self.trackGame(event, id)
+      def self.trackGame(_event, id)
+        # Check to see if we have added this game already or not
         trackedGame = nil
+        trackedGame = PostgresDB.getTrackedGame(id)
+        if trackedGame != nil
+          _event << "That game is already being tracked, remove it first."
+          return
+        end
         begin
           json = Util.jsonRequest("#{SrcAPI::API_URL}games/#{id}")
           addGameResults = SrcAPI.getGameInfoFromID(json)
@@ -53,22 +59,23 @@ module RunTracker
         rescue Exception => e
           RTBot.send_message(DevChannelID, e.backtrace.inspect + e.message + " ID: #{id}") # TODO: remove stacktrace stuff
         end
-        trackedGame.announce_channel = event.channel
+        trackedGame.announce_channel = _event.channel
 
         begin
-          PostgresDB::Conn.prepare('Add Tracked Games', 'insert into public."tracked_games"
+          PostgresDB::Conn.prepare('add_tracked_games', 'insert into public."tracked_games"
             ("game_id", "game_name", "announce_channel", categories, moderators)
             values ($1, $2, $3, $4, $5)')
-          PostgresDB::Conn.exec_prepared('Add Tracked Games', [trackedGame.id,
+          PostgresDB::Conn.exec_prepared('add_tracked_games', [trackedGame.id,
                                                                trackedGame.name, trackedGame.announce_channel.id,
                                                                JSON.generate(trackedGame.categories),
                                                                JSON.generate(trackedGame.moderators)])
+          PostgresDB::Conn.exec('DEALLOCATE add_tracked_games')
         rescue PG::UniqueViolation
           RTBot.send_message(DevChannelID, 'That game is already being tracked')
         end
 
         # Announce to user
-        event << Util.codeBlock("Found `#{trackedGame.name}` with ID: `#{trackedGame.id}`",
+        _event << Util.codeBlock("Found `#{trackedGame.name}` with ID: `#{trackedGame.id}`",
                                 "`#{trackedGame.categories.length}` categories and `#{trackedGame.moderators.length}` current moderators",
                                 "To change the alias `!setalias game #{gameAlias} or announce channel `!setannounce #{gameAlias} <channel_name>`",
                                 'If incorrect, remove with : `stub`') # TODO: add remove command
