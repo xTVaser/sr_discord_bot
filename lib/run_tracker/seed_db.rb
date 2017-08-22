@@ -45,7 +45,7 @@ module RunTracker
             runnerKey = ''
             runnerName = ''
             if run['players'].first['rel'].downcase.casecmp('guest').zero?
-              runnerKey = run['players'].first['name']
+              runnerKey = run['players'].first['name'].downcase
               runnerName = 'guest'
             else
               runnerKey = run['players'].first['id']
