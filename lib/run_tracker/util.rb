@@ -81,5 +81,16 @@ module RunTracker
       message += '```'
       message
     end # End self.arrayToCodeBlock
+
+    ##
+    # Given seconds, turns it into time
+    def self.secondsToTime(seconds)
+
+      minutes = seconds / 60
+      seconds = seconds % 60
+      hours = minutes / 60
+      minutes = minutes - (hours * 60)
+      return sprintf('%02d:%02d:%02d', hours, minutes, seconds)
+    end # end of secondsToTime
   end
 end

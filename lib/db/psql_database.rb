@@ -200,5 +200,20 @@ module RunTracker
 
       return game
     end
+
+    ##
+    # Gets the game name alias from a category alias
+    def self.categoryAliasToGameID(theAlias)
+
+      PostgresDB::Conn.prepare('find_alias', "SELECT * FROM public.aliases WHERE alias=$1")
+      results = PostgresDB::Conn.exec_prepared('find_alias', [theAlias])
+      PostgresDB::Conn.exec('DEALLOCATE find_alias')
+
+      if results.ntuples < 1
+        return nil
+      end
+      return self.findID(results.first['alias'].split('-').first)
+    end # end of func
+
   end # end of module
 end

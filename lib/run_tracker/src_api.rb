@@ -105,6 +105,36 @@ module RunTracker
 
       end # end category loop
       [categoryList, aliasList]
-    end
+    end # end func
+
+
+
+    ##
+    # Given a run ID, get its associated information
+    # this is a work in progress, more is extracted as needed
+    def self.getRunInfo(runID)
+
+      info = Util.jsonRequest("#{API_URL}runs/#{runID}")['data']
+      # TODO this doesnt handle 404 not found
+      # guaranteed to be just one run
+
+      runInfo = Hash.new
+      runInfo['time'] = Util.secondsToTime(info['times']['primary_t'])
+      # name
+      if info['players'].first['rel'].casecmp('guest').zero?
+        runInfo['name'] = info['players']['id']
+      else
+        runInfo['name'] = self.getUserName(info['players'].first['id'])
+      end
+      runInfo['srcLink'] = info['weblink']
+
+      if info['videos'] == nil
+        runInfo['videoLink'] = "No Video"
+      else
+        runInfo['videoLink'] = info['videos']['links'].first['uri']
+      end
+
+      return runInfo
+    end # end of func
   end # end SRC_API module
 end
