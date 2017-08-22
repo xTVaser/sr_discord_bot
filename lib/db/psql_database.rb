@@ -180,14 +180,20 @@ module RunTracker
       results = PostgresDB::Conn.exec_prepared('find_alias', [theAlias])
       PostgresDB::Conn.exec('DEALLOCATE find_alias')
 
+      if results.ntuples < 1
+        return nil
+      end
       return results.first['id']
     end
 
     ##
     # Get tracked game by alias, returns object representation
     def self.getTrackedGame(game_id)
-      gameResult = PostgresDB::Conn.exec("SELECT * FROM public.\"tracked_games\" WHERE \"game_id\"='#{game_id}'").first
-
+      gameResults = PostgresDB::Conn.exec("SELECT * FROM public.\"tracked_games\" WHERE \"game_id\"='#{game_id}'")
+      if gameResults.ntuples < 1
+        return nil
+      end
+      gameResult = gameResults.first
       game = TrackedGame.new(gameResult['game_id'], gameResult['game_name'], Hash.new, Hash.new)
       game.announce_channel = gameResult['announce_channel']
       game.fromJSON(gameResult['categories'], gameResult['moderators'])

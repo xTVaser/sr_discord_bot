@@ -21,6 +21,7 @@ module RunTracker
       Set,
       SetCategoryAlias,
       SetGameAlias,
+      StatsGame,
       StatsRunner,
       RemoveGame,
       RemoveResource,

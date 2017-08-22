@@ -145,10 +145,6 @@ module RunTracker
 
         _event << Util.arrayToCodeBlock(message)
 
-          # TODO number of submitted WRs is definitely wrong
-          # TODO number of submitted runs is wrong as well, categories have 0 submitted runs
-          # TODO milestones are wrong
-
       end # end of command body
     end
   end

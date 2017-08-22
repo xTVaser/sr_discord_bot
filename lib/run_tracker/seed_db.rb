@@ -85,6 +85,7 @@ module RunTracker
               runner.historic_runs[gameID].categories[category.category_id] = RunnerCategory.new(category.category_id, category.category_name)
             end # else its fine
 
+            category.number_submitted_runs += 1
             runner.num_submitted_runs += 1
             runner.total_time_overall += Integer(run['times']['primary_t'])
             runner.historic_runs[gameID].num_submitted_runs += 1
@@ -95,7 +96,6 @@ module RunTracker
             # Check if the run is a new milestone for this runner
             runnerCurrentPB = runner.historic_runs[gameID].categories[category.category_id].current_pb_time
             nextMilestone = Util.nextMilestone(runnerCurrentPB)
-            pp "Milestone#{nextMilestone}"
             if runnerCurrentPB == Util::MaxInteger
               runner.historic_runs[gameID].categories[category.category_id]
                     .milestones['First Run'] = run['weblink']
@@ -114,6 +114,7 @@ module RunTracker
             # TODO, support ties
             if currentWRTime > Integer(run['times']['primary_t'])
 
+              category.number_submitted_wrs += 1
               runner.num_submitted_wrs += 1
               runner.historic_runs[gameID].num_previous_wrs += 1
               runner.historic_runs[gameID].categories[category.category_id].num_previous_wrs += 1
