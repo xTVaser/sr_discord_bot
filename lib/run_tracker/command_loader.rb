@@ -14,6 +14,7 @@ module RunTracker
       ListResources,
       ListMods,
       Grant,
+      SetAnnounce,
       SetCategoryAlias,
       SetGameAlias,
       StatsCategory,
