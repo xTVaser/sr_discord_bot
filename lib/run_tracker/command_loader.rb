@@ -21,6 +21,7 @@ module RunTracker
       StatsRunner,
       RemoveGame,
       RemoveResource,
+      ResetDB,
       Resource
     ]
 

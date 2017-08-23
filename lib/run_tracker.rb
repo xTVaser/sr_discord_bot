@@ -23,18 +23,24 @@ module RunTracker
   PERM_MOD = 1
   PERM_USER = 0
 
+  # When the bot starts up
   RTBot.ready do |_event|
-    PostgresDB.initPermissions()
-    RTBot.send_message(DevChannelID, '!! Bot Back Online !!')
+    # Create the database tables
+    PostgresDB.generateSchema
+    # Initialize any permissions that have previously been set
+    PostgresDB.initPermissions
+    # Give the server owner maximum permissions
+    RTBot.set_user_permission(RTBot.servers.first.last.owner.id, PERM_ADMIN)
+    RTBot.send_message(DevChannelID, '!! Bot Back Online !!') # TODO remove
   end
-
-  require_relative 'run_tracker/models/jsonable.rb'
 
   # Require all files in run_tracker folder
   Dir["#{File.dirname(__FILE__)}/run_tracker/*.rb"].each do |file|
     require file
   end
 
+  # Require jsonable first because some of the models depend on it
+  require_relative 'run_tracker/models/jsonable.rb'
   # Require all model files
   Dir["#{File.dirname(__FILE__)}/run_tracker/models/*.rb"].each do |file|
     require file
@@ -46,14 +52,6 @@ module RunTracker
   # If the Bot is connecting to the server for the first time
   # it should establish the database schema, would be nice to
   # not have to call this manually but whatever.
-
-  # TODO: Temporary commands below, remove after devel or move to safe environment with permissions checking
-  RTBot.message(with_text: '!ResetDB DOIT') do |event|
-    event.respond 'k 1 sec'
-    event.respond "hope you know what you're doing"
-    event.respond PostgresDB.destroySchema
-    event.respond PostgresDB.generateSchema
-  end
 
   RTBot.run
 end
