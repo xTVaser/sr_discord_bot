@@ -5,6 +5,7 @@ module RunTracker
 
       command(:setgamealias, description: '',
                          usage: "!setgamealias <old alias> <new alias>\nAlias must be unique.",
+                         permission_level: PERM_MOD,
                          min_args: 2,
                          max_args: 2) do |_event, _oldAlias, _newAlias|
 

@@ -5,6 +5,7 @@ module RunTracker
 
       command(:listgames, description: 'Lists all tracked games.',
                           usage: '!listgames',
+                          permission_level: PERM_USER,
                           min_args: 0,
                           max_args: 0) do |_event|
 

@@ -5,6 +5,7 @@ module RunTracker
 
       command(:listresources, description: 'Lists all resources for a specific tracked game.',
                           usage: '!listresources <gameAlias>',
+                          permission_level: PERM_USER,
                           min_args: 1,
                           max_args: 1) do |_event, _gameAlias|
 

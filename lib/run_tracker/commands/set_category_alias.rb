@@ -5,6 +5,7 @@ module RunTracker
 
       command(:setcategoryalias, description: '',
                          usage: "!setcategoryalias <old alias> <new alias>\nAlias must be unique.\nDo not need to enter the game-alias prefix in the new alias.",
+                         permission_level: PERM_MOD,
                          min_args: 2,
                          max_args: 2) do |_event, _oldAlias, _newAlias|
 

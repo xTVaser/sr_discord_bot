@@ -5,6 +5,7 @@ module RunTracker
 
       command(:statsgame, description: 'Displays stats for a given tracked game',
                         usage: "!statsgame <alias>",
+                        permission_level: PERM_USER,
                         min_args: 1,
                         max_args: 1) do |_event, _gameAlias|
 

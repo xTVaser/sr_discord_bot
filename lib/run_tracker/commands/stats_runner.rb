@@ -5,6 +5,7 @@ module RunTracker
 
       command(:statsrunner, description: 'Displays all or a particular stat for a given runner',
                         usage: "!statsrunner <runner name> Optional:{<game alias> <category alias>}",
+                        permission_level: PERM_USER,
                         min_args: 1,
                         max_args: 3) do |_event, _runnerName, _type, _alias|
 

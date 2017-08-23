@@ -5,6 +5,7 @@ module RunTracker
 
       command(:listcategories, description: 'Lists all categories for a specific tracked game.',
                           usage: '!listcategories',
+                          permission_level: PERM_USER,
                           min_args: 1,
                           max_args: 1) do |_event, _game_alias|
 

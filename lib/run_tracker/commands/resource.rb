@@ -5,6 +5,7 @@ module RunTracker
 
       command(:resource, description: 'Displays the content of a particular games resource',
                          usage: '!resource <gameAlias> <name>',
+                         permission_level: PERM_USER,
                          min_args: 2,
                          max_args: 2) do |_event, _gameAlias, _name|
 

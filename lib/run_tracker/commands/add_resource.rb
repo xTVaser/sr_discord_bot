@@ -5,6 +5,7 @@ module RunTracker
 
       command(:addresource, description: 'Lists all categories for a specific tracked game.',
                           usage: '!addresource <gameAlias> <resource name> <content>',
+                          permission_level: PERM_MOD,
                           min_args: 3,
                           max_args: 3) do |_event, _gameAlias, _name, _content|
 

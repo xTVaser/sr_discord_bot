@@ -15,7 +15,8 @@ module RunTracker
   # Establish Discord Bot Connection
   RTBot = Discordrb::Commands::CommandBot.new(token: ENV['TOKEN'],
                                               client_id: ENV['CLIENT_ID'],
-                                              prefix: '!')
+                                              prefix: '!',
+                                              command_doesnt_exist_message: 'Use !help to see a list of available commands')
 
   DevChannelID = 338_452_338_912_264_192
   # Constants

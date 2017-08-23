@@ -5,6 +5,7 @@ module RunTracker
 
       command(:listmods, description: 'Lists all mods for a specific game.',
                           usage: '!listmods <gameAlias>',
+                          permission_level: PERM_USER,
                           min_args: 1,
                           max_args: 1) do |_event, _gameAlias|
 

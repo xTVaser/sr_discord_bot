@@ -5,6 +5,7 @@ module RunTracker
 
       command(:removeresource, description: 'Removed a particular games resource',
                           usage: '!removeresource <gameAlias> <resourceName>',
+                          permission_level: PERM_MOD,
                           min_args: 2,
                           max_args: 2) do |_event, _gameAlias, _name|
 

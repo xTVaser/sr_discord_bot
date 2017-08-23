@@ -5,6 +5,7 @@ module RunTracker
 
       command(:addgame, description: 'Add a game to the list of tracked games.',
                         usage: '!addgame <id/name> <game-name/game-id>',
+                        permission_level: PERM_ADMIN,
                         min_args: 2,
                         max_args: 2) do |_event, type, search_field|
 
