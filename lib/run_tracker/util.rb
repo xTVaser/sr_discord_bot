@@ -84,6 +84,16 @@ module RunTracker
     end # End self.arrayToCodeBlock
 
     ##
+    # Given an array of lines, make a message
+    def self.arrayToMessage(lines, highlighting: '') # This is a variadic function
+      message = "#{highlighting}\n" # Start of Code block
+      lines.each do |line|
+        message += "#{line}\n"
+      end
+      message
+    end # End self.arrayToCodeBlock
+
+    ##
     # Given seconds, turns it into time
     def self.secondsToTime(seconds)
 

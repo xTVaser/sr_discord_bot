@@ -37,17 +37,7 @@ module RunTracker
     RTBot.send_message(DevChannelID, '!! Bot Back Online !!') # TODO remove
   end
 
-  heartbeatCounter = 0
 
-  RTBot.heartbeat do |_event|
-
-    heartbeatCounter += 1
-    if heartbeatCounter >= HEARTBEAT_CHECKRUNS
-      heartbeatCounter = 0
-      RTBot.send_message(DevChannelID, "my hearts beating my hands are shaking but im still shooting and im still getting the headshots its like boom headshot boom headshot boom headshot.")
-    end
-
-  end
 
   # Require all files in run_tracker folder
   Dir["#{File.dirname(__FILE__)}/run_tracker/*.rb"].each do |file|
@@ -63,6 +53,20 @@ module RunTracker
 
   # Load up all the commands
   CommandLoader.loadCommands
+
+  heartbeatCounter = 0
+  NotifyMods.notifyMods
+
+  RTBot.heartbeat do |_event|
+
+    heartbeatCounter += 1
+    if heartbeatCounter >= HEARTBEAT_CHECKRUNS
+      heartbeatCounter = 0
+
+      RTBot.send_message(DevChannelID, "my hearts beating my hands are shaking but im still shooting and im still getting the headshots its like boom headshot boom headshot boom headshot.")
+    end
+
+  end
 
   # If the Bot is connecting to the server for the first time
   # it should establish the database schema, would be nice to
