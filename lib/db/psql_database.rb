@@ -95,6 +95,13 @@ module RunTracker
       return 'Schema Destruction Unsuccessful: ' + e.message
     end
 
+    def self.dontDropManagers
+      Conn.exec('DROP TABLE IF EXISTS public.tracked_games')
+      Conn.exec('DROP TABLE IF EXISTS public.tracked_runners')
+      Conn.exec('DROP TABLE IF EXISTS public.resources')
+      Conn.exec('DROP TABLE IF EXISTS public.aliases')
+    end
+
     def self.getCurrentRunners
 
       runners = {}

@@ -9,6 +9,7 @@ module RunTracker
     @commands = [
       AddGame,
       AddResource,
+      ClearRunData,
       ListCategories,
       ListGames,
       ListResources,
@@ -36,7 +37,6 @@ module RunTracker
       @commands.each do |command|
         return true if _command == command
       end
-
       false
     end
 
