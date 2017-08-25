@@ -13,19 +13,35 @@ module RunTracker
 
         results = Util.jsonRequest(requestLink)['data']
 
-        trackedGame.moderators.each do |key, moderator|
-          if moderator.should_notify == true && moderator.discord_id != 0
-            message = Array.new
-            message.push("#{trackedGame.name}'s unverified runs that you have not already been notified of")
-            results.each do |run|
-              pp run
-              message.push("#{run['weblink']}")
+        message = Array.new
+        message.push("#{trackedGame.name}'s unverified runs that you have not already been notified of")
+        runIDs = Array.new
+        # Construct the message
+        results.each do |run|
+          # Check to see if we have already notified the mod about this run before
+          check = PostgresDB::Conn.exec("SELECT * FROM public.notifications WHERE run_id = '#{run['id']}'")
+          if check.ntuples > 0
+            next
+          end
+          # Else, add the run to the message
+          message.push("#{run['weblink']}")
+          runIDs.push(run['id'])
+        end
+        # If we actually added a single run, notify the mods
+        if message.length > 1
+          trackedGame.moderators.each do |key, moderator|
+            if moderator.should_notify == true && moderator.discord_id != 0
+              message.push("If you want to stop receiving these notifications reply with !optout #{moderator.src_name}")
+              RTBot.user(moderator.discord_id).pm(Util.arrayToMessage(message))
+              message.pop # delete the mod specific line add it back later
             end
-            message.push("If you want to stop receiving these notifications reply with !optout #{moderator.src_name}")
-            RTBot.user(moderator.discord_id).pm(Util.arrayToMessage(message))
+          end
+          # Add this run's id to the notification table
+          runIDs.each do |runID|
+            PostgresDB::Conn.exec("INSERT INTO public.notifications (run_id) VALUES ('#{runID}')")
           end
         end
-      end
+      end # end of tracked games loop
 
 
     end # end notify mods

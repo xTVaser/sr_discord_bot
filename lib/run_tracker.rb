@@ -34,6 +34,9 @@ module RunTracker
     PostgresDB.initPermissions
     # Give the server owner maximum permissions
     RTBot.set_user_permission(RTBot.servers.first.last.owner.id, PERM_ADMIN)
+    # Clear the notifications table if at 200 rows, delete 150 of the most recent ones
+    PostgresDB.cleanNotificationTable
+    
     RTBot.send_message(DevChannelID, '!! Bot Back Online !!') # TODO remove
   end
 
@@ -55,14 +58,13 @@ module RunTracker
   CommandLoader.loadCommands
 
   heartbeatCounter = 0
-  NotifyMods.notifyMods
 
   RTBot.heartbeat do |_event|
 
     heartbeatCounter += 1
     if heartbeatCounter >= HEARTBEAT_CHECKRUNS
       heartbeatCounter = 0
-
+      NotifyMods.notifyMods
       RTBot.send_message(DevChannelID, "my hearts beating my hands are shaking but im still shooting and im still getting the headshots its like boom headshot boom headshot boom headshot.")
     end
 

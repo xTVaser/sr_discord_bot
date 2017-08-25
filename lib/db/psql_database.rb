@@ -76,12 +76,19 @@ module RunTracker
                              'PRIMARY KEY ("resource", "game_alias"))' \
                              'WITH (' \
                              'OIDS = FALSE);'
+      createNotificationTable = 'CREATE TABLE IF NOT EXISTS public.notifications(' \
+                             '"run_id" character varying(255) NOT NULL,' \
+                             '"count" SERIAL,' \
+                             'PRIMARY KEY ("run_id"))' \
+                             'WITH (' \
+                             'OIDS = FALSE);'
 
       Conn.exec(createTrackedGamesCmd)
       Conn.exec(createTrackedRunnersCmd)
       Conn.exec(createCommandPermissionsCmd)
       Conn.exec(createAliasTable)
       Conn.exec(createResourcesTable)
+      Conn.exec(createNotificationTable)
       return 'Tables Created Succesfully'
     rescue PG::Error => e
       return 'Table Creation Unsuccessful: ' + e.message
@@ -100,6 +107,20 @@ module RunTracker
       Conn.exec('DROP TABLE IF EXISTS public.tracked_runners')
       Conn.exec('DROP TABLE IF EXISTS public.resources')
       Conn.exec('DROP TABLE IF EXISTS public.aliases')
+    end
+
+    def self.cleanNotificationTable
+
+      # Pull all the rows
+      rows = Conn.exec("SELECT * FROM public.notifications ORDER BY count DESC")
+      if rows.ntuples < 200
+        return
+      end
+      # Get the highest count, subtract 25
+      cutoff = (rows.first.count) - 25
+      # Delete the other 150 rows
+      Conn.exec("DELETE FROM public.notifications WHERE count < '#{cutoff}'")
+
     end
 
     def self.getCurrentRunners
