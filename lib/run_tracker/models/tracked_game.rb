@@ -28,7 +28,7 @@ module RunTracker
       moderators.each do |key, value|
         moderator = Moderator.new(value['@src_id'], value['@src_name'])
         moderator.discord_id = Integer(value['@discord_id'])
-        moderator.should_notify = value['@should_notify'] == 'true'
+        moderator.should_notify = value['@should_notify'] == true
         moderator.secret_key = value['@secret_key']
         if value['@last_verified_run_date'] != nil
           moderator.last_verified_run_date = Date.strptime(value['@last_verified_run_date'], '%Y-%m-%d')

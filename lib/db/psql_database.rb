@@ -202,6 +202,34 @@ module RunTracker
     end
 
     ##
+    # Get tracked games, returns object representation
+    def self.getTrackedGames
+      gameResults = PostgresDB::Conn.exec("SELECT * FROM public.tracked_games")
+      if gameResults.ntuples < 1
+        return nil
+      end
+      games = Array.new
+      gameResults.each do |gameResult|
+        game = TrackedGame.new(gameResult['game_id'], gameResult['game_name'], Hash.new, Hash.new)
+        game.announce_channel = gameResult['announce_channel']
+        game.fromJSON(gameResult['categories'], gameResult['moderators'])
+        games.push(game)
+      end
+      return games
+    end
+
+    ##
+    # Updates tracked game based on it's ID
+    def self.updateTrackedGame(game)
+      PostgresDB::Conn.prepare('update_tracked_game', "update public.tracked_games set game_id = $1, game_name = $2,
+                                announce_channel = $3, categories = $4, moderators = $5 where game_id = $1")
+      PostgresDB::Conn.exec_prepared('update_tracked_game', [game.id, game.name, game.announce_channel,
+                                                             JSON.generate(game.categories),
+                                                             JSON.generate(game.moderators)])
+      PostgresDB::Conn.exec('DEALLOCATE update_tracked_game')
+    end
+
+    ##
     # Gets the game name alias from a category alias
     def self.categoryAliasToGameID(theAlias)
 
