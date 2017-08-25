@@ -15,6 +15,7 @@ module RunTracker
       ListMods,
       Grant,
       OptIn,
+      OptOut,
       SetAnnounce,
       SetCategoryAlias,
       SetGameAlias,
