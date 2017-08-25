@@ -28,7 +28,7 @@ module RunTracker
         requestLink = "#{SrcAPI::API_URL}runs" \
                       "?game=#{gameID}" \
                       "&category=#{category.category_id.split('-').first}" \
-                      '&orderby=date&direction=asc&max=200'
+                      '&verified=verified&orderby=date&direction=asc&max=200'
 
         loop do
           # This inefficiency makes me so depressed, the way SRC has added subcategories makes me cry

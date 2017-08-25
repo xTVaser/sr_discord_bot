@@ -24,6 +24,8 @@ module RunTracker
   PERM_MOD = 1
   PERM_USER = 0
 
+  HEARTBEAT_CHECKRUNS = 1 # 1 heartbeat approximately every 1minute
+
   # When the bot starts up
   RTBot.ready do |_event|
     # Create the database tables
@@ -33,6 +35,18 @@ module RunTracker
     # Give the server owner maximum permissions
     RTBot.set_user_permission(RTBot.servers.first.last.owner.id, PERM_ADMIN)
     RTBot.send_message(DevChannelID, '!! Bot Back Online !!') # TODO remove
+  end
+
+  heartbeatCounter = 0
+
+  RTBot.heartbeat do |_event|
+
+    heartbeatCounter += 1
+    if heartbeatCounter >= HEARTBEAT_CHECKRUNS
+      heartbeatCounter = 0
+      RTBot.send_message(DevChannelID, "my hearts beating my hands are shaking but im still shooting and im still getting the headshots its like boom headshot boom headshot boom headshot.")
+    end
+
   end
 
   # Require all files in run_tracker folder
