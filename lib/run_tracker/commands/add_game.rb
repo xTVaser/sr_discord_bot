@@ -9,13 +9,12 @@ module RunTracker
                         min_args: 2,
                         max_args: 2) do |_event, type, search_field|
 
-        # TODO: technically this should all be wrapped in a transaction so it can be rollbacked.
-
         # Command Body
         # Check to see if the command syntax was valid
         unless type.casecmp('id').zero? || type.casecmp('name').zero?
-          RTBot.send_message(DevChannelID, 'Invalid syntax for command `addgame`!')
-          next RTBot.send_message(DevChannelID, 'Usage: `!addgame <id/name> <game-name/game-id>`')
+          _event << 'Invalid syntax for command `addgame`!'
+          _event << 'Usage: `!addgame <id/name> <game-name/game-id>`'
+          next
         end
 
         # If the user wants to search by ID, check for ID with SRC API
@@ -25,23 +24,29 @@ module RunTracker
         # However if the user wants to lookup by game, we just get all the results, and make them re-query if >1.
         # http://www.speedrun.com/api/v1/games?name=<name>
         elsif type.casecmp('name').zero?
-          results = Util.jsonRequest("#{SrcAPI::API_URL}games?name=#{search_field}")['data']
+          results = Util.jsonRequest("#{SrcAPI::API_URL}games?name=#{search_field}&orderby=name.int&direction=asc")['data']
           if results.empty? # no results
-            next RTBot.send_message(DevChannelID, 'No games found with that search criteria, try again')
+            _event << 'No games found with that search criteria, try again'
+            next
           elsif results.length > 1 # more than 1 result
-            RTBot.send_message(DevChannelID, "Found `#{results.length}` results with that criteria: #{search_field}, re-call with correct ID:")
+
+            message = Array.new
+            message.push("Found `#{results.length}` results with the criteria: `#{search_field}`, re-call with correct ID:")
             count = 1
             results.each do |game| # Print all results out
-              RTBot.send_message(DevChannelID, "[#{count}] ID: `#{game['id']}` - #{game['names']['international']}")
+              message.push("[#{count}] ID: `#{game['id']}` - #{game['names']['international']}")
               count += 1
             end
+            Util.safeArrayToMesage(message, _event)
+
           else # only 1 result
             trackGame(_event, results.first['id'])
           end
         else
-          RTBot.send_message(DevChannelID, 'Usage: `!addgame <id/name> <game-name/game-id>`')
+          _event << 'Usage: `!addgame <id/name> <game-name/game-id>`'
+          next
         end
-      end
+      end # end command body
 
       # Adds a single game to the tracked-games DB
       def self.trackGame(_event, id)
@@ -54,14 +59,15 @@ module RunTracker
         end
         begin
           json = Util.jsonRequest("#{SrcAPI::API_URL}games/#{id}")
+          RTBot.send_message(_event.channel.id, 'Archiving Existing Runs...This can Take a While...')
           addGameResults = SrcAPI.getGameInfoFromID(json)
           trackedGame = addGameResults.last
           gameAlias = addGameResults.first
         rescue Exception => e
-          RTBot.send_message(DevChannelID, e.backtrace.inspect + e.message + " ID: #{id}") # TODO: remove stacktrace stuff
+          puts "[ERROR] #{e.message} #{e.backtrace}"
+          return
         end
         trackedGame.announce_channel = _event.channel
-
         begin
           PostgresDB::Conn.prepare('add_tracked_games', 'insert into public."tracked_games"
             ("game_id", "game_name", "announce_channel", categories, moderators)
@@ -72,14 +78,21 @@ module RunTracker
                                                                JSON.generate(trackedGame.moderators)])
           PostgresDB::Conn.exec('DEALLOCATE add_tracked_games')
         rescue PG::UniqueViolation
-          RTBot.send_message(DevChannelID, 'That game is already being tracked')
+          _event << "That game is already being tracked, remove it first."
+          return
         end
 
         # Announce to user
-        _event << Util.codeBlock("Found `#{trackedGame.name}` with ID: `#{trackedGame.id}`",
-                                "`#{trackedGame.categories.length}` categories and `#{trackedGame.moderators.length}` current moderators",
-                                "To change the alias `!setalias game #{gameAlias} or announce channel `!setannounce #{gameAlias} <channel_name>`",
-                                'If incorrect, remove with : `stub`') # TODO: add remove command
+        message = Array.new
+        message.push("Game Added!")
+        message.push("============")
+        message.push("Found <#{trackedGame.name}> with ID: <#{trackedGame.id}>")
+        message.push("Found <#{trackedGame.categories.length}> categories and <#{trackedGame.moderators.length}> current moderators")
+        message.push("To change the alias <!setgamealias #{gameAlias} <newAlias>>")
+        message.push("To change the announce channel <!setannounce #{gameAlias} <#channel_name>>")
+        message.push("If incorrect, remove with <!removegame #{gameAlias}>")
+        _event << Util.arrayToCodeBlock(message, highlighting: 'md')
+
       end # end self.trackGame
     end
   end

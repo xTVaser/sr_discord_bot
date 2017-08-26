@@ -62,7 +62,7 @@ module RunTracker
 
     ##
     # Given potentially many strings, surround them in a codeblock and return that string
-    # Lines must be under 5000 characters long as that is not guaranteed here
+    # Lines must be under 2000 characters long as that is not guaranteed here
     def self.codeBlock(*lines, highlighting: '') # This is a variadic function
       message = "```#{highlighting}\n" # Start of Code block
       lines.each do |line|
@@ -85,9 +85,25 @@ module RunTracker
 
     ##
     # Given an array of lines, make a message
-    def self.arrayToMessage(lines, highlighting: '') # This is a variadic function
-      message = "#{highlighting}\n" # Start of Code block
+    def self.arrayToMessage(lines) # This is a variadic function
       lines.each do |line|
+        message += "#{line}\n"
+      end
+      message
+    end # End self.arrayToCodeBlock
+
+    ##
+    # Given an array of lines, make a message, guarantees character limit
+    def self.safeArrayToMesage(lines, event) # This is a variadic function
+      characterCount = 0
+      message = ""
+      lines.each do |line|
+        characterCount += line.length
+        if characterCount > 2000
+          event.respond(message)
+          characterCount = 0
+          message = ""
+        end
         message += "#{line}\n"
       end
       message

@@ -96,17 +96,21 @@ module RunTracker
       Conn.exec(createResourcesTable)
       Conn.exec(createNotificationTable)
       Conn.exec(createAnnouncementsTable)
+      puts "[INFO] Tables Created Successfully"
       return 'Tables Created Succesfully'
     rescue PG::Error => e
-      return 'Table Creation Unsuccessful: ' + e.message
+      puts "[ERROR] #{e.message} #{e.backtrace}"
+      return 'Table Creation Unsuccessful'
     end
 
     def self.destroySchema
       Conn.exec('DROP SCHEMA public CASCADE;')
       Conn.exec('CREATE SCHEMA public;')
+      puts "[INFO] Tables Dropped"
       return 'Schema Destroyed!'
     rescue PG::Error => e
-      return 'Schema Destruction Unsuccessful: ' + e.message
+      puts "[ERROR] #{e.message} #{e.backtrace}"
+      return 'Schema Destruction Unsuccessful'
     end
 
     def self.dontDropManagers
@@ -114,12 +118,15 @@ module RunTracker
       Conn.exec('DROP TABLE IF EXISTS public.tracked_runners')
       Conn.exec('DROP TABLE IF EXISTS public.resources')
       Conn.exec('DROP TABLE IF EXISTS public.aliases')
+      puts "[INFO] Dropped Every Non-Manager and Notification Table"
+      return 'Only Game-Related Tables Dropped!'
     end
 
     def self.cleanNotificationTable
 
       # Pull all the rows
       rows = Conn.exec("SELECT * FROM public.notifications ORDER BY count DESC")
+      puts "[INFO] Notification Table at #{rows.ntuples}/200 rows"
       if rows.ntuples < 200
         return
       end
@@ -133,7 +140,8 @@ module RunTracker
 
       # Pull all the rows
       rows = Conn.exec("SELECT * FROM public.announcements ORDER BY count DESC")
-      if rows.ntuples < 200
+      puts "[INFO] Announcements Table at #{rows.ntuples}/500 rows"
+      if rows.ntuples < 500
         return
       end
       # Get the highest count, subtract 25
@@ -143,13 +151,10 @@ module RunTracker
     end
 
     def self.getCurrentRunners
-
       runners = {}
-
       PostgresDB::Conn.transaction do |conn|
 
         queryResults = conn.exec('SELECT * FROM public."tracked_runners"')
-
         queryResults.each do |runner|
           currentRunner = Runner.new(runner['user_id'], runner['user_name'])
           currentRunner.num_submitted_runs = Integer(runner['num_submitted_runs'])
@@ -163,7 +168,6 @@ module RunTracker
     end
 
     def self.getCurrentRunner(runnerID)
-
       currentRunner = nil
       PostgresDB::Conn.transaction do |conn|
 
@@ -194,7 +198,7 @@ module RunTracker
                                                                    JSON.generate(runner.historic_runs), runner.num_submitted_runs,
                                                                    runner.num_submitted_wrs, runner.total_time_overall])
         rescue Exception => e
-          puts "#{e.message} #{e.backtrace}"
+          puts "[ERROR] #{e.message} #{e.backtrace}"
         end
       end
       PostgresDB::Conn.exec('DEALLOCATE update_current_runner')
@@ -213,7 +217,7 @@ module RunTracker
                                                                  JSON.generate(runner.historic_runs), runner.num_submitted_runs,
                                                                  runner.num_submitted_wrs, runner.total_time_overall])
       rescue Exception => e
-        puts "#{e.message} #{e.backtrace}"
+        puts "[ERROR] #{e.message} #{e.backtrace}"
       end
       PostgresDB::Conn.exec('DEALLOCATE update_current_runner')
     end
@@ -231,7 +235,7 @@ module RunTracker
                                                                JSON.generate(runner.historic_runs), runner.num_submitted_runs,
                                                                runner.num_submitted_wrs, runner.total_time_overall])
         rescue Exception => e
-          puts "#{e.message} #{e.backtrace}"
+          puts "[ERROR] #{e.message} #{e.backtrace}"
         end
       end
       PostgresDB::Conn.exec('DEALLOCATE insert_new_runner')
@@ -249,7 +253,7 @@ module RunTracker
                                                              JSON.generate(runner.historic_runs), runner.num_submitted_runs,
                                                              runner.num_submitted_wrs, runner.total_time_overall])
       rescue Exception => e
-        puts "#{e.message} #{e.backtrace}"
+        puts "[ERROR] #{e.message} #{e.backtrace}"
       end
       PostgresDB::Conn.exec('DEALLOCATE insert_new_runner')
     end
@@ -265,7 +269,7 @@ module RunTracker
         begin
           PostgresDB::Conn.exec_prepared('insert_new_alias', [key, value.first, value.last])
         rescue Exception => e
-          puts "#{e.message} #{e.backtrace}"
+          puts "[ERROR] #{e.message} #{e.backtrace}"
         end
       end
       PostgresDB::Conn.exec('DEALLOCATE insert_new_alias')
@@ -346,13 +350,14 @@ module RunTracker
     ##
     # Initialize everyones permissions
     def self.initPermissions
+      puts "[INFO] Initializing Permissions"
       begin
         userPermissions = PostgresDB::Conn.exec('select * from public.managers') # Grab each user ID from the database
         userPermissions.each do |user|
           RTBot.set_user_permission(Integer(user['user_id']), Integer(user['access_level']))
         end
       rescue Exception => e
-        _event << e.backtrace.inspect + e.message + "lol sick spam"
+        puts "[ERROR] #{e.message} #{e.backtrace}"
       end
     end # end of func
 

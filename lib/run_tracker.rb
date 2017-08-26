@@ -18,13 +18,13 @@ module RunTracker
                                               prefix: '!',
                                               command_doesnt_exist_message: 'Use !help to see a list of available commands')
 
-  DevChannelID = 338_452_338_912_264_192
   # Constants
   PERM_ADMIN = 2
   PERM_MOD = 1
   PERM_USER = 0
 
   HEARTBEAT_CHECKRUNS = 1 # 1 heartbeat approximately every 1minute
+  HEARTBEAT_NOTIFYMODS = 1
 
   # When the bot starts up
   RTBot.ready do |_event|
@@ -38,7 +38,7 @@ module RunTracker
     PostgresDB.cleanNotificationTable
     PostgresDB.cleanAnnouncementsTable
 
-    RTBot.send_message(DevChannelID, '!! Bot Back Online !!') # TODO remove
+    puts "[INFO] Bot Online and Connected to Server"
   end
 
   # Require all files in run_tracker folder
@@ -59,24 +59,23 @@ module RunTracker
   heartbeatCounter = 1
 
   RTBot.heartbeat do |_event|
-    RTBot.send_message(DevChannelID, "Heartbeat - #{heartbeatCounter}")
 
-    # Every heartbeat, check the latest runs
-    AnnounceRuns.announceRuns
-    # Every so many heartbeats, notify the moderators
     heartbeatCounter += 1
+    # Every 5th heartbeat, check for new runs
     if heartbeatCounter >= HEARTBEAT_CHECKRUNS
+      AnnounceRuns.announceRuns
+      # Clean the notification table every so often
+      PostgresDB.cleanAnnouncementsTable
+    end
+
+    # Every 10th heartbeat, notify the moderators
+    if heartbeatCounter >= HEARTBEAT_NOTIFYMODS
       heartbeatCounter = 1
       NotifyMods.notifyMods
       # Clean the notification table every so often
       PostgresDB.cleanNotificationTable
-      PostgresDB.cleanAnnouncementsTable
     end
   end
-
-  # If the Bot is connecting to the server for the first time
-  # it should establish the database schema, would be nice to
-  # not have to call this manually but whatever.
 
   RTBot.run
 end

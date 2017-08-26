@@ -79,7 +79,6 @@ module RunTracker
         # TODO alot of the stuff below should be moved to a seperate method, but it works and im afraid
 
         # Try to get the runner object from database
-        pp run['players']
         runner = PostgresDB.getCurrentRunner(run['players'].first['id'])
         addNewRunner = false
         # If new runner or first run in this category, say this is his first run

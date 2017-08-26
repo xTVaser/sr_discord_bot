@@ -11,9 +11,6 @@ module RunTracker
       currentRunnerList = PostgresDB.getCurrentRunners # NOTE unverified implementation
       newRunnerList = {}
 
-      count = 0
-      RTBot.send_message(DevChannelID, 'Archiving Existing Runs...This can Take a While...')
-
       categoryList.each do |_key, category| # Loop through every category
         currentWRTime = Util::MaxInteger
         currentWRID = ''
@@ -83,7 +80,6 @@ module RunTracker
               runner.historic_runs[gameID].categories[category.category_id] = RunnerCategory.new(category.category_id, category.category_name)
             end # else its fine
 
-            count += 1
             category.number_submitted_runs += 1
             runner.num_submitted_runs += 1
             runner.total_time_overall += Integer(run['times']['primary_t'])
@@ -187,8 +183,6 @@ module RunTracker
       PostgresDB.updateCurrentRunners(currentRunnerList)
       # Insert new runners
       PostgresDB.insertNewRunners(newRunnerList)
-
-      RTBot.send_message(DevChannelID, "Archived #{count} Runs!")
 
     end # ends seed function
   end # ends seedDB module
