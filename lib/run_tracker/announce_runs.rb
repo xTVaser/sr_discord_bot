@@ -5,24 +5,39 @@ module RunTracker
 
       # Loop through all of the tracked games
       trackedGames = PostgresDB.getTrackedGames
+      if trackedGames == nil
+        return
+      end
       trackedGames.each do |trackedGame|
         # Get any unverified runs for this game
         requestLink = "#{SrcAPI::API_URL}runs" \
                       "?game=#{trackedGame.id}" \
-                      '&status=verified&orderby=date&direction=desc&max=1' # get the latest run in each game
+                      '&status=verified&orderby=verify-date&direction=desc&max=1' # get the latest run in each game
 
         run = Util.jsonRequest(requestLink)['data'].first
 
-        # Check to see if the run has already been verified before
+        # Check to see if the run has already been announced before
         check = PostgresDB::Conn.exec("SELECT * FROM public.announcements WHERE run_id = '#{run['id']}'")
         if check.ntuples > 0
           next
         end
 
+        # If the run is older than a day, ignore it
+        # This is kind of a hack, but i dont track individual run ids so no way to properly check
+        # This only really affects the first runs after seeding, once this gets going they will be
+        # properly avoided
+        if (Date.today).jd - Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d').jd > 1
+          next
+        end
+
         # handle guest accounts
-        playerName = run['players'].first['id']
-        unless run['players'].first['rel'].casecmp('guest').zero?
-          playerName = SrcAPI.getUserName(playerName)
+        pp run
+        runnerName = run['players'].first['id']
+        if !run['players'].first['rel'].casecmp('guest').zero?
+          runnerName = SrcAPI.getUserName(runnerName)
+          runnerKey = run['players'].first['id']
+        else
+          runnerKey = run['players'].first['name'].downcase
         end
 
         category = nil
@@ -50,18 +65,21 @@ module RunTracker
         end
 
         message = Array.new
-        message.push("Newly Verified Run for - #{trackedGame.name}-#{category.category_name} By - #{playerName} At - #{Util.secondsToTime(run['times']['primary_t'])}")
+        message.push("Newly Verified Run for - #{trackedGame.name} - #{category.category_name}")
+        message.push("============")
+        message.push("[Runner]: #{runnerName}")
+        message.push("[Time]: #{Util.secondsToTime(run['times']['primary_t'])}")
 
         # Handle non video links
         videoLink = "No Video"
         if run['videos'].key?('links')
           videoLink = run['videos']['links'].first['uri']
         end
-        message.push("Video Link - #{videoLink}")
 
         # TODO alot of the stuff below should be moved to a seperate method, but it works and im afraid
 
         # Try to get the runner object from database
+        pp run['players']
         runner = PostgresDB.getCurrentRunner(run['players'].first['id'])
         addNewRunner = false
         # If new runner or first run in this category, say this is his first run
@@ -103,8 +121,12 @@ module RunTracker
                 .milestones[Util.currentMilestoneStr(nextMilestone)] = run['weblink']
         end
 
+        newPB = false
+        pbDiff = 0
         # Update if PB
         if Integer(run['times']['primary_t']) < runner.historic_runs[trackedGame.id].categories[category.category_id].current_pb_time
+          newPB = true
+          pbDiff = runner.historic_runs[trackedGame.id].categories[category.category_id].current_pb_time - Integer(run['times']['primary_t'])
           runner.historic_runs[trackedGame.id].categories[category.category_id].current_pb_time = Integer(run['times']['primary_t'])
           runner.historic_runs[trackedGame.id].categories[category.category_id].current_pb_id = run['id']
         end
@@ -174,20 +196,19 @@ module RunTracker
 
         # Now that the hell is over, update the database
         if addNewRunner == true
-          pp "runner inserted"
-          pp runner
-          #PostgresDB.insertNewRunners(runner)
+          PostgresDB.insertNewRunner(runner)
         else
           if newPB == true
-          message.push("")
-          pp "runner updated"
-          pp runner
-          #PostgresDB.updateCurrentRunners(runner)
+            message.push("< New Personal Best by - #{Util.secondsToTime(pbDiff)} >")
+          end
+          PostgresDB.updateCurrentRunner(runner)
         end
-        pp trackedGame
-        #PostgresDB.updateTrackedGame(trackedGame)
-        RTBot.send_message(trackedGame.announce_channel, Util.arrayToCodeBlock(message, highlighting: "md"))
+        PostgresDB.updateTrackedGame(trackedGame)
+        highlightedText = Util.arrayToCodeBlock(message, highlighting: "md")
+        highlightedText += "\nVideo Link - #{videoLink}"
+        RTBot.send_message(trackedGame.announce_channel, highlightedText)
         # Add run to the announcements table so we dont duplicate the messages
+        PostgresDB::Conn.exec("INSERT INTO public.announcements (run_id) VALUES ('#{run['id']}')")
 
         next
       end # end of tracked games loop

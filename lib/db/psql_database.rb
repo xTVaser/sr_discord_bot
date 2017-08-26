@@ -168,6 +168,9 @@ module RunTracker
       PostgresDB::Conn.transaction do |conn|
 
         runner = conn.exec("SELECT * FROM public.tracked_runners WHERE user_id = '#{runnerID}'").first
+        if runner == nil
+          return nil
+        end
         currentRunner = Runner.new(runner['user_id'], runner['user_name'])
         currentRunner.num_submitted_runs = Integer(runner['num_submitted_runs'])
         currentRunner.num_submitted_wrs = Integer(runner['num_submitted_wrs'])
@@ -198,6 +201,24 @@ module RunTracker
     end
 
     ##
+    # Updates current runner with the new objects
+    # primary key for runner is their ID field
+    def self.updateCurrentRunner(runner)
+      # Update Statement
+      PostgresDB::Conn.prepare('update_current_runner', 'update public."tracked_runners"
+        set user_id = $1, user_name = $2, historic_runs = $3, num_submitted_runs = $4, num_submitted_wrs = $5, total_time_overall = $6
+        where user_id = $1')
+      begin
+        PostgresDB::Conn.exec_prepared('update_current_runner', [runner.src_id, runner.src_name,
+                                                                 JSON.generate(runner.historic_runs), runner.num_submitted_runs,
+                                                                 runner.num_submitted_wrs, runner.total_time_overall])
+      rescue Exception => e
+        puts "#{e.message} #{e.backtrace}"
+      end
+      PostgresDB::Conn.exec('DEALLOCATE update_current_runner')
+    end
+
+    ##
     # Inserts brand new runners into DB
     def self.insertNewRunners(newRunners)
       # Update Statement
@@ -212,6 +233,23 @@ module RunTracker
         rescue Exception => e
           puts "#{e.message} #{e.backtrace}"
         end
+      end
+      PostgresDB::Conn.exec('DEALLOCATE insert_new_runner')
+    end
+
+    ##
+    # Inserts brand new runners into DB
+    def self.insertNewRunner(runner)
+      # Update Statement
+      PostgresDB::Conn.prepare('insert_new_runner', 'insert into public."tracked_runners"
+        (user_id, user_name, historic_runs, num_submitted_runs, num_submitted_wrs, total_time_overall)
+        values ($1, $2, $3, $4, $5, $6)')
+      begin
+        PostgresDB::Conn.exec_prepared('insert_new_runner', [runner.src_id, runner.src_name,
+                                                             JSON.generate(runner.historic_runs), runner.num_submitted_runs,
+                                                             runner.num_submitted_wrs, runner.total_time_overall])
+      rescue Exception => e
+        puts "#{e.message} #{e.backtrace}"
       end
       PostgresDB::Conn.exec('DEALLOCATE insert_new_runner')
     end

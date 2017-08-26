@@ -94,7 +94,7 @@ module RunTracker
         else # else there are, so concat the id, name, and rules onto the category
           subCategories.each do |key, value|
             categoryList["#{category['id']}-#{key}"] = Category.new("#{category['id']}-#{key}",
-                                                                    "#{category['name']}#{value.first}",
+                                                                    "#{category['name']} - #{value.first}",
                                                                     "#{category['rules']}#{value.last}",
                                                                     subCategories)
             # remove all whitespace for default alias

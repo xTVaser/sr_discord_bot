@@ -39,7 +39,6 @@ module RunTracker
     PostgresDB.cleanAnnouncementsTable
 
     RTBot.send_message(DevChannelID, '!! Bot Back Online !!') # TODO remove
-    AnnounceRuns.announceRuns
   end
 
   # Require all files in run_tracker folder
@@ -57,18 +56,18 @@ module RunTracker
   # Load up all the commands
   CommandLoader.loadCommands
 
-  heartbeatCounter = 0
+  heartbeatCounter = 1
 
   RTBot.heartbeat do |_event|
+    RTBot.send_message(DevChannelID, "Heartbeat - #{heartbeatCounter}")
 
     # Every heartbeat, check the latest runs
-
+    AnnounceRuns.announceRuns
     # Every so many heartbeats, notify the moderators
     heartbeatCounter += 1
     if heartbeatCounter >= HEARTBEAT_CHECKRUNS
-      heartbeatCounter = 0
+      heartbeatCounter = 1
       NotifyMods.notifyMods
-      RTBot.send_message(DevChannelID, "my hearts beating my hands are shaking but im still shooting and im still getting the headshots its like boom headshot boom headshot boom headshot.")
       # Clean the notification table every so often
       PostgresDB.cleanNotificationTable
       PostgresDB.cleanAnnouncementsTable
