@@ -82,6 +82,12 @@ module RunTracker
                              'PRIMARY KEY ("run_id"))' \
                              'WITH (' \
                              'OIDS = FALSE);'
+      createAnnouncementsTable = 'CREATE TABLE IF NOT EXISTS public.announcements(' \
+                                 '"run_id" character varying(255) NOT NULL,' \
+                                 '"count" SERIAL,' \
+                                 'PRIMARY KEY ("run_id"))' \
+                                 'WITH (' \
+                                 'OIDS = FALSE);'
 
       Conn.exec(createTrackedGamesCmd)
       Conn.exec(createTrackedRunnersCmd)
@@ -89,6 +95,7 @@ module RunTracker
       Conn.exec(createAliasTable)
       Conn.exec(createResourcesTable)
       Conn.exec(createNotificationTable)
+      Conn.exec(createAnnouncementsTable)
       return 'Tables Created Succesfully'
     rescue PG::Error => e
       return 'Table Creation Unsuccessful: ' + e.message
@@ -120,7 +127,19 @@ module RunTracker
       cutoff = (rows.first.count) - 25
       # Delete the other 150 rows
       Conn.exec("DELETE FROM public.notifications WHERE count < '#{cutoff}'")
+    end
 
+    def self.cleanAnnouncementsTable
+
+      # Pull all the rows
+      rows = Conn.exec("SELECT * FROM public.announcements ORDER BY count DESC")
+      if rows.ntuples < 200
+        return
+      end
+      # Get the highest count, subtract 25
+      cutoff = (rows.first.count) - 25
+      # Delete the other 150 rows
+      Conn.exec("DELETE FROM public.announcements WHERE count < '#{cutoff}'")
     end
 
     def self.getCurrentRunners
@@ -141,6 +160,21 @@ module RunTracker
         end
       end
       runners
+    end
+
+    def self.getCurrentRunner(runnerID)
+
+      currentRunner = nil
+      PostgresDB::Conn.transaction do |conn|
+
+        runner = conn.exec("SELECT * FROM public.tracked_runners WHERE user_id = '#{runnerID}'").first
+        currentRunner = Runner.new(runner['user_id'], runner['user_name'])
+        currentRunner.num_submitted_runs = Integer(runner['num_submitted_runs'])
+        currentRunner.num_submitted_wrs = Integer(runner['num_submitted_wrs'])
+        currentRunner.total_time_overall = Integer(runner['total_time_overall'])
+        currentRunner.fromJSON(runner['historic_runs'])
+      end
+      return currentRunner
     end
 
     ##

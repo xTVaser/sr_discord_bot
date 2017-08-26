@@ -36,11 +36,11 @@ module RunTracker
     RTBot.set_user_permission(RTBot.servers.first.last.owner.id, PERM_ADMIN)
     # Clear the notifications table if at 200 rows, delete 150 of the most recent ones
     PostgresDB.cleanNotificationTable
-    
+    PostgresDB.cleanAnnouncementsTable
+
     RTBot.send_message(DevChannelID, '!! Bot Back Online !!') # TODO remove
+    AnnounceRuns.announceRuns
   end
-
-
 
   # Require all files in run_tracker folder
   Dir["#{File.dirname(__FILE__)}/run_tracker/*.rb"].each do |file|
@@ -61,13 +61,18 @@ module RunTracker
 
   RTBot.heartbeat do |_event|
 
+    # Every heartbeat, check the latest runs
+
+    # Every so many heartbeats, notify the moderators
     heartbeatCounter += 1
     if heartbeatCounter >= HEARTBEAT_CHECKRUNS
       heartbeatCounter = 0
       NotifyMods.notifyMods
       RTBot.send_message(DevChannelID, "my hearts beating my hands are shaking but im still shooting and im still getting the headshots its like boom headshot boom headshot boom headshot.")
+      # Clean the notification table every so often
+      PostgresDB.cleanNotificationTable
+      PostgresDB.cleanAnnouncementsTable
     end
-
   end
 
   # If the Bot is connecting to the server for the first time
