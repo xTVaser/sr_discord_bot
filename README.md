@@ -15,7 +15,7 @@ Bot provided AS-IS, I won't be fixing issues for a while if ever, if you make a 
   * [Moderator Only Commands](#moderator-only-commands)
   * [All User Commands](#all-user-commands)
 * [Known Issues and Short Comings](#known-issues-and-short-comings)
-
+* [Dependencies](#dependencies)
 
 ## Features
 * Integrates with speedrun.com's API
@@ -52,16 +52,46 @@ Bot provided AS-IS, I won't be fixing issues for a while if ever, if you make a 
 ## Commands
 * Commands have 3 tiers of permissions and users can be granted access.
 * By default, the server owner has Admin privledges only.
+* By default as well, I have hardcoded my own discord_id to have admin privledges, you should disable this or change to your own ID.
 
 ### Admin Only Commands
+* `!addgame`
+* `!grant` - Use @mention autocomplete
+* `!clearrundata` - Requires confirmation key 'DOIT'
+* `!resetdb` - Requires confirmation key 'DOIT'
+* `!removegame`
 
 ### Moderator Only Commands
+* `!addresource`
+* `!optin` - Must be called by the person wanting to receive the PMs
+* `!optout` - Must be called by the person wanting to stop receiving PMs
+* `!removeresource`
+* `!setannounce` - Use the #channel-name autocomplete
+* `!setcategoryalias` - I dont recommend changing the category alias as this is a pain in the ass
+* `!setgamealias` - This will cascade and modify it's categories ones automatically
 
 ### All User Commands
+* `!botinfo`
+* `!listcategories` 
+* `!listgames`
+* `!listmods`
+* `!listresources`
+* `!resource`
+* `!statscategory`
+* `!statsgame`
+* `!statsrunner`
 
 ## Known Issues and Short Comings
+* Too many things are case sensitive
+* Tied runs may produce unexpected results
+* Individual level leaderboards are not supported
+* Subcategories are defined as their own separate categories
+* Has not been throughly tested on every type of leaderboard so results may vary.
+* One bot cannot support multiple servers at this time, one server per bot only.
+* There are definitely bugs that I have not found, this is somewhat unavoidable due to the varied nature of the results of speedrun.com's API and unknown user input.
+* Other things I'm forgetting
 
-  
-Discord bot specialising in supporting speedrunning related chat rooms
-
-Speedrun.com API [https://github.com/speedruncom/api](https://github.com/speedruncom/api)
+## Dependencies
+* [Speedrun.com's REST API](https://github.com/speedruncomorg/api)
+* [DiscordRB](https://github.com/meew0/discordrb)
+* [ruby-pg](https://github.com/ged/ruby-pg)
