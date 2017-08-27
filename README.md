@@ -9,26 +9,26 @@ Bot provided AS-IS, I won't be fixing issues for a while if ever, if you make a 
 * [Features](#features)
 * [Installation](#installation)
 * [Commands](#commands)
-  * [Admin Only Commands](#admin)
-  * [Moderator Only Commands](#mods)
-  * [All User Commands](#user)
-* [Known Issues and Short Comings](#issues)
+  * [Admin Only Commands](#Admin-Only-Commands)
+  * [Moderator Only Commands](#Moderator-Only-Commands)
+  * [All User Commands](#All-User-Commands)
+* [Known Issues and Short Comings](#Known-Issues-and-Short-Comings)
 
 
 
 
-## [Features](#features)
+## Features
 
 
-## [Commands](#installation)
+## Commands
 
-### [Admin Only Commands](#admin)
+### Admin Only Commands
 
-### [Moderator Only Commands](#mods)
+### Moderator Only Commands
 
-### [All User Commands](#user)
+### All User Commands
 
-## [Known Issues and Short Comings](#issues)
+## Known Issues and Short Comings
 
   
 Discord bot specialising in supporting speedrunning related chat rooms
