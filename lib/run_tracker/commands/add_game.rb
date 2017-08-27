@@ -3,11 +3,15 @@ module RunTracker
     module AddGame
       extend Discordrb::Commands::CommandContainer
 
+      # Bucket for rate limiting. Limits to x uses every y seconds at z intervals.
+      bucket :limiter, limit: 1, time_span: 1, delay: 1
+
       command(:addgame, description: 'Add a game to the list of tracked games.',
                         usage: '!addgame <id/name> <game-name/game-id>',
                         permission_level: PERM_ADMIN,
                         min_args: 2,
-                        max_args: 2) do |_event, type, search_field|
+                        max_args: 2,
+                        bucket: :limiter) do |_event, type, search_field|
 
         # Command Body
         # Check to see if the command syntax was valid

@@ -3,9 +3,14 @@ module RunTracker
     module RemoveGame
       extend Discordrb::Commands::CommandContainer
 
+      # Bucket for rate limiting. Limits to x uses every y seconds at z intervals.
+      bucket :limiter, limit: 1, time_span: 5, delay: 1
+
       command(:removegame, description: 'Removes a game from the list of tracked games.',
                            usage: '!removegame <game-alias>',
                            permission_level: PERM_ADMIN,
+                           rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
+                           bucket: :limiter,
                            min_args: 1,
                            max_args: 1) do |_event, _gameAlias|
 
@@ -49,7 +54,8 @@ module RunTracker
           end # end of transaction
 
         rescue Exception => e
-          _event << "Error while deleteing the game #{e.backtrace} #{e.message}"
+          puts "[ERROR] #{e.message} #{e.backtrace}"
+          _event << "Error while deleteing the game."
           next
         end # end of begin
 

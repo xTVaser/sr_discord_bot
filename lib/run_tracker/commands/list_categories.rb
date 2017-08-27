@@ -3,20 +3,32 @@ module RunTracker
     module ListCategories
       extend Discordrb::Commands::CommandContainer
 
+      # Bucket for rate limiting. Limits to x uses every y seconds at z intervals.
+      bucket :limiter, limit: 1, time_span: 5, delay: 1
+
       command(:listcategories, description: 'Lists all categories for a specific tracked game.',
                           usage: '!listcategories',
                           permission_level: PERM_USER,
+                          rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
+                          bucket: :limiter,
                           min_args: 1,
                           max_args: 1) do |_event, _game_alias|
 
         # Command Body
         gameID = PostgresDB.findID(_game_alias)
+        if gameID == nil
+          _event << "No game with that alias, use `!listgames` to view current aliases"
+          next
+        end
         trackedGame = PostgresDB.getTrackedGame(gameID)
         aliases = PostgresDB::Conn.exec("SELECT * FROM public.\"aliases\" WHERE type='category'")
 
-        _event << "Categories for `#{_game_alias}`:"
-
-        messages = Array.new
+        message = Array.new
+        message.push("#Categories for #{_game_alias}, Sorted by Name")
+        message.push("[Name](Alias) - <Current WR Time>")
+        message.push("============")
+        # Sort by name
+        trackedGame.categories = trackedGame.categories.sort_by { |k, o| [o.category_name] }
         trackedGame.categories.each do |categoryID, categoryData|
           categoryAlias = ''
           aliases.each do |row|
@@ -24,10 +36,10 @@ module RunTracker
               categoryAlias = row['alias']
             end
           end
-          messages.push("Alias: #{categoryAlias} | Name: #{categoryData.category_name} | Current WR: #{categoryData.current_wr_time}")
+          message.push("[#{categoryData.category_name}](#{categoryAlias}) - <#{Util.secondsToTime(categoryData.current_wr_time)}>")
         end
 
-        _event << Util.arrayToCodeBlock(messages)
+        _event << Util.arrayToCodeBlock(message, highlighting: 'md')
 
       end # end of command body
     end # end of module

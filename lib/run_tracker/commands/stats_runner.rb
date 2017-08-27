@@ -3,9 +3,14 @@ module RunTracker
     module StatsRunner
       extend Discordrb::Commands::CommandContainer
 
+      # Bucket for rate limiting. Limits to x uses every y seconds at z intervals.
+      bucket :limiter, limit: 1, time_span: 5, delay: 1
+
       command(:statsrunner, description: 'Displays all or a particular stat for a given runner',
                         usage: "!statsrunner <runner name> Optional:{<game alias> <category alias>}",
                         permission_level: PERM_USER,
+                        rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
+                        bucket: :limiter,
                         min_args: 1,
                         max_args: 3) do |_event, _runnerName, _type, _alias|
 
@@ -33,19 +38,19 @@ module RunTracker
         # If only the runner name was supplied, print out a summary of the runner
         if _type == nil and _alias == nil
           # Name
-          message.push("Runner Summary: #{_runnerName}:\n")
+          message.push(">Runner Summary for <#{_runnerName}>:\n")
+          message.push("Runs of Games That are Tracked")
+          message.push("============")
           # games have done runs in
-          gameList = ""
           theRunner.historic_runs.each do |key, game|
-            gameList += "#{game.src_name}, "
+            message.push("< #{game.src_name} >")
           end
-          message.push("Runs of games that are tracked: #{gameList}")
           # Number of submitted WRs
           # Number of submitted runs
-          message.push("Number of Submitted World Records: #{theRunner.num_submitted_wrs}")
-          message.push("Number of Submitted Runs: #{theRunner.num_submitted_runs}")
+          message.push("\n>Number of Submitted World Records: <#{theRunner.num_submitted_wrs}>")
+          message.push(">Number of Submitted Runs: <#{theRunner.num_submitted_runs}>")
           # Total time convert to hours across all runs
-          message.push("Total Time spent across all runs: #{(theRunner.total_time_overall/3600.0).round(2)} hrs")
+          message.push(">Total Time spent across all runs: <#{(theRunner.total_time_overall/3600.0).round(2)}> hrs")
         # If we are only given the game alias
         elsif _type.downcase.casecmp('game').zero? and _alias != nil
           # Check to see if alias even exists
@@ -72,21 +77,21 @@ module RunTracker
           end
 
           # Name
-          message.push("Runner Summary: #{_runnerName} in Game: #{_alias}:\n")
+          message.push(">Runner Summary for <#{_runnerName}> in Game <#{_alias}>:\n")
           # categories have done runs in
-          categoryList = ""
+          message.push("Categories That Have Done Runs in:")
+          message.push("============")
           foundGame.categories.each do |key, category|
             if category.num_submitted_runs > 0
-              categoryList += "#{category.src_name}, "
+              message.push("< #{category.src_name} >")
             end
           end
-          message.push("Categories that have done runs in: #{categoryList}")
           # Number of submitted WRs
           # Number of submitted runs
-          message.push("Number of Submitted World Records: #{foundGame.num_previous_wrs}") # TODO refactor this across later
-          message.push("Number of Submitted Runs: #{foundGame.num_submitted_runs}")
+          message.push("\n>Number of Submitted World Records: <#{foundGame.num_previous_wrs}>") # TODO refactor this across later
+          message.push(">Number of Submitted Runs: <#{foundGame.num_submitted_runs}>")
           # Total time convert to hours across all runs
-          message.push("Total Time spent across all runs: #{(foundGame.total_time_overall/3600.0).round(2)} hrs")
+          message.push(">Total Time spent across all runs: <#{(foundGame.total_time_overall/3600.0).round(2)}> hrs")
 
         # Otherwise print category information
         elsif _type.downcase.casecmp('category').zero? and _alias != nil
@@ -126,25 +131,26 @@ module RunTracker
           end
 
           # Name
-          message.push("Runner Summary: #{_runnerName} in Game: #{gameAlias} in Category: #{_alias}:\n")
+          message.push(">Runner Summary for <#{_runnerName}> in Game <#{gameAlias}> in Category <#{_alias}>:\n")
           # milestones
+          message.push("Milestones for this Category")
+          message.push("============")
           milestoneList = ""
           category.milestones.each do |label, runID|
-            milestoneList += "#{label}: #{runID}\n" # TODO resolve runid to link, add a util
+            message.push("[#{label}](#{runID})")
           end
-          message.push("Milestones for that category: \n#{milestoneList}")
           # Number of submitted WRs
           # Number of submitted runs
-          message.push("Number of Submitted World Records: #{category.num_previous_wrs}") # TODO refactor this across later
-          message.push("Number of Submitted Runs: #{category.num_submitted_runs}")
+          message.push("\n>Number of Submitted World Records: <#{category.num_previous_wrs}>") # TODO refactor this across later
+          message.push(">Number of Submitted Runs: <#{category.num_submitted_runs}>")
           # Total time convert to hours across all runs
-          message.push("Total Time spent across all runs: #{(category.total_time_overall/3600.0).round(2)} hrs")
+          message.push(">Total Time spent across all runs: <#{(category.total_time_overall/3600.0).round(2)}> hrs")
         else
-          _event << "how the hell do i print the usage" # TODO fig it out
+          _event << "!statsrunner <runner name> Optional:{<game alias> <category alias>}"
           next
         end
 
-        _event << Util.arrayToCodeBlock(message)
+        _event << Util.arrayToCodeBlock(message, highlighting: 'md')
 
       end # end of command body
     end

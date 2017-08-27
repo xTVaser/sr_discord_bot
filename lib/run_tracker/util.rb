@@ -100,7 +100,7 @@ module RunTracker
       lines.each do |line|
         characterCount += line.length
         if characterCount > 2000
-          event.respond(message)
+          event.respond(message) # NOTE untested, this may not work, may have to do a hard RTBot.send_message
           characterCount = 0
           message = ""
         end

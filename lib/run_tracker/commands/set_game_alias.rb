@@ -3,15 +3,20 @@ module RunTracker
     module SetGameAlias
       extend Discordrb::Commands::CommandContainer
 
+      # Bucket for rate limiting. Limits to x uses every y seconds at z intervals.
+      bucket :limiter, limit: 1, time_span: 5, delay: 1
+
       command(:setgamealias, description: '',
                          usage: "!setgamealias <old alias> <new alias>\nAlias must be unique.",
                          permission_level: PERM_MOD,
+                         rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
+                         bucket: :limiter,
                          min_args: 2,
                          max_args: 2) do |_event, _oldAlias, _newAlias|
 
         # check if the newly provided alias is valid
         if !/[^a-zA-Z0-9\-()&:%]./.match(_newAlias).nil?
-          return :usage
+          return "`!setgamealias <old alias> <new alias>`\nAlias must be unique."
         end
 
         PostgresDB::Conn.transaction do |conn|
@@ -20,7 +25,7 @@ module RunTracker
           conn.prepare("find_alias", "SELECT * FROM public.\"aliases\" WHERE alias= $1 and type='game'")
           aliasResults = conn.exec_prepared('find_alias', [_oldAlias])
           if aliasResults.ntuples < 1
-            return "Game Alias not found use !listgames to see the current aliases"
+            return "Game Alias not found use `!listgames` to see the current aliases"
           end
           conn.exec('DEALLOCATE find_alias')
 
@@ -50,7 +55,6 @@ module RunTracker
         end
 
         _event << "Alias updated from #{_oldAlias} to #{_newAlias}"
-        # TODO add some output for errors
 
         return
       end # end command body

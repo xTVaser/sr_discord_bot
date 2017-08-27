@@ -3,11 +3,15 @@ module RunTracker
     module AddResource
       extend Discordrb::Commands::CommandContainer
 
+      # Bucket for rate limiting. Limits to x uses every y seconds at z intervals.
+      bucket :limiter, limit: 1, time_span: 1, delay: 1
+
       command(:addresource, description: 'Lists all categories for a specific tracked game.',
                           usage: '!addresource <gameAlias> <resource name> <content>',
                           permission_level: PERM_MOD,
                           min_args: 3,
-                          max_args: 3) do |_event, _gameAlias, _name, _content|
+                          max_args: 3,
+                          bucket: :limiter) do |_event, _gameAlias, _name, _content|
 
         # Command Body
         # Check to see if alias even exists

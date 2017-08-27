@@ -3,9 +3,14 @@ module RunTracker
     module RemoveResource
       extend Discordrb::Commands::CommandContainer
 
+      # Bucket for rate limiting. Limits to x uses every y seconds at z intervals.
+      bucket :limiter, limit: 1, time_span: 5, delay: 1
+      
       command(:removeresource, description: 'Removed a particular games resource',
                           usage: '!removeresource <gameAlias> <resourceName>',
                           permission_level: PERM_MOD,
+                          rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
+                          bucket: :limiter,
                           min_args: 2,
                           max_args: 2) do |_event, _gameAlias, _name|
 

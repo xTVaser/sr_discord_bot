@@ -3,9 +3,14 @@ module RunTracker
     module OptOut
       extend Discordrb::Commands::CommandContainer
 
+      # Bucket for rate limiting. Limits to x uses every y seconds at z intervals.
+      bucket :limiter, limit: 1, time_span: 5, delay: 1
+
       command(:optout, description: 'Allows a speedrun.com leaderboard mod to opt-out to stop receiving notifications from the games they moderate',
                          usage: '!optout <speedrunComName> *must be the user themselves',
                          permission_level: PERM_MOD,
+                         rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
+                         bucket: :limiter,
                          min_args: 1,
                          max_args: 1) do |_event, _srcName|
 
@@ -55,7 +60,7 @@ module RunTracker
           end
         end
 
-        _event << "#{_srcName} moderator successfully opted-out, use !optin #{_srcName} to opt-back-in at any time."
+        _event << "Moderator successfully opted-out, use !optin #{_srcName} to opt-back-in at any time."
 
       end # end of command body
     end # end of module

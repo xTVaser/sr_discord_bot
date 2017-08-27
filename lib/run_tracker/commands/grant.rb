@@ -4,13 +4,12 @@ module RunTracker
       extend Discordrb::Commands::CommandContainer
 
       # Bucket for rate limiting. Limits to x uses every y seconds at z intervals.
-      bucket :limiter, limit: 3, time_span: 10, delay: 1
+      bucket :limiter, limit: 1, time_span: 1, delay: 1
 
       command(:grant, bucket: :limiter,
                     description: 'Allows the setting and changing of access levels for users of the server through @ mentions.',
                     usage: '!grant <@user> <permission> (permission levels: `admin`, `mod`).',
                     permission_level: PERM_ADMIN,
-                    rate_limit_message: 'Andy Gavin says to wait %time% more second(s)!',
                     min_args: 2,
                     max_args: 2) do |_event, mention, permission|
 
@@ -54,7 +53,8 @@ module RunTracker
           # Send verbal confirmation of access level setting.
           _event << "Permission set for user #{user.name}!"
         rescue Exception => e # TODO: Change this to show an error message instead of the stack trace.
-          e.backtrace.inspect + e.message
+          puts "[ERROR] #{e.backtrace} + #{e.message}"
+          next
         end
       end
     end
