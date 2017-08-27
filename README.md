@@ -9,10 +9,10 @@ Bot provided AS-IS, I won't be fixing issues for a while if ever, if you make a 
 * [Features](#features)
 * [Installation](#installation)
 * [Commands](#commands)
-  * [Admin Only Commands](#Admin-Only-Commands)
-  * [Moderator Only Commands](#Moderator-Only-Commands)
-  * [All User Commands](#All-User-Commands)
-* [Known Issues and Short Comings](#Known-Issues-and-Short-Comings)
+  * [Admin Only Commands](#admin-only-commands)
+  * [Moderator Only Commands](#moderator-only-commands)
+  * [All User Commands](#all-user-commands)
+* [Known Issues and Short Comings](#known-issues-and-short-comings)
 
 
 
