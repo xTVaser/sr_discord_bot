@@ -18,6 +18,7 @@ module RunTracker
         message = Array.new
         message.push("Source Code and Documentation - http://www.github.com/xTVaser/sr_discord_bot")
         message.push("`!help` to view available commands")
+        message.push("If you do not have access to certain commands, you will need to get an admin to !grant <admin/mod> @yourname")
         _event << Util.arrayToMessage(message)
 
       end # end of command body
