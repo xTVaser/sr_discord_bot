@@ -34,7 +34,7 @@ module RunTracker
         totalSubmittedRuns = 0
         totalSubmittedWRs = 0
         game.categories.each do |key, category|
-          message.push("<#{category.category_name}>")
+          message.push("< #{category.category_name} >")
           totalSubmittedRuns += category.number_submitted_runs
           totalSubmittedWRs += category.number_submitted_wrs
         end

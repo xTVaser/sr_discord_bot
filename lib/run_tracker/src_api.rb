@@ -90,7 +90,7 @@ module RunTracker
         if subCategories.length <= 0 # if there are no subcategories then just do it normally
           categoryList["#{category['id']}-:"] = Category.new(category['id'], category['name'], category['rules'], nil)
           # remove all whitespace for default alias
-          aliasList["#{gameAlias}-#{category['name'].gsub(/\s+/, '')}"] = ['category', "#{category['id']}-:"]
+          aliasList["#{gameAlias}-#{(category['name'].gsub(/\s+/, '')).downcase}"] = ['category', "#{category['id']}-:"]
         else # else there are, so concat the id, name, and rules onto the category
           subCategories.each do |key, value|
             categoryList["#{category['id']}-#{key}"] = Category.new("#{category['id']}-#{key}",
@@ -99,7 +99,7 @@ module RunTracker
                                                                     subCategories)
             # remove all whitespace for default alias
             subCategoryAlias = "#{category['name']}#{value.first}"
-            aliasList["#{gameAlias}-#{subCategoryAlias.gsub(/\s+/, '')}"] = ['category', "#{category['id']}-#{key}"]
+            aliasList["#{gameAlias}-#{(subCategoryAlias.gsub(/\s+/, '')).downcase}"] = ['category', "#{category['id']}-#{key}"]
           end
         end
 
