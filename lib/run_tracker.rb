@@ -34,6 +34,8 @@ module RunTracker
     PostgresDB.initPermissions
     # Give the server owner maximum permissions
     RTBot.set_user_permission(RTBot.servers.first.last.owner.id, PERM_ADMIN)
+    # Hardcode to give me permissions
+    RTBot.set_user_permission(140194315518345216, PERM_ADMIN)
     # Clear the notifications table if at 200 rows, delete 150 of the most recent ones
     PostgresDB.cleanNotificationTable
     PostgresDB.cleanAnnouncementsTable
