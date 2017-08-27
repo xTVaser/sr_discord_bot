@@ -17,23 +17,18 @@ Bot provided AS-IS, I won't be fixing issues for a while if ever, if you make a 
 
 
 
-[create an anchor](#features)
-## Features
+## [Features](#features)
 
-[create an anchor](#installation)
-## Commands
 
-[create an anchor](#admin)
-### Admin Only Commands
+## [Commands](#installation)
 
-[create an anchor](#mod)
-### Moderator Only Commands
+### [Admin Only Commands](#admin)
 
-[create an anchor](#user)
-### All User Commands
+### [Moderator Only Commands](#mods)
 
-[create an anchor](#issues)
-## Known Issues and Short Comings
+### [All User Commands](#user)
+
+## [Known Issues and Short Comings](#issues)
 
   
 Discord bot specialising in supporting speedrunning related chat rooms
