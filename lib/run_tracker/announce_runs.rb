@@ -31,7 +31,6 @@ module RunTracker
         end
 
         # handle guest accounts
-        pp run
         runnerName = run['players'].first['id']
         if !run['players'].first['rel'].casecmp('guest').zero?
           runnerName = SrcAPI.getUserName(runnerName)
@@ -61,7 +60,7 @@ module RunTracker
         end # end of category loop
 
         if category == nil
-          puts "Something went wrong finding the category"
+          puts "[ERROR] Something went wrong finding the category"
         end
 
         message = Array.new

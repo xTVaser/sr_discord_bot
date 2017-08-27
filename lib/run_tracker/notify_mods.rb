@@ -24,7 +24,6 @@ module RunTracker
           # Check to see if we have already notified the mod about this run before
           check = PostgresDB::Conn.exec("SELECT * FROM public.notifications WHERE run_id = '#{run['id']}'")
           if check.ntuples > 0
-            pp "skipping"
             next
           end
           # Else, add the run to the message

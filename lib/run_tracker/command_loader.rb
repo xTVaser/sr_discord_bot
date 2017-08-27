@@ -9,6 +9,7 @@ module RunTracker
     @commands = [
       AddGame,
       AddResource,
+      BotInfo,
       ClearRunData,
       ListCategories,
       ListGames,

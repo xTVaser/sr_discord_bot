@@ -86,6 +86,7 @@ module RunTracker
     ##
     # Given an array of lines, make a message
     def self.arrayToMessage(lines) # This is a variadic function
+      message = ""
       lines.each do |line|
         message += "#{line}\n"
       end
