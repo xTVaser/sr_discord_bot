@@ -33,7 +33,7 @@ Bot provided AS-IS, I won't be fixing issues for a while if ever, if you make a 
 * run `rake update`
 * create a `vars.env` file in the root directory
 * Log into the web version of discord, and go to [this page](https://discordapp.com/developers/applications/me)
-* Create a new app, give it a name, give bot does not require OAuth2 Authorization.
+* Create a new app, give it a name, this bot does not require OAuth2 Authorization.
 * To the `vars.env` file add `CLIENT_ID=<your client_id>` and `TOKEN=<your token>`
 * Next use the following link to add the bot to your server, replacing `CLIENT_ID` appropriately `discordapp.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot&permissions=0`
 * You should now see the bot offline in your server
