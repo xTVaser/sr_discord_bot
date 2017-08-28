@@ -41,17 +41,17 @@ module RunTracker
 
         category = nil
         # Figure out the games category
-        trackedGame.categories.each do |key, cat|
+        trackedGame.categories.each do |hashKey, cat|
           # first check to see if it is the right category, regardless of subcategory
-          key = cat.category_id.split('-').first
-          if key.casecmp(run['category']).zero?
+          categoryID = hashKey.split('-').first
+          if categoryID.casecmp(run['category']).zero?
             # k then need to check the sub-category portion
-            if cat.category_id.casecmp("#{run['category']}-:").zero?
+            if hashKey.casecmp("#{run['category']}-:").zero?
               category = cat
               break
             end
-            variableID = cat.category_id.split('-').last.split(':').first
-            subcatID = cat.category_id.split('-').last.split(':').last
+            variableID = hashKey.split('-').last.split(':').first
+            subcatID = hashKey.split('-').last.split(':').last
             if run['values'].key?(variableID) && run['values'][variableID].casecmp(subcatID).zero?
               category = cat
               break
