@@ -134,6 +134,16 @@ module RunTracker
         runInfo['videoLink'] = info['videos']['links'].first['uri']
       end
 
+      runDate = nil
+      # If the run has no date, fallback to the verified date
+      if !info['date'].nil?
+        runDate = Date.strptime(info['date'], '%Y-%m-%d')
+      elsif !info['status']['verify-date'].nil?
+        runDate = Date.strptime(info['status']['verify-date'].split('T').first, '%Y-%m-%d') # TODO: cant strp date and time at same time? loses accuracy, fix
+      end
+
+      runInfo['date'] = runDate
+
       return runInfo
     end # end of func
   end # end SRC_API module

@@ -50,6 +50,8 @@ module RunTracker
         message.push("Current WR")
         message.push("============")
         message.push("<Runner #{runInfo['name']}> <Time #{Util.secondsToTime(category.current_wr_time)}>")
+        dateDiff = (Date.today).jd - runInfo['date'].jd
+        message.push("<Date #{runInfo['date'].to_s}> <#{dateDiff}> days ago")
         message.push("[Speedrun.com Link](#{runInfo['srcLink']})")
         message.push("[Video Link](#{runInfo['videoLink']})\n")
 
@@ -57,7 +59,9 @@ module RunTracker
         runInfo = SrcAPI.getRunInfo(category.longest_held_wr_id)
         message.push("Longest Held WR")
         message.push("============")
-        message.push("<Runner #{runInfo['name']}> <Time #{runInfo['time']} <Lasting #{category.longest_held_wr_time} days>")
+        message.push("<Runner #{runInfo['name']}> <Time #{runInfo['time']}> <Lasting #{category.longest_held_wr_time} days>")
+        dateDiff = (Date.today).jd - runInfo['date'].jd
+        message.push("<Date #{runInfo['date'].to_s}> <#{dateDiff}> days ago")
         message.push("[Speedrun.com Link](#{runInfo['srcLink']})")
         message.push("[Video Link](#{runInfo['videoLink']})\n")
 
