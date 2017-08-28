@@ -34,7 +34,7 @@ module RunTracker
         actuallyNotified = false
         if message.length > 1
           trackedGame.moderators.each do |key, moderator|
-            if moderator.should_notify == true && moderator.discord_id != 0
+            if moderator.should_notify == true && moderator.discord_id != 0 && moderator.past_moderator == false
               actuallyNotified = true
               message.push("If you want to stop receiving these notifications reply with !optout #{moderator.src_name}")
               RTBot.user(moderator.discord_id).pm(Util.arrayToMessage(message))
