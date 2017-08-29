@@ -34,7 +34,7 @@ module RunTracker
           moderator.last_verified_run_date = Date.strptime(value['@last_verified_run_date'], '%Y-%m-%d')
         end
         moderator.total_verified_runs = Integer(value['@total_verified_runs'])
-        moderator.past_moderator = value['@past_moderator']
+        moderator.past_moderator = value['@past_moderator'] == true
         self.moderators[key] = moderator
       end
     end # end of fromJson
