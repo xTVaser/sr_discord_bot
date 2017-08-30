@@ -26,6 +26,8 @@ module RunTracker
   HEARTBEAT_CHECKRUNS = 1 # 1 heartbeat approximately every 1minute
   HEARTBEAT_NOTIFYMODS = 1
 
+  DEBUG_CHANNEL = 351320655540781066
+
   # When the bot starts up
   RTBot.ready do |_event|
     # Create the database tables
@@ -40,6 +42,8 @@ module RunTracker
     # Clear the notifications table if at 200 rows, delete 150 of the most recent ones
     PostgresDB.cleanNotificationTable
     PostgresDB.cleanAnnouncementsTable
+
+
 
     puts "[INFO] Bot Online and Connected to Server"
   end

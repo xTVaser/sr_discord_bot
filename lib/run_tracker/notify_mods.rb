@@ -8,6 +8,7 @@ module RunTracker
       if trackedGames == nil
         return
       end
+      # TODO this does not handle adding new moderators
       trackedGames.each do |trackedGame|
         # Get any unverified runs for this game
         requestLink = "#{SrcAPI::API_URL}runs" \
