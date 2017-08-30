@@ -23,8 +23,8 @@ module RunTracker
   PERM_MOD = 1
   PERM_USER = 0
 
-  HEARTBEAT_CHECKRUNS = 1 # 1 heartbeat approximately every 1minute
-  HEARTBEAT_NOTIFYMODS = 1
+  HEARTBEAT_CHECKRUNS = 5 # 1 heartbeat approximately every 1minute
+  HEARTBEAT_NOTIFYMODS = 10
 
   DEBUG_CHANNEL = 351320655540781066
 

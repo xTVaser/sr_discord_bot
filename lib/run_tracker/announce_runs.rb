@@ -180,7 +180,9 @@ module RunTracker
 
           mod = trackedGame.moderators[modKey]
           RTBot.send_message(DEBUG_CHANNEL, "Selected Moderator - #{mod.src_name}")
+          RTBot.send_message(DEBUG_CHANNEL, "Verified Runs - #{mod.total_verified_runs}")
           mod.total_verified_runs += 1
+          RTBot.send_message(DEBUG_CHANNEL, "Verified Runs - #{mod.total_verified_runs}")
 
           # If there is no verify date, skip it
           if run['status']['verify-date'].nil?

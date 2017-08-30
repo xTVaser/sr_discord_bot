@@ -118,6 +118,8 @@ module RunTracker
       # TODO this doesnt handle 404 not found
       # guaranteed to be just one run
 
+      pp info['times']['primary_t']
+
       runInfo = Hash.new
       runInfo['time'] = Util.secondsToTime(info['times']['primary_t'])
       # name

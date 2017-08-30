@@ -45,6 +45,8 @@ module RunTracker
         # Name
         message.push(">Category Summary for - #{category.category_name} for game: #{game.name}:\n")
 
+        pp category
+
         # Current WR
         runInfo = SrcAPI.getRunInfo(category.current_wr_run_id)
         message.push("Current WR")
@@ -56,10 +58,15 @@ module RunTracker
         message.push("[Video Link](#{runInfo['videoLink']})\n")
 
         # Longest Held WR
-        runInfo = SrcAPI.getRunInfo(category.longest_held_wr_id)
         message.push("Longest Held WR")
         message.push("============")
-        message.push("<Runner #{runInfo['name']}> <Time #{runInfo['time']}> <Lasting #{category.longest_held_wr_time} days>")
+        if category.longest_held_wr_id == ""
+          runInfo = SrcAPI.getRunInfo(category.current_wr_run_id) # no one has broken the record yet
+          message.push("<Runner #{runInfo['name']}> <Time #{runInfo['time']}> < Still Counting >")
+        else
+          runInfo = SrcAPI.getRunInfo(category.longest_held_wr_id)
+          message.push("<Runner #{runInfo['name']}> <Time #{runInfo['time']}> <Lasting #{category.longest_held_wr_time} days>")
+        end
         dateDiff = (Date.today).jd - runInfo['date'].jd
         message.push("<Date #{runInfo['date'].to_s}> <#{dateDiff}> days ago")
         message.push("[Speedrun.com Link](#{runInfo['srcLink']})")
