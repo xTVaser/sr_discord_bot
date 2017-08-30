@@ -15,6 +15,7 @@ module RunTracker
                          max_args: 1) do |_event, _srcName|
 
         # Command Body
+        # TODO this command wipes the moderators stats
 
         # First check to see if the moderator exists for one of the games
         mod = nil

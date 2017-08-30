@@ -35,8 +35,6 @@ module RunTracker
           # TODO this sort will fail if the last_verified_run_date is still null, should start the date at something else maybe epoch
           modList = modList.sort_by { |k, o| [-o.last_verified_run_date.jd, -o.total_verified_runs] }
 
-          pp modList
-
           modList.each do |key, mod|
             modListing.push("<Name #{mod.src_name}> | <Total_Verified_Runs #{mod.total_verified_runs}> | <Last_Verified_Run_Date #{mod.last_verified_run_date}>")
           end
