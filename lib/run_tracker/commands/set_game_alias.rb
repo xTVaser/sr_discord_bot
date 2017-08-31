@@ -14,9 +14,6 @@ module RunTracker
                          min_args: 2,
                          max_args: 2) do |_event, _oldAlias, _newAlias|
 
-        pp _oldAlias
-        pp _newAlias
-
         # check if the newly provided alias is valid
         if !/[^a-zA-Z0-9\-()&:%]./.match(_newAlias).nil?
           return "`!setgamealias <old alias> <new alias>`\nAlias must be unique."
@@ -34,7 +31,7 @@ module RunTracker
           conn.exec('DEALLOCATE find_alias')
 
           # Set the alias for the game, and then change the prefix for any category aliases
-          # NOTE sometimes commands hang here forever....why?
+          # NOTE sometimes commands hang here forever because too many DB connections
           conn.prepare("update_game_alias", "update public.aliases set alias=$1 where alias=$2 and type = 'game'")
           conn.exec_prepared('update_game_alias', [_newAlias, _oldAlias])
           conn.exec('DEALLOCATE update_game_alias')

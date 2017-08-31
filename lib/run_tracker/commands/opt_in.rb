@@ -40,16 +40,14 @@ module RunTracker
           next
         end
 
-        # Otherwise, we are good to opt the moderator in
-        mod.discord_id = _event.message.user.id
-        mod.should_notify = true
-
         # Update all relevant games
         trackedGames = PostgresDB.getTrackedGames
         trackedGames.each do |trackedGame|
           trackedGame.moderators.each do |key, moderator|
             if moderator.src_name.downcase.casecmp(_srcName.downcase).zero?
-              trackedGame.moderators[key] = mod
+              # Update each mod's game individually dont corrupt other game's instances
+              trackedGame.moderators[key].discord_id = _event.message.user.id
+              trackedGame.moderators[key].should_notify = true
               PostgresDB.updateTrackedGame(trackedGame)
               break
             end
