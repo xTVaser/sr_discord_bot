@@ -169,20 +169,14 @@ module RunTracker
         # Moderator stuff
         if !run['status']['examiner'].nil?
           modKey = run['status']['examiner']
-          RTBot.send_message(DEBUG_CHANNEL, "Announcing a Run in a Channel")
-          RTBot.send_message(DEBUG_CHANNEL, "Mod Key: #{modKey}")
           # If the moderator is no longer a moderator, create them
           unless trackedGame.moderators.key?(modKey)
             trackedGame.moderators[modKey] = Moderator.new(modKey, SrcAPI.getUserName(modKey))
             trackedGame.moderators[modKey].past_moderator = true
-            RTBot.send_message(DEBUG_CHANNEL, "Moderator didnt exist #{SrcAPI.getUserName(modKey)}")
           end
 
           mod = trackedGame.moderators[modKey]
-          RTBot.send_message(DEBUG_CHANNEL, "Selected Moderator - #{mod.src_name}")
-          RTBot.send_message(DEBUG_CHANNEL, "Verified Runs - #{mod.total_verified_runs}")
           mod.total_verified_runs += 1
-          RTBot.send_message(DEBUG_CHANNEL, "Verified Runs - #{mod.total_verified_runs}")
 
           # If there is no verify date, skip it
           if run['status']['verify-date'].nil?
@@ -196,7 +190,6 @@ module RunTracker
           elsif mod.last_verified_run_date < Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
             mod.last_verified_run_date = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
           end
-          RTBot.send_message(DEBUG_CHANNEL, "Last Verified Run Date - #{mod.last_verified_run_date}")
         end # end of moderator stuff check
 
         # Now that the hell is over, update the database
@@ -211,7 +204,6 @@ module RunTracker
         PostgresDB.updateTrackedGame(trackedGame)
         highlightedText = Util.arrayToCodeBlock(message, highlighting: "md")
         highlightedText += "\nVideo Link - #{videoLink}"
-        RTBot.send_message(trackedGame.announce_channel, highlightedText)
         # Add run to the announcements table so we dont duplicate the messages
         PostgresDB::Conn.exec("INSERT INTO public.announcements (run_id) VALUES ('#{run['id']}')")
 
