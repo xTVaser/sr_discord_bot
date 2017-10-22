@@ -2,7 +2,7 @@ module RunTracker
   ##
   # Holds all related functions for dealing with speedrun.com API
   module SrcAPI
-    API_URL = 'http://www.speedrun.com/api/v1/'.freeze
+    API_URL = 'https://www.speedrun.com/api/v1/'.freeze
 
     ##
     # Returns the forward link given the rel key

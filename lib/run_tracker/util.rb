@@ -9,8 +9,8 @@ module RunTracker
       pp "[JSON] #{url}"
       jsonURI = URI(url)
       response = Net::HTTP.get(jsonURI)
-
-      JSON.parse(response)
+      response = JSON.parse(response)
+      return response
     end
 
     ##
