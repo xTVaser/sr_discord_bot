@@ -16,7 +16,7 @@ module RunTracker
   RTBot = Discordrb::Commands::CommandBot.new(token: ENV['TOKEN'],
                                               client_id: ENV['CLIENT_ID'],
                                               prefix: '~',
-                                              command_doesnt_exist_message: 'Use !help to see a list of available commands')
+                                              command_doesnt_exist_message: 'Use ~help to see a list of available commands')
 
   # Constants
   PERM_ADMIN = 2

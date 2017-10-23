@@ -102,7 +102,7 @@ module RunTracker
           aliasResults = PostgresDB::Conn.exec_prepared('find_alias', [_alias])
           if aliasResults.ntuples < 1
             PostgresDB::Conn.exec('DEALLOCATE find_alias')
-            _event << "Category Alias not found use !listcategories <gameAlias> to see the current aliases"
+            _event << "Category Alias not found use ~listcategories <gameAlias> to see the current aliases"
             next
           end
           PostgresDB::Conn.exec('DEALLOCATE find_alias')

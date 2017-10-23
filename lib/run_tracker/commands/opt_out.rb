@@ -40,7 +40,7 @@ module RunTracker
 
         # Otherwise, let's check to see if the moderator has already opted in
         if mod.should_notify != true
-          _event << "#{_srcName} has not opted in, !optin #{_srcName} to opt-in"
+          _event << "#{_srcName} has not opted in, ~optin #{_srcName} to opt-in"
           next
         end
 

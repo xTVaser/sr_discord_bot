@@ -17,7 +17,7 @@ module RunTracker
         # Command Body
         gameID = PostgresDB.findID(_game_alias)
         if gameID == nil
-          _event << "No game with that alias, use `!listgames` to view current aliases"
+          _event << "No game with that alias, use `~listgames` to view current aliases"
           next
         end
         trackedGame = PostgresDB.getTrackedGame(gameID)

@@ -28,7 +28,7 @@ module RunTracker
 
         # Name
         message.push(">Game Summary for: <#{_gameAlias}>:\n")
-        message.push("Categories <!statscategory categoryAlias>:")
+        message.push("Categories <~statscategory categoryAlias>:")
         message.push("============")
         # games have done runs in
         totalSubmittedRuns = 0
