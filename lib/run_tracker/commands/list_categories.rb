@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:listcategories, description: 'Lists all categories for a specific tracked game.',
-                          usage: '!listcategories',
+                          usage: '~listcategories',
                           permission_level: PERM_USER,
                           rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                           bucket: :limiter,

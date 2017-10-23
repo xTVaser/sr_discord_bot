@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:listmods, description: 'Lists all mods for a specific game.',
-                          usage: '!listmods <gameAlias>',
+                          usage: '~listmods <gameAlias>',
                           permission_level: PERM_USER,
                           rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                           bucket: :limiter,
@@ -22,7 +22,7 @@ module RunTracker
           conn.prepare("find_alias", "SELECT * FROM public.\"aliases\" WHERE alias=$1 and type='game'")
           aliasResults = conn.exec_prepared('find_alias', [_gameAlias])
           if aliasResults.ntuples < 1
-            return "Game Alias not found use `!listgames` to see the current aliases"
+            return "Game Alias not found use `~listgames` to see the current aliases"
           end
           conn.exec('DEALLOCATE find_alias')
 

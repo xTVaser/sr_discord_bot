@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 1, delay: 1
 
       command(:addgame, description: 'Add a game to the list of tracked games.',
-                        usage: '!addgame <id/name> <game-name/game-id>',
+                        usage: '~addgame <id/name> <game-name/game-id>',
                         permission_level: PERM_ADMIN,
                         min_args: 2,
                         max_args: 2,
@@ -17,7 +17,7 @@ module RunTracker
         # Check to see if the command syntax was valid
         unless type.casecmp('id').zero? || type.casecmp('name').zero?
           _event << 'Invalid syntax for command `addgame`!'
-          _event << 'Usage: `!addgame <id/name> <game-name/game-id>`'
+          _event << 'Usage: `~addgame <id/name> <game-name/game-id>`'
           next
         end
 
@@ -47,7 +47,7 @@ module RunTracker
             trackGame(_event, results.first['id'])
           end
         else
-          _event << 'Usage: `!addgame <id/name> <game-name/game-id>`'
+          _event << 'Usage: `~addgame <id/name> <game-name/game-id>`'
           next
         end
       end # end command body
@@ -92,9 +92,9 @@ module RunTracker
         message.push("============")
         message.push("Found <#{trackedGame.name}> with ID: <#{trackedGame.id}>")
         message.push("Found <#{trackedGame.categories.length}> categories and <#{trackedGame.moderators.length}> current moderators")
-        message.push("To change the alias <!setgamealias #{gameAlias} <newAlias>>")
-        message.push("To change the announce channel <!setannounce #{gameAlias} <#channel_name>>")
-        message.push("If incorrect, remove with <!removegame #{gameAlias}>")
+        message.push("To change the alias <~setgamealias #{gameAlias} <newAlias>>")
+        message.push("To change the announce channel <~setannounce #{gameAlias} <#channel_name>>")
+        message.push("If incorrect, remove with <~removegame #{gameAlias}>")
         _event << Util.arrayToCodeBlock(message, highlighting: 'md')
 
       end # end self.trackGame

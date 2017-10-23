@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:optin, description: 'Allows a speedrun.com leaderboard mod to opt-in to receiving notifications from the games they moderate',
-                         usage: '!optin <speedrunComName> *must be the user themselves',
+                         usage: '~optin <speedrunComName> *must be the user themselves',
                          permission_level: PERM_MOD,
                          rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                          bucket: :limiter,
@@ -36,7 +36,7 @@ module RunTracker
 
         # Otherwise, let's check to see if the moderator has already opted in
         if mod.should_notify == true
-          _event << "#{_srcName} has already opted in, `!optout #{_srcName}` to opt-out"
+          _event << "#{_srcName} has already opted in, `~optout #{_srcName}` to opt-out"
           next
         end
 
@@ -54,7 +54,7 @@ module RunTracker
           end
         end
 
-        _event << "Moderator successfully opted-in, use `!optout #{_srcName}` to opt-out at any time."
+        _event << "Moderator successfully opted-in, use `~optout #{_srcName}` to opt-out at any time."
 
       end # end of command body
     end # end of module

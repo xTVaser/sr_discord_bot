@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:removegame, description: 'Removes a game from the list of tracked games.',
-                           usage: '!removegame <game-alias>',
+                           usage: '~removegame <game-alias>',
                            permission_level: PERM_ADMIN,
                            rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                            bucket: :limiter,

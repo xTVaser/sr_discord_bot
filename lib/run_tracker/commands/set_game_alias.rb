@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:setgamealias, description: '',
-                         usage: "!setgamealias <old alias> <new alias>\nAlias must be unique.",
+                         usage: "~setgamealias <old alias> <new alias>\nAlias must be unique.",
                          permission_level: PERM_MOD,
                          rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                          bucket: :limiter,
@@ -16,7 +16,7 @@ module RunTracker
 
         # check if the newly provided alias is valid
         if !/[^a-zA-Z0-9\-()&:%]./.match(_newAlias).nil?
-          return "`!setgamealias <old alias> <new alias>`\nAlias must be unique."
+          return "`~setgamealias <old alias> <new alias>`\nAlias must be unique."
         end
 
         PostgresDB::Conn.transaction do |conn|

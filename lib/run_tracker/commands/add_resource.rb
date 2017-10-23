@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 1, delay: 1
 
       command(:addresource, description: 'Lists all categories for a specific tracked game.',
-                          usage: '!addresource <gameAlias> <resource name> <content>',
+                          usage: '~addresource <gameAlias> <resource name> <content>',
                           permission_level: PERM_MOD,
                           min_args: 3,
                           max_args: 3,
@@ -18,7 +18,7 @@ module RunTracker
         PostgresDB::Conn.prepare("find_alias", "SELECT * FROM public.\"aliases\" WHERE alias= $1 and type='game'")
         aliasResults = PostgresDB::Conn.exec_prepared('find_alias', [_gameAlias])
         if aliasResults.ntuples < 1
-          _event << "Game Alias not found use !listgames to see the current aliases"
+          _event << "Game Alias not found use ~listgames to see the current aliases"
           PostgresDB::Conn.exec('DEALLOCATE find_alias')
           return
         end

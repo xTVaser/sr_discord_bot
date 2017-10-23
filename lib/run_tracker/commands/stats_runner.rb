@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:statsrunner, description: 'Displays all or a particular stat for a given runner',
-                        usage: "!statsrunner <runnerName> <game/category> <gameAlias/categoryAlias>",
+                        usage: "~statsrunner <runnerName> <game/category> <gameAlias/categoryAlias>",
                         permission_level: PERM_USER,
                         rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                         bucket: :limiter,
@@ -146,7 +146,7 @@ module RunTracker
           # Total time convert to hours across all runs
           message.push(">Total Time spent across all runs: <#{(category.total_time_overall/3600.0).round(2)}> hrs")
         else
-          _event << "!statsrunner <runnerName> <game/category> <gameAlias/categoryAlias>"
+          _event << "~statsrunner <runnerName> <game/category> <gameAlias/categoryAlias>"
           next
         end
 

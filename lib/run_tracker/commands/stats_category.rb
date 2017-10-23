@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:statscategory, description: 'Displays stats for a given tracked games category',
-                        usage: "!statscategory <alias>",
+                        usage: "~statscategory <alias>",
                         permission_level: PERM_USER,
                         rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                         bucket: :limiter,
@@ -18,7 +18,7 @@ module RunTracker
 
         gameID = PostgresDB.categoryAliasToGameID(_categoryAlias)
         if gameID == nil
-          _event << "No category found with that alias, use !listcategories <gameAlias> to view current aliases"
+          _event << "No category found with that alias, use ~listcategories <gameAlias> to view current aliases"
           next
         end
         categoryID = PostgresDB.findID(_categoryAlias)

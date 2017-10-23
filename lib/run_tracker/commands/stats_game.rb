@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:statsgame, description: 'Displays stats for a given tracked game',
-                        usage: "!statsgame <alias>",
+                        usage: "~statsgame <alias>",
                         permission_level: PERM_USER,
                         rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                         bucket: :limiter,
@@ -17,7 +17,7 @@ module RunTracker
         # Command Body
         gameID = PostgresDB.findID(_gameAlias)
         if gameID == nil
-          _event << "No game found with that alias, use !listgames to view current aliases"
+          _event << "No game found with that alias, use ~listgames to view current aliases"
           next
         end
         # First verify if that game is even tracked (by getting it)
