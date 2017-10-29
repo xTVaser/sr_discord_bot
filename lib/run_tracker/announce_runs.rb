@@ -206,7 +206,7 @@ module RunTracker
         highlightedText += "\nVideo Link - #{videoLink}"
         # Add run to the announcements table so we dont duplicate the messages
         PostgresDB::Conn.exec("INSERT INTO public.announcements (run_id) VALUES ('#{run['id']}')")
-        RTBot.send_message(trackedGame.announce_channel, Util.arrayToCodeBlock(message, highlighting: "md"))
+        RTBot.send_message(trackedGame.announce_channel, highlightedText)
         next
       end # end of tracked games loop
 
