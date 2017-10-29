@@ -63,25 +63,28 @@ module RunTracker
   # Load up all the commands
   CommandLoader.loadCommands
 
-  heartbeatCounter = 1
+  announceCounter = 1
+  notifyModCounter = 1
 
   RTBot.heartbeat do |_event|
 
-    heartbeatCounter += 1
     # Every 5th heartbeat, check for new runs
-    if heartbeatCounter >= HEARTBEAT_CHECKRUNS
+    if announceCounter >= HEARTBEAT_CHECKRUNS
       AnnounceRuns.announceRuns
       # Clean the notification table every so often
       PostgresDB.cleanAnnouncementsTable
+      announceCounter = 1
     end
 
     # Every 10th heartbeat, notify the moderators
-    if heartbeatCounter >= HEARTBEAT_NOTIFYMODS
-      heartbeatCounter = 1
+    if notifyModCounter >= HEARTBEAT_NOTIFYMODS
       NotifyMods.notifyMods
       # Clean the notification table every so often
       PostgresDB.cleanNotificationTable
+      notifyModCounter = 1
     end
+    announceCounter += 1
+    notifyModCounter += 1
   end
 
   RTBot.run
