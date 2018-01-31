@@ -17,12 +17,12 @@ module RunTracker
         # Command Body
         begin
           # Set the alias for the game, and then change the prefix for any category aliases
-          PostgresDB::Conn.prepare('remove_game_resource', 'delete from public.resources WHERE game_alias=$1 and resource=$2')
-          PostgresDB::Conn.exec_prepared('remove_game_resource', [_gameAlias, _name])
-          PostgresDB::Conn.exec('DEALLOCATE remove_game_resource')
+          SQLiteDB::Conn.prepare('remove_game_resource', 'delete from resources WHERE game_alias=$1 and resource=$2')
+          SQLiteDB::Conn.exec_prepared('remove_game_resource', [_gameAlias, _name])
+          SQLiteDB::Conn.execute('DEALLOCATE remove_game_resource')
         rescue Exception => ex
           _event << "No resource for #{_gameAlias} with name #{_name}"
-          PostgresDB::Conn.exec('DEALLOCATE remove_game_resource')
+          SQLiteDB::Conn.execute('DEALLOCATE remove_game_resource')
           return
         end
 

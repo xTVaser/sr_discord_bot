@@ -16,15 +16,15 @@ module RunTracker
 
         # Command Body
         modListing = []
-        PostgresDB::Conn.transaction do |conn|
+        SQLiteDB::Conn.transaction do |conn|
 
           # Check to see if alias even exists
-          conn.prepare("find_alias", "SELECT * FROM public.\"aliases\" WHERE alias=$1 and type='game'")
+          conn.prepare("find_alias", "SELECT * FROM \"aliases\" WHERE alias=$1 and type='game'")
           aliasResults = conn.exec_prepared('find_alias', [_gameAlias])
-          if aliasResults.ntuples < 1
+          if aliasResults.length < 1
             return "Game Alias not found use `~listgames` to see the current aliases"
           end
-          conn.exec('DEALLOCATE find_alias')
+          conn.execute('DEALLOCATE find_alias')
 
           game = PostgresDB.getTrackedGame(aliasResults.first['id'])
           modListing.push("Moderators for #{game.name}:")

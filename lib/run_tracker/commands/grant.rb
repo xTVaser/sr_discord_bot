@@ -40,14 +40,14 @@ module RunTracker
 
           # If the user is not in the database then we insert them into the table and save their access level.
           begin
-            PostgresDB::Conn.prepare('insert_grant_permission', 'insert into public."managers"("user_id", access_level) values ($1, $2 )')
-            PostgresDB::Conn.exec_prepared('insert_grant_permission', [user.id, level])
-            PostgresDB::Conn.exec('DEALLOCATE insert_grant_permission')
+            SQLiteDB::Conn.prepare('insert_grant_permission', 'insert into "managers"("user_id", access_level) values ($1, $2 )')
+            SQLiteDB::Conn.exec_prepared('insert_grant_permission', [user.id, level])
+            SQLiteDB::Conn.execute('DEALLOCATE insert_grant_permission')
           rescue PG::UniqueViolation # Otherwise if they are already in the database we update their access level.
-            PostgresDB::Conn.exec('DEALLOCATE insert_grant_permission')
-            PostgresDB::Conn.prepare('update_grant_permission', 'update public."managers" set access_level = $1 where user_id = $2')
-            PostgresDB::Conn.exec_prepared('update_grant_permission', [level, user.id])
-            PostgresDB::Conn.exec('DEALLOCATE update_grant_permission')
+            SQLiteDB::Conn.execute('DEALLOCATE insert_grant_permission')
+            SQLiteDB::Conn.prepare('update_grant_permission', 'update "managers" set access_level = $1 where user_id = $2')
+            SQLiteDB::Conn.exec_prepared('update_grant_permission', [level, user.id])
+            SQLiteDB::Conn.execute('DEALLOCATE update_grant_permission')
           end
 
           # Send verbal confirmation of access level setting.

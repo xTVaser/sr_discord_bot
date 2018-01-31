@@ -21,9 +21,9 @@ module RunTracker
           _event << "Game not found with that alias"
           next
         end
-        PostgresDB::Conn.prepare('update_announce_channel', 'UPDATE public.tracked_games SET announce_channel = $1 WHERE game_id = $2')
-        PostgresDB::Conn.exec_prepared('update_announce_channel', [channelID, gameID])
-        PostgresDB::Conn.exec('DEALLOCATE update_announce_channel')
+        SQLiteDB::Conn.prepare('update_announce_channel', 'UPDATE tracked_games SET announce_channel = $1 WHERE game_id = $2')
+        SQLiteDB::Conn.exec_prepared('update_announce_channel', [channelID, gameID])
+        SQLiteDB::Conn.execute('DEALLOCATE update_announce_channel')
 
         _event << "Channel updated successfully for #{_gameAlias}"
 

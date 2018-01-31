@@ -1,4 +1,4 @@
-ruby '2.4.1'
+ruby '2.4.2'
 
 source 'https://rubygems.org'
 
@@ -15,11 +15,8 @@ gem 'discordrb', '~> 3.2'
 # Added at 2017-07-22 17:55:56 -0400 by tyler:
 gem 'dotenv', '~> 2.2'
 
-# Added at 2017-07-26 20:54:44 -0400 by tyler:
-gem 'redis', '~> 3.3'
-
-# Added at 2017-07-28 20:05:43 -0400 by tyler:
-gem 'pg', '~> 0.21.0'
-
 # Added at 2017-08-01 22:44:13 -0400 by tyler:
 gem 'rubocop', '~> 0.49.1'
+
+# Added at 2018-01-28 20:11:43 -0500 by tyler-pc\xtvas:
+gem "sqlite3", "~> 1.3"

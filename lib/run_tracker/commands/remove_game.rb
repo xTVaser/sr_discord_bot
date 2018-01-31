@@ -23,10 +23,10 @@ module RunTracker
 
         begin
 
-          PostgresDB::Conn.transaction do |conn|
+          SQLiteDB::Conn.transaction do |conn|
 
             # Delete the tracked game row
-            conn.exec("DELETE from public.tracked_games where game_id = '#{gameID}'")
+            conn.execute("DELETE from tracked_games where game_id = '#{gameID}'")
 
             # Go through all of the runners and delete the tracked game
             runners = PostgresDB.getCurrentRunners
@@ -47,10 +47,10 @@ module RunTracker
             PostgresDB.updateCurrentRunners(runners)
 
             # Delete the game and category aliases
-            conn.exec("DELETE from public.aliases where alias LIKE '#{_gameAlias}%'")
+            conn.execute("DELETE from aliases where alias LIKE '#{_gameAlias}%'")
 
             # Delete the game's resources
-            conn.exec("DELETE from public.resources where game_alias = '#{_gameAlias}'")
+            conn.execute("DELETE from resources where game_alias = '#{_gameAlias}'")
           end # end of transaction
 
         rescue Exception => e

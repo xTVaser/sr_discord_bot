@@ -21,7 +21,7 @@ module RunTracker
           next
         end
         trackedGame = PostgresDB.getTrackedGame(gameID)
-        aliases = PostgresDB::Conn.exec("SELECT * FROM public.\"aliases\" WHERE type='category'")
+        aliases = SQLiteDB::Conn.execute("SELECT * FROM \"aliases\" WHERE type='category'")
 
         message = Array.new
         message.push("#Categories for #{_game_alias}, Sorted by Name")

@@ -20,19 +20,19 @@ module RunTracker
         end
 
         # Check to see if alias even exists
-        aliasResults = PostgresDB::Conn.exec("SELECT * FROM public.\"aliases\" WHERE alias='#{_oldAlias}' and type='category'")
-        if aliasResults.ntuples < 1
+        aliasResults = SQLiteDB::Conn.execute("SELECT * FROM \"aliases\" WHERE alias='#{_oldAlias}' and type='category'")
+        if aliasResults.length < 1
           return "Category Alias not found use `~listcategories <game_alias>` to see the current aliases"
         end
 
-        PostgresDB::Conn.transaction do |conn|
+        SQLiteDB::Conn.transaction do |conn|
 
           gameAlias = _oldAlias.split('-').first
 
           # Set the alias for the game, and then change the prefix for any category aliases
-          conn.prepare("update_category_alias", "update public.aliases set alias = $1 where alias = $2 and type = 'category'")
+          conn.prepare("update_category_alias", "update aliases set alias = $1 where alias = $2 and type = 'category'")
           conn.exec_prepared('update_category_alias', ["#{gameAlias}-#{_newAlias}", _oldAlias])
-          conn.exec('DEALLOCATE update_category_alias')
+          conn.execute('DEALLOCATE update_category_alias')
 
         end
         return

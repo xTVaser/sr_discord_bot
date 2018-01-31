@@ -19,25 +19,25 @@ module RunTracker
           return "`~setgamealias <old alias> <new alias>`\nAlias must be unique."
         end
 
-        PostgresDB::Conn.transaction do |conn|
+        SQLiteDB::Conn.transaction do |conn|
 
           # Check to see if alias even exists
-          conn.prepare("find_alias", "SELECT * FROM public.\"aliases\" WHERE alias= $1 and type='game'")
+          conn.prepare("find_alias", "SELECT * FROM \"aliases\" WHERE alias= $1 and type='game'")
           aliasResults = conn.exec_prepared('find_alias', [_oldAlias])
           pp aliasResults
-          if aliasResults.ntuples < 1
+          if aliasResults.length < 1
             return "Game Alias not found use `!listgames` to see the current aliases"
           end
-          conn.exec('DEALLOCATE find_alias')
+          conn.execute('DEALLOCATE find_alias')
 
           # Set the alias for the game, and then change the prefix for any category aliases
           # NOTE sometimes commands hang here forever because too many DB connections
-          conn.prepare("update_game_alias", "update public.aliases set alias=$1 where alias=$2 and type = 'game'")
+          conn.prepare("update_game_alias", "update aliases set alias=$1 where alias=$2 and type = 'game'")
           conn.exec_prepared('update_game_alias', [_newAlias, _oldAlias])
-          conn.exec('DEALLOCATE update_game_alias')
+          conn.execute('DEALLOCATE update_game_alias')
 
-          categoryAliases = conn.exec("SELECT * FROM public.aliases WHERE type='category'")
-          conn.prepare("update_category_prefix", "update public.aliases set alias = $1 where alias = $2 and type = 'category'")
+          categoryAliases = conn.execute("SELECT * FROM aliases WHERE type='category'")
+          conn.prepare("update_category_prefix", "update aliases set alias = $1 where alias = $2 and type = 'category'")
           categoryAliases.each do |catAlias|
             prefix = catAlias['alias'].split('-').first
             withPrefixRemoved = catAlias['alias'].split('-')
@@ -47,12 +47,12 @@ module RunTracker
               conn.exec_prepared('update_category_prefix', ["#{newCategoryAlias}", catAlias['alias']])
             end
           end
-          conn.exec('DEALLOCATE update_category_prefix')
+          conn.execute('DEALLOCATE update_category_prefix')
 
           # Set the alias for any existing resources
-          conn.prepare('update_resource_aliases', "update public.resources set game_alias=$1 where game_alias=$2")
+          conn.prepare('update_resource_aliases', "update resources set game_alias=$1 where game_alias=$2")
           conn.exec_prepared('update_resource_aliases', [_newAlias, _oldAlias])
-          conn.exec('DEALLOCATE update_resource_aliases')
+          conn.execute('DEALLOCATE update_resource_aliases')
 
         end
 

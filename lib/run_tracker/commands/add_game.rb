@@ -73,14 +73,14 @@ module RunTracker
         end
         trackedGame.announce_channel = _event.channel
         begin
-          PostgresDB::Conn.prepare('add_tracked_games', 'insert into public."tracked_games"
+          SQLiteDB::Conn.prepare('add_tracked_games', 'insert into "tracked_games"
             ("game_id", "game_name", "announce_channel", categories, moderators)
             values ($1, $2, $3, $4, $5)')
-          PostgresDB::Conn.exec_prepared('add_tracked_games', [trackedGame.id,
+          SQLiteDB::Conn.exec_prepared('add_tracked_games', [trackedGame.id,
                                                                trackedGame.name, trackedGame.announce_channel.id,
                                                                JSON.generate(trackedGame.categories),
                                                                JSON.generate(trackedGame.moderators)])
-          PostgresDB::Conn.exec('DEALLOCATE add_tracked_games')
+          SQLiteDB::Conn.execute('DEALLOCATE add_tracked_games')
         rescue PG::UniqueViolation
           _event << "That game is already being tracked, remove it first."
           return

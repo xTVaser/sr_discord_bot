@@ -17,8 +17,8 @@ module RunTracker
         run = Util.jsonRequest(requestLink)['data'].first
 
         # Check to see if the run has already been announced before
-        check = PostgresDB::Conn.exec("SELECT * FROM public.announcements WHERE run_id = '#{run['id']}'")
-        if check.ntuples > 0
+        check = SQLiteDB::Conn.execute("SELECT * FROM announcements WHERE run_id = '#{run['id']}'")
+        if check.length > 0
           next
         end
 
@@ -205,7 +205,7 @@ module RunTracker
         highlightedText = Util.arrayToCodeBlock(message, highlighting: "md")
         highlightedText += "\nVideo Link - #{videoLink}"
         # Add run to the announcements table so we dont duplicate the messages
-        PostgresDB::Conn.exec("INSERT INTO public.announcements (run_id) VALUES ('#{run['id']}')")
+        SQLiteDB::Conn.execute("INSERT INTO announcements (run_id) VALUES ('#{run['id']}')")
         RTBot.send_message(trackedGame.announce_channel, highlightedText)
         next
       end # end of tracked games loop

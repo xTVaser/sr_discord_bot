@@ -8,7 +8,9 @@ require 'pp'
 # All code in the gem is namespaced under this module.
 module RunTracker
   require_relative 'run_tracker/version'
-  require_relative 'db/psql_database'
+  require_relative 'db/sqlite_database'
+  # Require jsonable first because some of the models depend on it
+  require_relative 'run_tracker/models/jsonable.rb'
 
   Dotenv.load('vars.env')
 
@@ -18,12 +20,12 @@ module RunTracker
                                               prefix: '~',
                                               command_doesnt_exist_message: 'Use ~help to see a list of available commands')
 
-  # Constants
+  # Permission Constants
   PERM_ADMIN = 2
   PERM_MOD = 1
   PERM_USER = 0
 
-  HEARTBEAT_CHECKRUNS = 5 # 1 heartbeat approximately every 1minute
+  HEARTBEAT_CHECKRUNS = 5 # 1 heartbeat approximately every 1 minute
   HEARTBEAT_NOTIFYMODS = 10
 
   DEBUG_CHANNEL = 351320655540781066
@@ -31,19 +33,14 @@ module RunTracker
   # When the bot starts up
   RTBot.ready do |_event|
     # Create the database tables
-    PostgresDB.generateSchema
+    SQLiteDB.generateSchema
     # Initialize any permissions that have previously been set
-    PostgresDB.initPermissions
+    SQLiteDB.initPermissions
     # Give the server owner maximum permissions
     RTBot.set_user_permission(RTBot.servers.first.last.owner.id, PERM_ADMIN)
     # Hardcode to give me permissions
-    # TODO disable this if you dont want me to have full access!
+    # TODO disable this line if you dont want me to have full access!
     RTBot.set_user_permission(140194315518345216, PERM_ADMIN)
-    # Clear the notifications table if at 200 rows, delete 150 of the most recent ones
-    PostgresDB.cleanNotificationTable
-    PostgresDB.cleanAnnouncementsTable
-
-
 
     puts "[INFO] Bot Online and Connected to Server"
   end
@@ -53,8 +50,6 @@ module RunTracker
     require file
   end
 
-  # Require jsonable first because some of the models depend on it
-  require_relative 'run_tracker/models/jsonable.rb'
   # Require all model files
   Dir["#{File.dirname(__FILE__)}/run_tracker/models/*.rb"].each do |file|
     require file
@@ -71,16 +66,12 @@ module RunTracker
     # Every 5th heartbeat, check for new runs
     if announceCounter >= HEARTBEAT_CHECKRUNS
       AnnounceRuns.announceRuns
-      # Clean the notification table every so often
-      PostgresDB.cleanAnnouncementsTable
       announceCounter = 1
     end
 
     # Every 10th heartbeat, notify the moderators
     if notifyModCounter >= HEARTBEAT_NOTIFYMODS
       NotifyMods.notifyMods
-      # Clean the notification table every so often
-      PostgresDB.cleanNotificationTable
       notifyModCounter = 1
     end
     announceCounter += 1

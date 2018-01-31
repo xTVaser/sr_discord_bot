@@ -15,9 +15,9 @@ module RunTracker
                           max_args: 1) do |_event, _gameAlias|
 
         # Command Body
-        PostgresDB::Conn.prepare('get_resources', "SELECT * FROM public.resources WHERE game_alias=$1")
-        resources = PostgresDB::Conn.exec_prepared('get_resources', [_gameAlias])
-        PostgresDB::Conn.exec('DEALLOCATE get_resources')
+        SQLiteDB::Conn.prepare('get_resources', "SELECT * FROM resources WHERE game_alias=$1")
+        resources = SQLiteDB::Conn.exec_prepared('get_resources', [_gameAlias])
+        SQLiteDB::Conn.execute('DEALLOCATE get_resources')
 
         message = Array.new
         message.push("Resources for #{_gameAlias}:")

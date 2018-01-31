@@ -15,11 +15,11 @@ module RunTracker
                          max_args: 2) do |_event, _gameAlias, _name|
 
         # Command Body
-        PostgresDB::Conn.prepare('get_resource', "SELECT * FROM public.resources WHERE game_alias=$1 and resource=$2")
-        resource = PostgresDB::Conn.exec_prepared('get_resource', [_gameAlias, _name])
-        PostgresDB::Conn.exec('DEALLOCATE get_resource')
+        SQLiteDB::Conn.prepare('get_resource', "SELECT * FROM resources WHERE game_alias=$1 and resource=$2")
+        resource = SQLiteDB::Conn.exec_prepared('get_resource', [_gameAlias, _name])
+        SQLiteDB::Conn.execute('DEALLOCATE get_resource')
 
-        if resource.ntuples < 1
+        if resource.length < 1
           _event << "No resource found for that game with that name!"
           return
         end
