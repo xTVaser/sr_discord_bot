@@ -17,7 +17,7 @@ module RunTracker
         # Command Body
 
         # First verify if that runner even exists
-        runners = PostgresDB.getCurrentRunners
+        runners = SQLiteDB.getCurrentRunners
         theRunner = nil
         runners.each do |key, runner|
           if runner.src_name.casecmp(_runnerName.downcase).zero? or
@@ -109,7 +109,7 @@ module RunTracker
 
           gameAlias = aliasResults.first['alias'].split('-').first
 
-          gameID = PostgresDB.findID(gameAlias)
+          gameID = SQLiteDB.findID(gameAlias)
 
           # Check to see if that runner has done runs of that game
           foundGame = nil

@@ -15,7 +15,7 @@ module RunTracker
                            max_args: 1) do |_event, _gameAlias|
 
         # Check to see if the game is even tracked
-        gameID = PostgresDB.findID(_gameAlias)
+        gameID = SQLiteDB.findID(_gameAlias)
         if gameID == nil
           _event << "That game is not currently being tracked"
           next
@@ -29,7 +29,7 @@ module RunTracker
             conn.execute("DELETE from tracked_games where game_id = '#{gameID}'")
 
             # Go through all of the runners and delete the tracked game
-            runners = PostgresDB.getCurrentRunners
+            runners = SQLiteDB.getCurrentRunners
             runners.each do |key, runner|
               # If the runner hasnt played that game, forget about it
               if !runner.historic_runs.key?(gameID)
@@ -44,7 +44,7 @@ module RunTracker
               runner.historic_runs.delete(gameID)
             end
             # Update their fields
-            PostgresDB.updateCurrentRunners(runners)
+            SQLiteDB.updateCurrentRunners(runners)
 
             # Delete the game and category aliases
             conn.execute("DELETE from aliases where alias LIKE '#{_gameAlias}%'")

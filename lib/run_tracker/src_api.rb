@@ -31,8 +31,6 @@ module RunTracker
         raise 'Game ID Malformed, no game found.'
       end
 
-      # TODO: put this processing in a seperate thread for immediate feedback
-
       foundGame = gameData['data']
       categoryLink = getFwdLink('categories', foundGame['links'])
 
@@ -47,7 +45,8 @@ module RunTracker
       # Add the category aliases to the alias table
       aliasList = categoryResults.last
       aliasList[gameAlias] = ['game', foundGame['id']]
-      PostgresDB.insertNewAliases(aliasList)
+      # TODO this should be moved, not transactional
+      SQLiteDB.insertNewAliases(aliasList)
 
       modList = getGameMods(foundGame['moderators'])
       SeedDB.getGameRunners(foundGame['id'], foundGame['names']['international'], categoryList, modList)

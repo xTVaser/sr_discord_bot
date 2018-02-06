@@ -36,7 +36,7 @@ module RunTracker
                             '"src_id" TEXT NOT NULL,' \
                             '"game_id" TEXT NOT NULL,' \
                             '"src_name" TEXT NOT NULL,' \
-                            '"discord_id" TEXT NOT NULL,' \
+                            '"discord_id" INTEGER NOT NULL,' \
                             '"should_notify" INTEGER NOT NULL,' \
                             '"secret_key" TEXT NOT NULL,' \
                             '"last_verified_run_date" INTEGER,' \
@@ -59,7 +59,7 @@ module RunTracker
                          '"alias" TEXT NOT NULL,' \
                          '"type" TEXT NOT NULL,' \
                          '"id" TEXT NOT NULL UNIQUE,' \
-                         'PRIMARY KEY ("alias"));'
+                         'PRIMARY KEY ("alias", "type"));'
       createResourcesTable = 'CREATE TABLE IF NOT EXISTS resources (' \
                              '"resource" TEXT NOT NULL,' \
                              '"game_alias" TEXT NOT NULL,' \
@@ -199,7 +199,7 @@ module RunTracker
     def self.insertNewRunner(runner)
       # Update Statement
       begin
-        Conn.exceute('insert into "tracked_runners"
+        Conn.execute('insert into "tracked_runners"
                         (user_id, 
                         user_name, 
                         historic_runs, 
@@ -211,7 +211,8 @@ module RunTracker
                       runner.src_name, 
                       JSON.generate(runner.historic_runs), 
                       runner.num_submitted_runs, 
-                      runner.num_submitted_wrs)
+                      runner.num_submitted_wrs,
+                      runner.total_time_overall)
       rescue Exception => e
         puts "[ERROR] #{e.message} #{e.backtrace}"
       end
@@ -222,20 +223,97 @@ module RunTracker
     def self.insertNewAliases(newAliases)
       # Update Statement
       newAliases.each do |key, value|
-        begin
-          Conn.execute('insert into "aliases"
-                          (alias, 
-                          type, 
-                          id)
-                        values (?, ?, ?)',
-                        key,
-                        value.first,
-                        value.last)
-        rescue SQLite3::Exception => e
-          puts "[ERROR] #{e.message} #{e.backtrace}"
-        end
+        insertNewAlias(key, value)
       end
     end # end of self.insertNewAliases
+
+    def self.insertNewAlias(key, value)
+      begin
+        Conn.execute('insert into "aliases"
+                        (alias, 
+                        type, 
+                        id)
+                      values (?, ?, ?)',
+                      key,
+                      value.first,
+                      value.last)
+                      # TODO unique constraint violation
+      rescue SQLite3::Exception => e
+        puts "[ERROR] #{e.message} #{e.backtrace}"
+        return false
+      end
+      return true
+    end
+
+    def self.insertNewTrackedGame(trackedGame)
+      begin
+        Conn.transaction
+        Conn.execute('insert into "tracked_games"
+                        ("game_id", 
+                        "game_name", 
+                        "announce_channel")
+                      values (?, ?, ?)',
+                      trackedGame.id,
+                      trackedGame.name,
+                      trackedGame.announce_channel.id)
+        categories = trackedGame.categories
+        categories.each do |key, category|
+          Conn.execute('insert into categories
+                          ("category_id",
+                          "game_id",
+                          name,
+                          rules,
+                          subcategories,
+                          "current_wr_run_id",
+                          "current_wr_time",
+                          "longest_held_wr_id",
+                          "longest_held_wr_time",
+                          "number_submitted_runs",
+                          "number_submitted_wrs")
+                          values (?,?,?,?,?,?,?,?,?,?,?)',
+                          key,
+                          trackedGame.id,
+                          category.category_name,
+                          category.rules,
+                          category.subcategories,
+                          category.current_wr_run_id,
+                          category.current_wr_time,
+                          category.longest_held_wr_id,
+                          category.longest_held_wr_time,
+                          category.number_submitted_runs,
+                          category.number_submitted_wrs)
+        end
+        moderators = trackedGame.moderators
+        moderators.each do |key, moderator|
+          Conn.execute('insert into moderators
+                          ("src_id",
+                          "game_id",
+                          "src_name",
+                          "discord_id",
+                          "should_notify",
+                          "secret_key",
+                          "last_verified_run_date",
+                          "total_verified_runs",
+                          "past_moderator")
+                        values (?,?,?,?,?,?,?,?,?)',
+                        moderator.src_id,
+                        trackedGame.id,
+                        moderator.src_name,
+                        moderator.discord_id,
+                        (moderator.should_notify ? 1 : 0),
+                        moderator.secret_key,
+                        moderator.last_verified_run_date.to_s, # TODO this might cause problems down the chain
+                        moderator.total_verified_runs,
+                        (moderator.past_moderator ? 1 : 0))
+        end
+        Conn.commit
+      rescue SQLite3::Exception => e
+        puts "[ERROR] #{e.message} #{e.backtrace}"
+        Conn.rollback
+        return false
+      end
+      return true
+    end
 
     ##
     # Given an alias, return the ID equivalent

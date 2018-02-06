@@ -4,7 +4,7 @@ module RunTracker
     def self.announceRuns
 
       # Loop through all of the tracked games
-      trackedGames = PostgresDB.getTrackedGames
+      trackedGames = SQLiteDB.getTrackedGames
       if trackedGames == nil
         return
       end
@@ -78,7 +78,7 @@ module RunTracker
         # TODO alot of the stuff below should be moved to a seperate method, but it works and im afraid
 
         # Try to get the runner object from database
-        runner = PostgresDB.getCurrentRunner(run['players'].first['id'])
+        runner = SQLiteDB.getCurrentRunner(run['players'].first['id'])
         addNewRunner = false
         # If new runner or first run in this category, say this is his first run
         if runner == nil
@@ -194,14 +194,14 @@ module RunTracker
 
         # Now that the hell is over, update the database
         if addNewRunner == true
-          PostgresDB.insertNewRunner(runner)
+          SQLiteDB.insertNewRunner(runner)
         else
           if newPB == true
             message.push("< New Personal Best by - #{Util.secondsToTime(pbDiff)} >")
           end
-          PostgresDB.updateCurrentRunner(runner)
+          SQLiteDB.updateCurrentRunner(runner)
         end
-        PostgresDB.updateTrackedGame(trackedGame)
+        SQLiteDB.updateTrackedGame(trackedGame)
         highlightedText = Util.arrayToCodeBlock(message, highlighting: "md")
         highlightedText += "\nVideo Link - #{videoLink}"
         # Add run to the announcements table so we dont duplicate the messages

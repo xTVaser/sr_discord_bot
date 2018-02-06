@@ -4,7 +4,7 @@ module RunTracker
     def self.notifyMods
 
       # Loop through all of the tracked games
-      trackedGames = PostgresDB.getTrackedGames
+      trackedGames = SQLiteDB.getTrackedGames
       if trackedGames == nil
         return
       end

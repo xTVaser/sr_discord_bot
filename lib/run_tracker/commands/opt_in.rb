@@ -19,7 +19,7 @@ module RunTracker
 
         # First check to see if the moderator exists for one of the games
         mod = nil
-        trackedGames = PostgresDB.getTrackedGames
+        trackedGames = SQLiteDB.getTrackedGames
         trackedGames.each do |trackedGame|
           trackedGame.moderators.each do |key, moderator|
             if moderator.src_name.downcase.casecmp(_srcName.downcase).zero?
@@ -41,14 +41,14 @@ module RunTracker
         end
 
         # Update all relevant games
-        trackedGames = PostgresDB.getTrackedGames
+        trackedGames = SQLiteDB.getTrackedGames
         trackedGames.each do |trackedGame|
           trackedGame.moderators.each do |key, moderator|
             if moderator.src_name.downcase.casecmp(_srcName.downcase).zero?
               # Update each mod's game individually dont corrupt other game's instances
               trackedGame.moderators[key].discord_id = _event.message.user.id
               trackedGame.moderators[key].should_notify = true
-              PostgresDB.updateTrackedGame(trackedGame)
+              SQLiteDB.updateTrackedGame(trackedGame)
               break
             end
           end

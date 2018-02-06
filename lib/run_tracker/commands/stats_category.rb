@@ -16,15 +16,15 @@ module RunTracker
 
         # Command Body
 
-        gameID = PostgresDB.categoryAliasToGameID(_categoryAlias)
+        gameID = SQLiteDB.categoryAliasToGameID(_categoryAlias)
         if gameID == nil
           _event << "No category found with that alias, use ~listcategories <gameAlias> to view current aliases"
           next
         end
-        categoryID = PostgresDB.findID(_categoryAlias)
+        categoryID = SQLiteDB.findID(_categoryAlias)
 
         # First verify if that game is even tracked (by getting it)
-        game = PostgresDB.getTrackedGame(gameID)
+        game = SQLiteDB.getTrackedGame(gameID)
 
         # Find the category
         category = nil

@@ -26,7 +26,7 @@ module RunTracker
           end
           conn.execute('DEALLOCATE find_alias')
 
-          game = PostgresDB.getTrackedGame(aliasResults.first['id'])
+          game = SQLiteDB.getTrackedGame(aliasResults.first['id'])
           modListing.push("Moderators for #{game.name}:")
           modListing.push("============")
           modList = game.moderators

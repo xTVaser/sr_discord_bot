@@ -21,8 +21,8 @@ module RunTracker
         end
 
         _event << "Resetting Database"
-        _event <<  PostgresDB.destroySchema
-        _event <<  PostgresDB.generateSchema
+        _event <<  SQLiteDB.destroySchema
+        _event <<  SQLiteDB.generateSchema
 
       end # end of command body
     end

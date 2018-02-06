@@ -8,7 +8,7 @@ module RunTracker
     # Will pull all current data from a game's leaderboard
     # categoryList and modList are expected to be hashes keyed with their respective SRC ids
     def self.getGameRunners(gameID, gameName, categoryList, modList)
-      currentRunnerList = PostgresDB.getCurrentRunners # NOTE unverified implementation
+      currentRunnerList = SQLiteDB.getCurrentRunners # NOTE unverified implementation
       newRunnerList = {}
 
       categoryList.each do |_key, category| # Loop through every category
@@ -180,9 +180,9 @@ module RunTracker
       end # end of category loop
 
       # Update current runners
-      PostgresDB.updateCurrentRunners(currentRunnerList)
+      SQLiteDB.updateCurrentRunners(currentRunnerList)
       # Insert new runners
-      PostgresDB.insertNewRunners(newRunnerList)
+      SQLiteDB.insertNewRunners(newRunnerList)
 
     end # ends seed function
   end # ends seedDB module

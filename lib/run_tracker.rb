@@ -28,10 +28,22 @@ module RunTracker
   HEARTBEAT_CHECKRUNS = 5 # 1 heartbeat approximately every 1 minute
   HEARTBEAT_NOTIFYMODS = 10
 
-  DEBUG_CHANNEL = 351320655540781066
+  DEBUG_CHANNEL = 338452338912264192
+
+  
+  
 
   # When the bot starts up
   RTBot.ready do |_event|
+    embed = Discordrb::Webhooks::Embed.new(
+        author: { name: "name" },
+        description: "description"
+    )
+    begin
+      RTBot.send_message(DEBUG_CHANNEL, "test", false, embed)
+    rescue Exception => e
+      puts e.message
+    end
     # Create the database tables
     SQLiteDB.generateSchema
     # Initialize any permissions that have previously been set
