@@ -19,6 +19,7 @@ module RunTracker
         SQLiteDB::Conn.transaction do |conn|
 
           # Check to see if alias even exists
+          # TODO fix this
           conn.prepare("find_alias", "SELECT * FROM \"aliases\" WHERE alias=$1 and type='game'")
           aliasResults = conn.exec_prepared('find_alias', [_gameAlias])
           if aliasResults.length < 1

@@ -14,6 +14,7 @@ module RunTracker
                            min_args: 1,
                            max_args: 1) do |_event, _gameAlias|
 
+                            # TODO fix this
         # Check to see if the game is even tracked
         gameID = SQLiteDB.findID(_gameAlias)
         if gameID == nil

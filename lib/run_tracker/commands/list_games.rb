@@ -15,6 +15,7 @@ module RunTracker
                           max_args: 0) do |_event|
 
         # Command Body
+        # TODO fix this
         aliases = SQLiteDB::Conn.execute("SELECT * FROM \"aliases\" WHERE type='game'")
         results = SQLiteDB::Conn.execute('SELECT * FROM "tracked_games"')
 

@@ -14,6 +14,7 @@ module RunTracker
                          min_args: 2,
                          max_args: 2) do |_event, _gameAlias, _name|
 
+                            # TODO fix this
         # Command Body
         SQLiteDB::Conn.prepare('get_resource', "SELECT * FROM resources WHERE game_alias=$1 and resource=$2")
         resource = SQLiteDB::Conn.exec_prepared('get_resource', [_gameAlias, _name])

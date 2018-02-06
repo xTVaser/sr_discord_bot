@@ -30,11 +30,10 @@ module RunTracker
 
   DEBUG_CHANNEL = 338452338912264192
 
-  
-  
 
   # When the bot starts up
   RTBot.ready do |_event|
+    RTBot.send_message(DEBUG_CHANNEL, "~addgame name Jak_II_Flashgame")
     embed = Discordrb::Webhooks::Embed.new(
         author: { name: "name" },
         description: "description"

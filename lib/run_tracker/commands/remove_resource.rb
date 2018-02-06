@@ -15,6 +15,7 @@ module RunTracker
                           max_args: 2) do |_event, _gameAlias, _name|
 
         # Command Body
+        # TODO fix this
         begin
           # Set the alias for the game, and then change the prefix for any category aliases
           SQLiteDB::Conn.prepare('remove_game_resource', 'delete from resources WHERE game_alias=$1 and resource=$2')

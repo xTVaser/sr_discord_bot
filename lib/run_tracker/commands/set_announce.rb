@@ -16,6 +16,8 @@ module RunTracker
 
         channelID = Integer(_channel[2..-2])
 
+        # TODO fix
+
         gameID = SQLiteDB.findID(_gameAlias)
         if gameID == nil
           _event << "Game not found with that alias"

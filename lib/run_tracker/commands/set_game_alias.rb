@@ -19,6 +19,8 @@ module RunTracker
           return "`~setgamealias <old alias> <new alias>`\nAlias must be unique."
         end
 
+        # TODO fix
+
         SQLiteDB::Conn.transaction do |conn|
 
           # Check to see if alias even exists

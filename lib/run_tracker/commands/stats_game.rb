@@ -15,6 +15,7 @@ module RunTracker
                         max_args: 1) do |_event, _gameAlias|
 
         # Command Body
+        # TODO fix 
         gameID = SQLiteDB.findID(_gameAlias)
         if gameID == nil
           _event << "No game found with that alias, use ~listgames to view current aliases"

@@ -90,8 +90,15 @@ module RunTracker
     end
 
     def self.destroySchema
-      File.delete("db/database.db")
-      @Conn = SQLite3::Database.new "db/database.db"
+      Conn.execute('DROP TABLE IF EXISTS tracked_games')
+      Conn.execute('DROP TABLE IF EXISTS categories')
+      Conn.execute('DROP TABLE IF EXISTS moderators')
+      Conn.execute('DROP TABLE IF EXISTS tracked_runners')
+      Conn.execute('DROP TABLE IF EXISTS resources')
+      Conn.execute('DROP TABLE IF EXISTS aliases')
+      Conn.execute('DROP TABLE IF EXISTS managers')
+      Conn.execute('DROP TABLE IF EXISTS notifications')
+      Conn.execute('DROP TABLE IF EXISTS announcements')
       puts "[INFO] Tables Dropped"
       return 'Schema Destroyed!'
     rescue SQLite3::Exception => e
@@ -258,6 +265,7 @@ module RunTracker
                       trackedGame.announce_channel.id)
         categories = trackedGame.categories
         categories.each do |key, category|
+          pp category
           Conn.execute('insert into categories
                           ("category_id",
                           "game_id",
@@ -275,7 +283,7 @@ module RunTracker
                           trackedGame.id,
                           category.category_name,
                           category.rules,
-                          category.subcategories,
+                          JSON.generate(category.subcategories),
                           category.current_wr_run_id,
                           category.current_wr_time,
                           category.longest_held_wr_id,
@@ -349,6 +357,7 @@ module RunTracker
       end
       games = Array.new
       gameResults.each do |gameResult|
+        pp gameResult # TODO broken
         game = TrackedGame.new(gameResult['game_id'], gameResult['game_name'], Hash.new, Hash.new)
         game.announce_channel = gameResult['announce_channel']
         game.fromJSON(gameResult['categories'], gameResult['moderators'])

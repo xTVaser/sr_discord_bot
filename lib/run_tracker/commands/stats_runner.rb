@@ -15,7 +15,7 @@ module RunTracker
                         max_args: 3) do |_event, _runnerName, _type, _alias|
 
         # Command Body
-
+        
         # First verify if that runner even exists
         runners = SQLiteDB.getCurrentRunners
         theRunner = nil
@@ -55,6 +55,7 @@ module RunTracker
         elsif _type.downcase.casecmp('game').zero? and _alias != nil
           # Check to see if alias even exists
           # TODO cleant his up with postgres util fundtion findID
+          # TODO fix
           SQLiteDB::Conn.prepare("find_alias", "SELECT * FROM \"aliases\" WHERE alias= $1 and type='game'")
           aliasResults = SQLiteDB::Conn.exec_prepared('find_alias', [_alias])
           if aliasResults.length < 1

@@ -15,6 +15,7 @@ module RunTracker
                         max_args: 1) do |_event, _categoryAlias|
 
         # Command Body
+        # TODO fix because now categories table
 
         gameID = SQLiteDB.categoryAliasToGameID(_categoryAlias)
         if gameID == nil

@@ -15,6 +15,7 @@ module RunTracker
 
         # Command Body
         # Check to see if alias even exists
+        # TODO fix this command
         SQLiteDB::Conn.prepare("find_alias", "SELECT * FROM \"aliases\" WHERE alias= $1 and type='game'")
         aliasResults = SQLiteDB::Conn.exec_prepared('find_alias', [_gameAlias])
         if aliasResults.length < 1

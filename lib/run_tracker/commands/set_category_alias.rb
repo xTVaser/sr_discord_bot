@@ -18,7 +18,7 @@ module RunTracker
         if !/[^a-zA-Z0-9\-()&:%]./.match(_newAlias).nil?
           return "`~setcategoryalias <old alias> <new alias>`\nAlias must be unique.\nDo not need to enter the game-alias prefix in the new alias."
         end
-
+        # TODO fix
         # Check to see if alias even exists
         aliasResults = SQLiteDB::Conn.execute("SELECT * FROM \"aliases\" WHERE alias='#{_oldAlias}' and type='category'")
         if aliasResults.length < 1

@@ -16,6 +16,8 @@ module RunTracker
 
         # Command Body
 
+        # TODO change this because separate table now
+
         # First check to see if the moderator exists for one of the games
         mod = nil
         trackedGames = SQLiteDB.getTrackedGames

@@ -40,6 +40,7 @@ module RunTracker
 
           # If the user is not in the database then we insert them into the table and save their access level.
           begin
+            # TODO fix this command
             SQLiteDB::Conn.prepare('insert_grant_permission', 'insert into "managers"("user_id", access_level) values ($1, $2 )')
             SQLiteDB::Conn.exec_prepared('insert_grant_permission', [user.id, level])
             SQLiteDB::Conn.execute('DEALLOCATE insert_grant_permission')
