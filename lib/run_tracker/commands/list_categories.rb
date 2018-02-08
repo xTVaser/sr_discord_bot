@@ -12,20 +12,19 @@ module RunTracker
                           rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                           bucket: :limiter,
                           min_args: 1,
-                          max_args: 1) do |_event, _game_alias|
+                          max_args: 1) do |_event, _gameAlias|
 
         # Command Body
-        # TODO fix this
-        gameID = SQLiteDB.findID(_game_alias)
+        gameID = SQLiteDB.findID(_gameAlias)
         if gameID == nil
           _event << "No game with that alias, use `~listgames` to view current aliases"
           next
         end
         trackedGame = SQLiteDB.getTrackedGame(gameID)
-        aliases = SQLiteDB::Conn.execute("SELECT * FROM \"aliases\" WHERE type='category'")
+        aliases = SQLiteDB::Conn.execute('SELECT * FROM "aliases" WHERE type="category"')
 
         message = Array.new
-        message.push("#Categories for #{_game_alias}, Sorted by Name")
+        message.push("#Categories for #{_gameAlias}, Sorted by Name")
         message.push("[Name](Alias) - <Current WR Time>")
         message.push("============")
         # Sort by name

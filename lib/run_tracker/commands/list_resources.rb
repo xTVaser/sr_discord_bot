@@ -15,10 +15,7 @@ module RunTracker
                           max_args: 1) do |_event, _gameAlias|
 
         # Command Body
-        # TODO fix this
-        SQLiteDB::Conn.prepare('get_resources', "SELECT * FROM resources WHERE game_alias=$1")
-        resources = SQLiteDB::Conn.exec_prepared('get_resources', [_gameAlias])
-        SQLiteDB::Conn.execute('DEALLOCATE get_resources')
+        resources = SQLiteDB::Conn.execute('SELECT * FROM resources WHERE game_alias=?', _gameAlias)
 
         message = Array.new
         message.push("Resources for #{_gameAlias}:")

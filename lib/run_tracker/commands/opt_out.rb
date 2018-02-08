@@ -20,15 +20,8 @@ module RunTracker
 
         # First check to see if the moderator exists for one of the games
         mod = nil
-        trackedGames = SQLiteDB.getTrackedGames
-        trackedGames.each do |trackedGame|
-          trackedGame.moderators.each do |key, moderator|
-            if moderator.src_name.downcase.casecmp(_srcName.downcase).zero?
-              mod = moderator
-              break
-            end
-          end
-        end
+        moderatorResults = SQLiteDB::Conn('SELECT * FROM moderators WHERE "src_name"=?', _srcName.downcase)
+        mod = moderatorResults.first
 
         if mod == nil
           _event << "No moderator for any of the currently tracked games by the name #{_srcName}"
@@ -41,26 +34,19 @@ module RunTracker
         end
 
         # Otherwise, let's check to see if the moderator has already opted in
-        if mod.should_notify != true
+        if mod['should_notify'] != true
           _event << "#{_srcName} has not opted in, ~optin #{_srcName} to opt-in"
           next
         end
 
         # Otherwise, we are good to opt the moderator in
-        mod.discord_id = 0
-        mod.should_notify = false
-
-        # Update all relevant games
-        trackedGames = SQLiteDB.getTrackedGames
-        trackedGames.each do |trackedGame|
-          trackedGame.moderators.each do |key, moderator|
-            if moderator.src_name.downcase.casecmp(_srcName.downcase).zero?
-              trackedGame.moderators[key] = mod
-              SQLiteDB.updateTrackedGame(trackedGame)
-              break
-            end
-          end
-        end
+        SQLiteDB::Conn.execute('update moderators
+                                set discord_id = ?,
+                                    should_notify = ?,
+                                where "src_name" = ?',
+                                _event.message.user.id,
+                                0,
+                                _srcName.downcase)
 
         _event << "Moderator successfully opted-out, use ~optin #{_srcName} to opt-back-in at any time."
 

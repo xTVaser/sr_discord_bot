@@ -32,14 +32,18 @@ module RunTracker
 
 
   # When the bot starts up
+  # TODO automate the setting up of the bot
+  # TODO Move all logic for databases into the models
+  # TODO replace puts with actual logging statements
+  # TODO replace all markdown messages with embeds
+  # TODO embeds will require me to also store the image!
   RTBot.ready do |_event|
-    RTBot.send_message(DEBUG_CHANNEL, "~addgame name Jak_II_Flashgame")
     embed = Discordrb::Webhooks::Embed.new(
         author: { name: "name" },
         description: "description"
     )
     begin
-      RTBot.send_message(DEBUG_CHANNEL, "test", false, embed)
+      RTBot.send_message(DEBUG_CHANNEL, "", false, embed)
     rescue Exception => e
       puts e.message
     end
@@ -50,7 +54,7 @@ module RunTracker
     # Give the server owner maximum permissions
     RTBot.set_user_permission(RTBot.servers.first.last.owner.id, PERM_ADMIN)
     # Hardcode to give me permissions
-    # TODO disable this line if you dont want me to have full access!
+    # NOTE disable this line if you dont want me to have full access!
     RTBot.set_user_permission(140194315518345216, PERM_ADMIN)
 
     puts "[INFO] Bot Online and Connected to Server"

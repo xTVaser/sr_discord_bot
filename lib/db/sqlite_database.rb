@@ -6,6 +6,7 @@ module RunTracker
 
     # Establish connection to SQLite database
     Conn = SQLite3::Database.new "db/database.db"
+    Conn.results_as_hash = true
 
     # Called at this point manually to create the schema.
     # If the bot is expanded in the future, then we can either have a 'server'
@@ -244,7 +245,6 @@ module RunTracker
                       key,
                       value.first,
                       value.last)
-                      # TODO unique constraint violation
       rescue SQLite3::Exception => e
         puts "[ERROR] #{e.message} #{e.backtrace}"
         return false
@@ -265,7 +265,6 @@ module RunTracker
                       trackedGame.announce_channel.id)
         categories = trackedGame.categories
         categories.each do |key, category|
-          pp category
           Conn.execute('insert into categories
                           ("category_id",
                           "game_id",
@@ -279,7 +278,7 @@ module RunTracker
                           "number_submitted_runs",
                           "number_submitted_wrs")
                           values (?,?,?,?,?,?,?,?,?,?,?)',
-                          key,
+                          key, # TODO why use key?
                           trackedGame.id,
                           category.category_name,
                           category.rules,
@@ -310,7 +309,7 @@ module RunTracker
                         moderator.discord_id,
                         (moderator.should_notify ? 1 : 0),
                         moderator.secret_key,
-                        moderator.last_verified_run_date.to_s, # TODO this might cause problems down the chain
+                        moderator.last_verified_run_date.to_s,
                         moderator.total_verified_runs,
                         (moderator.past_moderator ? 1 : 0))
         end
@@ -325,7 +324,7 @@ module RunTracker
 
     ##
     # Given an alias, return the ID equivalent
-    # TODO add check on type here
+    # TODO add type argument here and fix usages throughout codebase
     def self.findID(theAlias)
       results = Conn.execute("SELECT * FROM aliases WHERE alias=?", theAlias)
       if results.length < 1
@@ -342,9 +341,11 @@ module RunTracker
         return nil
       end
       gameResult = gameResults.first
-      game = TrackedGame.new(gameResult['game_id'], gameResult['game_name'], Hash.new, Hash.new)
+      game = TrackedGame.new(gameResult['game_id'], 
+                              gameResult['game_name'], 
+                              getCategories(gameResult['game_id']), 
+                              getModerators(gameResult['game_id']))
       game.announce_channel = gameResult['announce_channel']
-      game.fromJSON(gameResult['categories'], gameResult['moderators'])
       return game
     end
 
@@ -357,13 +358,55 @@ module RunTracker
       end
       games = Array.new
       gameResults.each do |gameResult|
-        pp gameResult # TODO broken
-        game = TrackedGame.new(gameResult['game_id'], gameResult['game_name'], Hash.new, Hash.new)
+        game = TrackedGame.new(gameResult['game_id'], 
+                               gameResult['game_name'], 
+                               getCategories(gameResult['game_id']), 
+                               getModerators(gameResult['game_id']))
         game.announce_channel = gameResult['announce_channel']
-        game.fromJSON(gameResult['categories'], gameResult['moderators'])
         games.push(game)
       end
       return games
+    end
+
+    ##
+    # Get the associated categories and moderators for each game
+    def self.getCategories(game_id)
+      categoryResults = Conn.execute("SELECT * FROM categories WHERE game_id = ?", game_id)
+      categories = Hash.new
+      categoryResults.each do |row|
+        category = Category.new(
+          row['category_id'],
+          row['name'],
+          row['rules'],
+          row['subcategories']
+        )
+        category.current_wr_run_id = row['current_wr_run_id']
+        category.current_wr_time = row['current_wr_time']
+        category.longest_held_wr_id = row['longest_held_wr_id']
+        category.longest_held_wr_time = row['longest_held_wr_time']
+        category.number_submitted_runs = row['number_submitted_runs']
+        category.number_submitted_wrs = row['number_submitted_wrs']
+        categories[row['category_id']] = category
+      end
+      return categories
+    end # end of getCategories
+
+    ##
+    #
+    def self.getModerators(game_id)
+      moderatorResults = Conn.execute("SELECT * FROM moderators WHERE game_id = ?", game_id)
+      moderators = Hash.new
+      moderatorResults.each do |row|
+        moderator = Moderator.new(row['src_id'], row['src_name'])
+        moderator.discord_id = row['discord_id']
+        moderator.should_notify = row['should_notify']
+        moderator.secret_key = row['secret_key']
+        moderator.last_verified_run_date = row['last_verified_run_date']
+        moderator.total_verified_runs = row['total_verified_runs']
+        moderator.past_moderator = row['past_moderator']
+        moderators[row['src_id']] = moderator
+      end
+      return moderators
     end
 
     ##
@@ -404,6 +447,3 @@ module RunTracker
     end # end of func
   end # end of module
 end
-
-# TODO automate the setting up of the bot
-# see if the bot can respond to it's own commands

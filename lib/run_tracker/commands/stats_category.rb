@@ -15,7 +15,6 @@ module RunTracker
                         max_args: 1) do |_event, _categoryAlias|
 
         # Command Body
-        # TODO fix because now categories table
 
         gameID = SQLiteDB.categoryAliasToGameID(_categoryAlias)
         if gameID == nil
@@ -45,8 +44,6 @@ module RunTracker
 
         # Name
         message.push(">Category Summary for - #{category.category_name} for game: #{game.name}:\n")
-
-        pp category
 
         # Current WR
         runInfo = SrcAPI.getRunInfo(category.current_wr_run_id)

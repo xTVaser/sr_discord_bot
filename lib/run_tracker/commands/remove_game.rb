@@ -14,7 +14,6 @@ module RunTracker
                            min_args: 1,
                            max_args: 1) do |_event, _gameAlias|
 
-                            # TODO fix this
         # Check to see if the game is even tracked
         gameID = SQLiteDB.findID(_gameAlias)
         if gameID == nil
@@ -23,11 +22,11 @@ module RunTracker
         end
 
         begin
-
-          SQLiteDB::Conn.transaction do |conn|
-
-            # Delete the tracked game row
-            conn.execute("DELETE from tracked_games where game_id = '#{gameID}'")
+            SQLiteDB::Conn.transaction
+            # Delete the tracked game information
+            SQLiteDB::Conn.execute('DELETE from tracked_games where game_id = "?"', gameID)
+            SQLiteDB::Conn.execute('DELETE from categories where game_id = "?"', gameID)
+            SQLiteDB::Conn.execute('DELETE from moderators where game_id = "?"', gameID)
 
             # Go through all of the runners and delete the tracked game
             runners = SQLiteDB.getCurrentRunners
@@ -48,16 +47,16 @@ module RunTracker
             SQLiteDB.updateCurrentRunners(runners)
 
             # Delete the game and category aliases
-            conn.execute("DELETE from aliases where alias LIKE '#{_gameAlias}%'")
+            SQLiteDB::Conn.execute('DELETE from aliases where alias LIKE "?%"', _gameAlias)
 
             # Delete the game's resources
-            conn.execute("DELETE from resources where game_alias = '#{_gameAlias}'")
-          end # end of transaction
-
-        rescue Exception => e
-          puts "[ERROR] #{e.message} #{e.backtrace}"
-          _event << "Error while deleteing the game."
-          next
+            SQLiteDB::Conn.execute('DELETE from resources where game_alias = "?"', _gameAlias)
+            SQLiteDB::Conn.commit
+          rescue Exception => e
+            SQLiteDB::Conn.rollback
+            puts "[ERROR] #{e.message} #{e.backtrace}"
+            _event << "Error while deleting the game."
+            next
         end # end of begin
 
         _event << "Game removed successfully"

@@ -26,7 +26,7 @@ module RunTracker
       # Verify the game data first
       if gameData.length > 1
         raise 'Game ID Malformed, returning multiple games
-              (this should be impossible).' # TODO: return when wrong, check
+              (this should be impossible).'
       elsif gameData.key?('status')
         raise 'Game ID Malformed, no game found.'
       end
@@ -117,8 +117,6 @@ module RunTracker
       # TODO this doesnt handle 404 not found
       # guaranteed to be just one run
 
-      pp info['times']['primary_t']
-
       runInfo = Hash.new
       runInfo['time'] = Util.secondsToTime(info['times']['primary_t'])
       # name
@@ -140,7 +138,8 @@ module RunTracker
       if !info['date'].nil?
         runDate = Date.strptime(info['date'], '%Y-%m-%d')
       elsif !info['status']['verify-date'].nil?
-        runDate = Date.strptime(info['status']['verify-date'].split('T').first, '%Y-%m-%d') # TODO: cant strp date and time at same time? loses accuracy, fix
+        # TODO: cant strp date and time at same time? loses accuracy, fix
+        runDate = Date.strptime(info['status']['verify-date'].split('T').first, '%Y-%m-%d') 
       end
 
       runInfo['date'] = runDate
