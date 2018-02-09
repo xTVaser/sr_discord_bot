@@ -15,6 +15,7 @@ module RunTracker
                           max_args: 0) do |_event|
 
         # Command Body
+        puts "in the command body"
         message = Array.new
         message.push("Source Code and Documentation - http://www.github.com/xTVaser/sr_discord_bot")
         message.push("`~help` to view available commands")

@@ -21,6 +21,7 @@ module RunTracker
       SetAnnounce,
       SetCategoryAlias,
       SetGameAlias,
+      SetupBot,
       StatsCategory,
       StatsGame,
       StatsRunner,

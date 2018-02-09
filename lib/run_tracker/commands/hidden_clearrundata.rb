@@ -1,6 +1,6 @@
 module RunTracker
   module CommandLoader
-    module ClearRunData # TODO: change
+    module ClearRunData
       extend Discordrb::Commands::CommandContainer
 
       # Bucket for rate limiting. Limits to x uses every y seconds at z intervals.
