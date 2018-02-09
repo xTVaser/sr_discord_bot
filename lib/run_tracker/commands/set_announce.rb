@@ -21,7 +21,7 @@ module RunTracker
           _event << "Game not found with that alias"
           next
         end
-        SQLiteDB::Conn.prepare('UPDATE tracked_games SET announce_channel = ? WHERE game_id = ?', channelID, gameID)
+        SQLiteDB::Conn.execute('UPDATE tracked_games SET announce_channel = ? WHERE game_id = ?', channelID, gameID)
 
         _event << "Channel updated successfully for #{_gameAlias}"
 

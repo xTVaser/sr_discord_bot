@@ -24,7 +24,7 @@ module RunTracker
                             '"category_id" TEXT NOT NULL,' \
                             '"game_id" TEXT NOT NULL,' \
                             'name TEXT NOT NULL,' \
-                            'rules TEXT NOT NULL,' \
+                            'rules TEXT,' \
                             'subcategories TEXT,' \
                             'current_wr_run_id TEXT,' \
                             'current_wr_time INTEGER,' \
@@ -173,19 +173,20 @@ module RunTracker
       # Update Statement
       begin
         Conn.execute('update "tracked_runners"
-                      set user_id = :id,
-                          user_name = :name, 
-                          historic_runs = :historic_runs,
-                          num_submitted_runs = :num_runs, 
-                          num_submitted_wrs = :num_wrs, 
-                          total_time_overall = :total_time, 
-                      where user_id = :id',
-                      :id => runner.src_id,
-                      :name => runner.src_name,
-                      :historic_runs => JSON.generate(runner.historic_runs),
-                      :num_runs => runner.num_submitted_runs,
-                      :num_wrs => runner.num_submitted_wrs,
-                      :total_time => runner.total_time_overall)
+                      set user_id = ?,
+                          user_name = ?, 
+                          historic_runs = ?,
+                          num_submitted_runs = ?, 
+                          num_submitted_wrs = ?, 
+                          total_time_overall = ?
+                      where user_id = ?',
+                      runner.src_id,
+                      runner.src_name,
+                      JSON.generate(runner.historic_runs),
+                      runner.num_submitted_runs,
+                      runner.num_submitted_runs,
+                      runner.total_time_overall,
+                      runner.src_id)
       rescue SQLite3::Exception => e
         puts "[ERROR] #{e.message} #{e.backtrace}"
       end # end of transaction
@@ -397,10 +398,12 @@ module RunTracker
       moderatorResults = Conn.execute("SELECT * FROM moderators WHERE game_id = ?", game_id)
       moderators = Hash.new
       moderatorResults.each do |row|
+        pp row
         moderator = Moderator.new(row['src_id'], row['src_name'])
         moderator.discord_id = row['discord_id']
         moderator.should_notify = row['should_notify']
         moderator.secret_key = row['secret_key']
+        # TODO still a problem
         moderator.last_verified_run_date = Date.strptime(row['last_verified_run_date'], '%Y-%m-%d')
         moderator.total_verified_runs = row['total_verified_runs']
         moderator.past_moderator = row['past_moderator']

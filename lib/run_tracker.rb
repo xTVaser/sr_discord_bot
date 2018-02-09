@@ -30,7 +30,6 @@ module RunTracker
 
   DEBUG_CHANNEL = ENV['DEBUG_CHANNEL']
 
-
   # When the bot starts up
   # TODO automate the setting up of the bot
   # TODO Move all logic for databases into the models
