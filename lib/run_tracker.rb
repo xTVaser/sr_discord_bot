@@ -28,7 +28,7 @@ module RunTracker
   HEARTBEAT_CHECKRUNS = 5 # 1 heartbeat approximately every 1 minute
   HEARTBEAT_NOTIFYMODS = 10
 
-  DEBUG_CHANNEL = 338452338912264192
+  DEBUG_CHANNEL = ENV['DEBUG_CHANNEL']
 
 
   # When the bot starts up
