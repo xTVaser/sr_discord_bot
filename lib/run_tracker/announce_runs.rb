@@ -142,7 +142,8 @@ module RunTracker
           if !run['date'].nil?
             runDate = Date.strptime(run['date'], '%Y-%m-%d')
           elsif !run['status']['verify-date'].nil?
-            runDate = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d') # TODO: cant strp date and time at same time? loses accuracy, fix
+            # TODO: cant strp date and time at same time? loses accuracy, fix
+            runDate = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d') 
           end
 
           # Get the WR's date
@@ -153,7 +154,8 @@ module RunTracker
           if !oldWR['date'].nil?
             oldWRDate = Date.strptime(oldWR['date'], '%Y-%m-%d')
           elsif !oldWR['status']['verify-date'].nil?
-            oldWRDate = Date.strptime(oldWR['status']['verify-date'].split('T').first, '%Y-%m-%d') # TODO: cant strp date and time at same time? loses accuracy, fix
+            # TODO: cant strp date and time at same time? loses accuracy, fix
+            oldWRDate = Date.strptime(oldWR['status']['verify-date'].split('T').first, '%Y-%m-%d') 
           end
 
           # Before we scrap the old date, see if it's the new longest WR
@@ -186,7 +188,6 @@ module RunTracker
           if mod.last_verified_run_date.nil?
             mod.last_verified_run_date = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
           # If the verified date is more recent (epoch, greater is closer)
-          # NOTE dont need time here
           elsif mod.last_verified_run_date < Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
             mod.last_verified_run_date = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
           end
@@ -209,8 +210,6 @@ module RunTracker
         RTBot.send_message(trackedGame.announce_channel, highlightedText)
         next
       end # end of tracked games loop
-
     end # end announce runs
-
   end
 end

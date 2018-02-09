@@ -175,7 +175,7 @@ module RunTracker
         Conn.execute('update "tracked_runners"
                       set user_id = :id,
                           user_name = :name, 
-                          historic_runs = :historic_runs
+                          historic_runs = :historic_runs,
                           num_submitted_runs = :num_runs, 
                           num_submitted_wrs = :num_wrs, 
                           total_time_overall = :total_time, 
@@ -401,7 +401,7 @@ module RunTracker
         moderator.discord_id = row['discord_id']
         moderator.should_notify = row['should_notify']
         moderator.secret_key = row['secret_key']
-        moderator.last_verified_run_date = row['last_verified_run_date']
+        moderator.last_verified_run_date = Date.strptime(row['last_verified_run_date'], '%Y-%m-%d')
         moderator.total_verified_runs = row['total_verified_runs']
         moderator.past_moderator = row['past_moderator']
         moderators[row['src_id']] = moderator
