@@ -16,18 +16,12 @@ module RunTracker
 
         # Command Body
         # TODO this command wipes the moderators stats
+        # TODO what does ^ mean
 
         # First check to see if the moderator exists for one of the games
         mod = nil
-        trackedGames = PostgresDB.getTrackedGames
-        trackedGames.each do |trackedGame|
-          trackedGame.moderators.each do |key, moderator|
-            if moderator.src_name.downcase.casecmp(_srcName.downcase).zero?
-              mod = moderator
-              break
-            end
-          end
-        end
+        moderatorResults = SQLiteDB::Conn('SELECT * FROM moderators WHERE "src_name"=?', _srcName.downcase)
+        mod = moderatorResults.first
 
         if mod == nil
           _event << "No moderator for any of the currently tracked games by the name `#{_srcName}`"
@@ -35,24 +29,18 @@ module RunTracker
         end
 
         # Otherwise, let's check to see if the moderator has already opted in
-        if mod.should_notify == true
+        if mod['should_notify'] == true
           _event << "#{_srcName} has already opted in, `~optout #{_srcName}` to opt-out"
           next
         end
 
-        # Update all relevant games
-        trackedGames = PostgresDB.getTrackedGames
-        trackedGames.each do |trackedGame|
-          trackedGame.moderators.each do |key, moderator|
-            if moderator.src_name.downcase.casecmp(_srcName.downcase).zero?
-              # Update each mod's game individually dont corrupt other game's instances
-              trackedGame.moderators[key].discord_id = _event.message.user.id
-              trackedGame.moderators[key].should_notify = true
-              PostgresDB.updateTrackedGame(trackedGame)
-              break
-            end
-          end
-        end
+        SQLiteDB::Conn.execute('update moderators
+                                set discord_id = ?,
+                                    should_notify = ?,
+                                where "src_name" = ?',
+                                _event.message.user.id,
+                                1,
+                                _srcName.downcase)
 
         _event << "Moderator successfully opted-in, use `~optout #{_srcName}` to opt-out at any time."
 

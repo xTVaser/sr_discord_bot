@@ -15,13 +15,13 @@ module RunTracker
                         max_args: 1) do |_event, _gameAlias|
 
         # Command Body
-        gameID = PostgresDB.findID(_gameAlias)
+        gameID = SQLiteDB.findID(_gameAlias)
         if gameID == nil
           _event << "No game found with that alias, use ~listgames to view current aliases"
           next
         end
         # First verify if that game is even tracked (by getting it)
-        game = PostgresDB.getTrackedGame(gameID)
+        game = SQLiteDB.getTrackedGame(gameID)
 
         # else, we can do things with it.
         message = Array.new

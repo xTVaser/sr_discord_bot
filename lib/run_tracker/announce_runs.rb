@@ -4,7 +4,7 @@ module RunTracker
     def self.announceRuns
 
       # Loop through all of the tracked games
-      trackedGames = PostgresDB.getTrackedGames
+      trackedGames = SQLiteDB.getTrackedGames
       if trackedGames == nil
         return
       end
@@ -17,8 +17,8 @@ module RunTracker
         run = Util.jsonRequest(requestLink)['data'].first
 
         # Check to see if the run has already been announced before
-        check = PostgresDB::Conn.exec("SELECT * FROM public.announcements WHERE run_id = '#{run['id']}'")
-        if check.ntuples > 0
+        check = SQLiteDB::Conn.execute("SELECT * FROM announcements WHERE run_id = '#{run['id']}'")
+        if check.length > 0
           next
         end
 
@@ -78,7 +78,7 @@ module RunTracker
         # TODO alot of the stuff below should be moved to a seperate method, but it works and im afraid
 
         # Try to get the runner object from database
-        runner = PostgresDB.getCurrentRunner(run['players'].first['id'])
+        runner = SQLiteDB.getCurrentRunner(run['players'].first['id'])
         addNewRunner = false
         # If new runner or first run in this category, say this is his first run
         if runner == nil
@@ -142,7 +142,8 @@ module RunTracker
           if !run['date'].nil?
             runDate = Date.strptime(run['date'], '%Y-%m-%d')
           elsif !run['status']['verify-date'].nil?
-            runDate = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d') # TODO: cant strp date and time at same time? loses accuracy, fix
+            # TODO: cant strp date and time at same time? loses accuracy, fix
+            runDate = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d') 
           end
 
           # Get the WR's date
@@ -153,7 +154,8 @@ module RunTracker
           if !oldWR['date'].nil?
             oldWRDate = Date.strptime(oldWR['date'], '%Y-%m-%d')
           elsif !oldWR['status']['verify-date'].nil?
-            oldWRDate = Date.strptime(oldWR['status']['verify-date'].split('T').first, '%Y-%m-%d') # TODO: cant strp date and time at same time? loses accuracy, fix
+            # TODO: cant strp date and time at same time? loses accuracy, fix
+            oldWRDate = Date.strptime(oldWR['status']['verify-date'].split('T').first, '%Y-%m-%d') 
           end
 
           # Before we scrap the old date, see if it's the new longest WR
@@ -186,7 +188,6 @@ module RunTracker
           if mod.last_verified_run_date.nil?
             mod.last_verified_run_date = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
           # If the verified date is more recent (epoch, greater is closer)
-          # NOTE dont need time here
           elsif mod.last_verified_run_date < Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
             mod.last_verified_run_date = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d')
           end
@@ -194,23 +195,21 @@ module RunTracker
 
         # Now that the hell is over, update the database
         if addNewRunner == true
-          PostgresDB.insertNewRunner(runner)
+          SQLiteDB.insertNewRunner(runner)
         else
           if newPB == true
             message.push("< New Personal Best by - #{Util.secondsToTime(pbDiff)} >")
           end
-          PostgresDB.updateCurrentRunner(runner)
+          SQLiteDB.updateCurrentRunner(runner)
         end
-        PostgresDB.updateTrackedGame(trackedGame)
+        SQLiteDB.updateTrackedGame(trackedGame)
         highlightedText = Util.arrayToCodeBlock(message, highlighting: "md")
         highlightedText += "\nVideo Link - #{videoLink}"
         # Add run to the announcements table so we dont duplicate the messages
-        PostgresDB::Conn.exec("INSERT INTO public.announcements (run_id) VALUES ('#{run['id']}')")
+        SQLiteDB::Conn.execute("INSERT INTO announcements (run_id) VALUES ('#{run['id']}')")
         RTBot.send_message(trackedGame.announce_channel, highlightedText)
         next
       end # end of tracked games loop
-
     end # end announce runs
-
   end
 end

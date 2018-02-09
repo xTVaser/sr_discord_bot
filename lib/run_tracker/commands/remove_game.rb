@@ -15,21 +15,21 @@ module RunTracker
                            max_args: 1) do |_event, _gameAlias|
 
         # Check to see if the game is even tracked
-        gameID = PostgresDB.findID(_gameAlias)
+        gameID = SQLiteDB.findID(_gameAlias)
         if gameID == nil
           _event << "That game is not currently being tracked"
           next
         end
 
         begin
-
-          PostgresDB::Conn.transaction do |conn|
-
-            # Delete the tracked game row
-            conn.exec("DELETE from public.tracked_games where game_id = '#{gameID}'")
+            SQLiteDB::Conn.transaction
+            # Delete the tracked game information
+            SQLiteDB::Conn.execute('DELETE from tracked_games where game_id = "?"', gameID)
+            SQLiteDB::Conn.execute('DELETE from categories where game_id = "?"', gameID)
+            SQLiteDB::Conn.execute('DELETE from moderators where game_id = "?"', gameID)
 
             # Go through all of the runners and delete the tracked game
-            runners = PostgresDB.getCurrentRunners
+            runners = SQLiteDB.getCurrentRunners
             runners.each do |key, runner|
               # If the runner hasnt played that game, forget about it
               if !runner.historic_runs.key?(gameID)
@@ -44,19 +44,19 @@ module RunTracker
               runner.historic_runs.delete(gameID)
             end
             # Update their fields
-            PostgresDB.updateCurrentRunners(runners)
+            SQLiteDB.updateCurrentRunners(runners)
 
             # Delete the game and category aliases
-            conn.exec("DELETE from public.aliases where alias LIKE '#{_gameAlias}%'")
+            SQLiteDB::Conn.execute('DELETE from aliases where alias LIKE "?%"', _gameAlias)
 
             # Delete the game's resources
-            conn.exec("DELETE from public.resources where game_alias = '#{_gameAlias}'")
-          end # end of transaction
-
-        rescue Exception => e
-          puts "[ERROR] #{e.message} #{e.backtrace}"
-          _event << "Error while deleteing the game."
-          next
+            SQLiteDB::Conn.execute('DELETE from resources where game_alias = "?"', _gameAlias)
+            SQLiteDB::Conn.commit
+          rescue Exception => e
+            SQLiteDB::Conn.rollback
+            puts "[ERROR] #{e.message} #{e.backtrace}"
+            _event << "Error while deleting the game."
+            next
         end # end of begin
 
         _event << "Game removed successfully"

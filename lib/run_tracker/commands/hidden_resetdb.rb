@@ -12,7 +12,7 @@ module RunTracker
                         permission_level: PERM_ADMIN,
                         min_args: 1,
                         max_args: 1,
-                        bucket: :limiter) do |_event, _confirmationCode| # TODO: config
+                        bucket: :limiter) do |_event, _confirmationCode|
 
         # Command Body
         unless _confirmationCode.casecmp("DOIT").zero?
@@ -21,8 +21,8 @@ module RunTracker
         end
 
         _event << "Resetting Database"
-        _event <<  PostgresDB.destroySchema
-        _event <<  PostgresDB.generateSchema
+        _event <<  SQLiteDB.destroySchema
+        _event <<  SQLiteDB.generateSchema
 
       end # end of command body
     end

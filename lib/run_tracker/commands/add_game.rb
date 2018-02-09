@@ -55,8 +55,7 @@ module RunTracker
       # Adds a single game to the tracked-games DB
       def self.trackGame(_event, id)
         # Check to see if we have added this game already or not
-        trackedGame = nil
-        trackedGame = PostgresDB.getTrackedGame(id)
+        trackedGame = SQLiteDB.getTrackedGame(id)
         if trackedGame != nil
           _event << "That game is already being tracked, remove it first."
           return
@@ -72,16 +71,8 @@ module RunTracker
           return
         end
         trackedGame.announce_channel = _event.channel
-        begin
-          PostgresDB::Conn.prepare('add_tracked_games', 'insert into public."tracked_games"
-            ("game_id", "game_name", "announce_channel", categories, moderators)
-            values ($1, $2, $3, $4, $5)')
-          PostgresDB::Conn.exec_prepared('add_tracked_games', [trackedGame.id,
-                                                               trackedGame.name, trackedGame.announce_channel.id,
-                                                               JSON.generate(trackedGame.categories),
-                                                               JSON.generate(trackedGame.moderators)])
-          PostgresDB::Conn.exec('DEALLOCATE add_tracked_games')
-        rescue PG::UniqueViolation
+        pass = SQLiteDB.insertNewTrackedGame(trackedGame)
+        unless pass
           _event << "That game is already being tracked, remove it first."
           return
         end

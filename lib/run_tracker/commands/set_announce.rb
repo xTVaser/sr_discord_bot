@@ -16,14 +16,12 @@ module RunTracker
 
         channelID = Integer(_channel[2..-2])
 
-        gameID = PostgresDB.findID(_gameAlias)
+        gameID = SQLiteDB.findID(_gameAlias)
         if gameID == nil
           _event << "Game not found with that alias"
           next
         end
-        PostgresDB::Conn.prepare('update_announce_channel', 'UPDATE public.tracked_games SET announce_channel = $1 WHERE game_id = $2')
-        PostgresDB::Conn.exec_prepared('update_announce_channel', [channelID, gameID])
-        PostgresDB::Conn.exec('DEALLOCATE update_announce_channel')
+        SQLiteDB::Conn.prepare('UPDATE tracked_games SET announce_channel = ? WHERE game_id = ?', channelID, gameID)
 
         _event << "Channel updated successfully for #{_gameAlias}"
 

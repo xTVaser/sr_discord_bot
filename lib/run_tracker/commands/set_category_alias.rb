@@ -18,23 +18,22 @@ module RunTracker
         if !/[^a-zA-Z0-9\-()&:%]./.match(_newAlias).nil?
           return "`~setcategoryalias <old alias> <new alias>`\nAlias must be unique.\nDo not need to enter the game-alias prefix in the new alias."
         end
-
         # Check to see if alias even exists
-        aliasResults = PostgresDB::Conn.exec("SELECT * FROM public.\"aliases\" WHERE alias='#{_oldAlias}' and type='category'")
-        if aliasResults.ntuples < 1
+        aliasResults = SQLiteDB::Conn.execute('SELECT * FROM "aliases" WHERE alias="?" and type="category"', _oldAlias)
+        if aliasResults.length < 1
           return "Category Alias not found use `~listcategories <game_alias>` to see the current aliases"
         end
 
-        PostgresDB::Conn.transaction do |conn|
+        gameAlias = _oldAlias.split('-').first
 
-          gameAlias = _oldAlias.split('-').first
-
+        begin
           # Set the alias for the game, and then change the prefix for any category aliases
-          conn.prepare("update_category_alias", "update public.aliases set alias = $1 where alias = $2 and type = 'category'")
-          conn.exec_prepared('update_category_alias', ["#{gameAlias}-#{_newAlias}", _oldAlias])
-          conn.exec('DEALLOCATE update_category_alias')
-
+          SQLiteDB::Conn.execute('update aliases set alias = ? where alias = ? and type = "category"', 
+                                  "#{gameAlias}-#{_newAlias}", _oldAlias)
+        rescue SQLite3::Exception => e
+          puts "oh no fix me"
         end
+        
         return
       end # end command body
     end # end SetGameAlias module

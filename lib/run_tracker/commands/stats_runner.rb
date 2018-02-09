@@ -15,9 +15,9 @@ module RunTracker
                         max_args: 3) do |_event, _runnerName, _type, _alias|
 
         # Command Body
-
+        
         # First verify if that runner even exists
-        runners = PostgresDB.getCurrentRunners
+        runners = SQLiteDB.getCurrentRunners
         theRunner = nil
         runners.each do |key, runner|
           if runner.src_name.casecmp(_runnerName.downcase).zero? or
@@ -54,20 +54,17 @@ module RunTracker
         # If we are only given the game alias
         elsif _type.downcase.casecmp('game').zero? and _alias != nil
           # Check to see if alias even exists
-          # TODO cleant his up with postgres util fundtion findID
-          PostgresDB::Conn.prepare("find_alias", "SELECT * FROM public.\"aliases\" WHERE alias= $1 and type='game'")
-          aliasResults = PostgresDB::Conn.exec_prepared('find_alias', [_alias])
-          if aliasResults.ntuples < 1
-            PostgresDB::Conn.exec('DEALLOCATE find_alias')
+          # TODO untested
+          gameID = SQLiteDB.findID(_alias)
+          if gameID == nil
             _event << "Game Alias not found use !listgames to see the current aliases"
             next
           end
-          PostgresDB::Conn.exec('DEALLOCATE find_alias')
 
           # Check to see if that runner has done runs of that game
           foundGame = nil
           theRunner.historic_runs.each do |key, game|
-            if key.casecmp(aliasResults.first['id']).zero?
+            if key.casecmp(gameID).zero?
               foundGame = game
             end
           end
@@ -98,18 +95,14 @@ module RunTracker
           # Check to see if alias even exists
           # TODO cleant his up with postgres util fundtion findID
           # Check to see if they've done the category
-          PostgresDB::Conn.prepare("find_alias", "SELECT * FROM public.\"aliases\" WHERE alias= $1 and type='category'")
-          aliasResults = PostgresDB::Conn.exec_prepared('find_alias', [_alias])
-          if aliasResults.ntuples < 1
-            PostgresDB::Conn.exec('DEALLOCATE find_alias')
+          categoryID = SQLiteDB.findID(_alias)
+          if categoryID == nil
             _event << "Category Alias not found use ~listcategories <gameAlias> to see the current aliases"
             next
           end
-          PostgresDB::Conn.exec('DEALLOCATE find_alias')
 
           gameAlias = aliasResults.first['alias'].split('-').first
-
-          gameID = PostgresDB.findID(gameAlias)
+          gameID = SQLiteDB.findID(gameAlias)
 
           # Check to see if that runner has done runs of that game
           foundGame = nil

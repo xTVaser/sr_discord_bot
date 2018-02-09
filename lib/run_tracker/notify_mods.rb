@@ -4,7 +4,7 @@ module RunTracker
     def self.notifyMods
 
       # Loop through all of the tracked games
-      trackedGames = PostgresDB.getTrackedGames
+      trackedGames = SQLiteDB.getTrackedGames
       if trackedGames == nil
         return
       end
@@ -23,8 +23,8 @@ module RunTracker
         # Construct the message
         results.each do |run|
           # Check to see if we have already notified the mod about this run before
-          check = PostgresDB::Conn.exec("SELECT * FROM public.notifications WHERE run_id = '#{run['id']}'")
-          if check.ntuples > 0
+          check = SQLiteDB::Conn.execute("SELECT * FROM notifications WHERE run_id = '#{run['id']}'")
+          if check.length > 0
             next
           end
           # Else, add the run to the message
@@ -45,7 +45,7 @@ module RunTracker
           # Add this run's id to the notification table
           runIDs.each do |runID|
             if actuallyNotified == true
-              PostgresDB::Conn.exec("INSERT INTO public.notifications (run_id) VALUES ('#{runID}')")
+              SQLiteDB::Conn.execute("INSERT INTO notifications (run_id) VALUES ('#{runID}')")
             end
           end
         end

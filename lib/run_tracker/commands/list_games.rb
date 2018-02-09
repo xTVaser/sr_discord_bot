@@ -15,11 +15,11 @@ module RunTracker
                           max_args: 0) do |_event|
 
         # Command Body
-        aliases = PostgresDB::Conn.exec("SELECT * FROM public.\"aliases\" WHERE type='game'")
-        results = PostgresDB::Conn.exec('SELECT * FROM public."tracked_games"')
+        aliases = SQLiteDB::Conn.execute('SELECT * FROM "aliases" WHERE type="game"')
+        results = SQLiteDB::Conn.execute('SELECT * FROM "tracked_games"')
 
         message = Array.new
-        message.push("<#{results.ntuples}> Currently Tracked Game(s):")
+        message.push("<#{results.length}> Currently Tracked Game(s):")
         results.each do |game|
           gameAlias = ''
           aliases.each do |row|
@@ -27,7 +27,7 @@ module RunTracker
               gameAlias = row['alias']
             end
           end
-          channel = JSON.parse(Discordrb::API::Channel.resolve(RTBot.token, game['announce_channel'])) # NOTE not sure if this is the easiest way
+          channel = JSON.parse(Discordrb::API::Channel.resolve(RTBot.token, game['announce_channel']))
           message.push("<Alias: #{gameAlias}> | <Name: #{game['game_name']}> | <Announce_Channel: #{channel['name']}>")
         end
 

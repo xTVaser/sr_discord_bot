@@ -16,17 +16,14 @@ module RunTracker
 
         # Command Body
         modListing = []
-        PostgresDB::Conn.transaction do |conn|
-
+        begin
           # Check to see if alias even exists
-          conn.prepare("find_alias", "SELECT * FROM public.\"aliases\" WHERE alias=$1 and type='game'")
-          aliasResults = conn.exec_prepared('find_alias', [_gameAlias])
-          if aliasResults.ntuples < 1
+          aliasResults = SQLiteDB::Conn.execute('SELECT * FROM "aliases" WHERE alias=? and type="game"', _gameAlias)
+          if aliasResults.length < 1
             return "Game Alias not found use `~listgames` to see the current aliases"
           end
-          conn.exec('DEALLOCATE find_alias')
 
-          game = PostgresDB.getTrackedGame(aliasResults.first['id'])
+          game = SQLiteDB.getTrackedGame(aliasResults.first['id'])
           modListing.push("Moderators for #{game.name}:")
           modListing.push("============")
           modList = game.moderators
@@ -38,9 +35,10 @@ module RunTracker
           modList.each do |key, mod|
             modListing.push("<Name #{mod.src_name}> | <Total_Verified_Runs #{mod.total_verified_runs}> | <Last_Verified_Run_Date #{mod.last_verified_run_date}>")
           end
-        end
 
-        # TODO add error messages
+        rescue SQLite3::Exception => e
+          puts "error message please log me"
+        end
 
         _event << Util.arrayToCodeBlock(modListing, highlighting: 'md')
 

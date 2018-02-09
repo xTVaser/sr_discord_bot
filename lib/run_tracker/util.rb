@@ -48,7 +48,6 @@ module RunTracker
 
     ##
     # Given a very long string, will split it so it is under the 5000 character limit
-    # TODO make this generic by taking in the event as well
     def self.sendBulkMessage(message)
       if message.length <= 5000
         RTBot.send_message(DevChannelID, message)
@@ -113,7 +112,6 @@ module RunTracker
     ##
     # Given seconds, turns it into time
     def self.secondsToTime(seconds)
-
       minutes = seconds / 60
       seconds = seconds % 60
       hours = minutes / 60
