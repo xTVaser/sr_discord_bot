@@ -18,7 +18,7 @@ module RunTracker
       createTrackedGamesCmd = 'CREATE TABLE IF NOT EXISTS "tracked_games" (' \
                               '"game_id" TEXT NOT NULL,' \
                               '"game_name" TEXT NOT NULL,' \
-                              '"announce_channel" INTEGER NOT NULL,' \
+                              '"announce_channel" INTEGER NOT NULL,' \ # TODO add cover image
                               'PRIMARY KEY ("game_id"));'
       createCategoriesCmd = 'CREATE TABLE IF NOT EXISTS categories (' \
                             '"category_id" TEXT NOT NULL,' \
@@ -398,7 +398,6 @@ module RunTracker
       moderatorResults = Conn.execute("SELECT * FROM moderators WHERE game_id = ?", game_id)
       moderators = Hash.new
       moderatorResults.each do |row|
-        pp row
         moderator = Moderator.new(row['src_id'], row['src_name'])
         moderator.discord_id = row['discord_id']
         moderator.should_notify = row['should_notify']

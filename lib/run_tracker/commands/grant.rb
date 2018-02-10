@@ -13,7 +13,6 @@ module RunTracker
                     min_args: 2,
                     max_args: 2) do |_event, mention, permission|
 
-        pp mention
         # Command Body
         # Encapsulate the user from the mention statement.
         user = _event.bot.parse_mention(mention)

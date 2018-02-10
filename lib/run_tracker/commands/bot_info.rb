@@ -15,12 +15,28 @@ module RunTracker
                           max_args: 0) do |_event|
 
         # Command Body
-        puts "in the command body"
-        message = Array.new
-        message.push("Source Code and Documentation - http://www.github.com/xTVaser/sr_discord_bot")
-        message.push("`~help` to view available commands")
-        message.push("If you do not have access to certain commands, you will need to get an admin to ~grant <admin/mod> @yourname")
-        _event << Util.arrayToMessage(message)
+        embed = Discordrb::Webhooks::Embed.new(
+            author: { 
+              name: "xTVaser",
+              url: "https://github.com/xTVaser",
+              icon_url: "https://avatars0.githubusercontent.com/u/13153231?s=460&v=4"
+            },
+            title: "Bot Information",
+            description: "A Discord bot specializing in supporting speedrunning related discord servers.",
+            url: "http://www.github.com/xTVaser/sr_discord_bot",
+            footer: {
+              text: "~help to view a list of available commands"
+            },
+            thumbnail: {
+              url: "https://raw.githubusercontent.com/xTVaser/sr_discord_bot/master/assets/author_icon.png"
+            }
+        )
+        embed.colour = "#FFFFFF"
+        embed.add_field(
+          name: "Technical Info",
+          value: "Written in Ruby with **discordrb**"
+        )
+        RTBot.send_message(_event.channel.id, "", false, embed)
 
       end # end of command body
     end # end of module

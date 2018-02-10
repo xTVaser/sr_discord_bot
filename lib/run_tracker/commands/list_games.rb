@@ -18,8 +18,13 @@ module RunTracker
         aliases = SQLiteDB::Conn.execute('SELECT * FROM "aliases" WHERE type="game"')
         results = SQLiteDB::Conn.execute('SELECT * FROM "tracked_games"')
 
-        message = Array.new
-        message.push("<#{results.length}> Currently Tracked Game(s):")
+        embed = Discordrb::Webhooks::Embed.new(
+            title: "Tracked Games",
+            footer: {
+              text: "~help to view a list of available commands"
+            }
+        )
+        embed.colour = "#1AB5FF"
         results.each do |game|
           gameAlias = ''
           aliases.each do |row|
@@ -28,10 +33,13 @@ module RunTracker
             end
           end
           channel = JSON.parse(Discordrb::API::Channel.resolve(RTBot.token, game['announce_channel']))
-          message.push("<Alias: #{gameAlias}> | <Name: #{game['game_name']}> | <Announce_Channel: #{channel['name']}>")
+          embed.add_field(
+            name: game['game_name'],
+            value: "_Alias_ : `#{gameAlias}`\n_Announce Channel_ : #{channel['name']}",
+            inline: true
+          )
         end
-
-        _event << Util.arrayToCodeBlock(message, highlighting: 'md')
+        RTBot.send_message(_event.channel.id, "", false, embed)
 
       end # end of command body
     end # end of module

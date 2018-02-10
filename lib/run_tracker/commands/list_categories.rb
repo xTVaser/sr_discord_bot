@@ -23,10 +23,13 @@ module RunTracker
         trackedGame = SQLiteDB.getTrackedGame(gameID)
         aliases = SQLiteDB::Conn.execute('SELECT * FROM "aliases" WHERE type="category"')
 
-        message = Array.new
-        message.push("#Categories for #{_gameAlias}, Sorted by Name")
-        message.push("[Name](Alias) - <Current WR Time>")
-        message.push("============")
+        embed = Discordrb::Webhooks::Embed.new(
+            title: "Categories for #{_gameAlias}, Sorted by Name",
+            footer: {
+              text: "~help to view a list of available commands"
+            }
+        )
+        embed.colour = "#1AB5FF"
         # Sort by name
         trackedGame.categories = trackedGame.categories.sort_by { |k, o| [o.category_name] }
         trackedGame.categories.each do |categoryID, categoryData|
@@ -36,10 +39,14 @@ module RunTracker
               categoryAlias = row['alias']
             end
           end
-          message.push("[#{categoryData.category_name}](#{categoryAlias}) - <#{Util.secondsToTime(categoryData.current_wr_time)}>")
+          embed.add_field(
+            name: categoryData.category_name,
+            value: "_WR_ :   #{Util.secondsToTime(categoryData.current_wr_time)}\n_Alias_ : `#{categoryAlias}`",
+            inline: true
+          )
         end
-
-        _event << Util.arrayToCodeBlock(message, highlighting: 'md')
+        
+        RTBot.send_message(_event.channel.id, "", false, embed)
 
       end # end of command body
     end # end of module

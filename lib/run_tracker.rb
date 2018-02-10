@@ -31,21 +31,12 @@ module RunTracker
   DEBUG_CHANNEL = ENV['DEBUG_CHANNEL']
 
   # When the bot starts up
-  # TODO automate the setting up of the bot
   # TODO Move all logic for databases into the models
   # TODO replace puts with actual logging statements
   # TODO replace all markdown messages with embeds
   # TODO embeds will require me to also store the image!
   RTBot.ready do |_event|
-    embed = Discordrb::Webhooks::Embed.new(
-        author: { name: "name" },
-        description: "description"
-    )
-    begin
-      RTBot.send_message(DEBUG_CHANNEL, "", false, embed)
-    rescue Exception => e
-      puts e.message
-    end
+    
     # Create the database tables
     SQLiteDB.generateSchema
     # Initialize any permissions that have previously been set
