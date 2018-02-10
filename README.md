@@ -1,4 +1,4 @@
-# Speedrun Tracking Discord Bot
+# Speedrun Tracking Discord Bot test
 A Discord Bot specialising in supporting speedrunning related discord chat rooms.
 
 ## Notice
