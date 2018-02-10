@@ -20,3 +20,4 @@ gem 'rubocop', '~> 0.49.1'
 
 # Added at 2018-01-28 20:11:43 -0500 by tyler-pc\xtvas:
 gem "sqlite3", "~> 1.3"
+
