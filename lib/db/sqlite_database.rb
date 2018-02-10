@@ -18,7 +18,8 @@ module RunTracker
       createTrackedGamesCmd = 'CREATE TABLE IF NOT EXISTS "tracked_games" (' \
                               '"game_id" TEXT NOT NULL,' \
                               '"game_name" TEXT NOT NULL,' \
-                              '"announce_channel" INTEGER NOT NULL,' \ # TODO add cover image
+                              '"cover_url" TEXT,' \
+                              '"announce_channel" INTEGER NOT NULL,' \
                               'PRIMARY KEY ("game_id"));'
       createCategoriesCmd = 'CREATE TABLE IF NOT EXISTS categories (' \
                             '"category_id" TEXT NOT NULL,' \
