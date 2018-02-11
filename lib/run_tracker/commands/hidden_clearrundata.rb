@@ -20,9 +20,17 @@ module RunTracker
           next
         end
 
-        _event << "Resetting Database"
-        _event << SQLiteDB.dontDropManagers
-        _event << SQLiteDB.generateSchema
+        SQLiteDB.dontDropManagers
+        SQLiteDB.generateSchema
+
+        embed = Discordrb::Webhooks::Embed.new(
+            title: "Game and Run Tables Cleared",
+            footer: {
+              text: "~help to view a list of available commands"
+            }
+        )
+        embed.colour = "#ff0000"
+        RTBot.send_message(_event.channel.id, "", false, embed)
 
       end # end of command body
     end

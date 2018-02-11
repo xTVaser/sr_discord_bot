@@ -23,8 +23,14 @@ module RunTracker
         end
         SQLiteDB::Conn.execute('UPDATE tracked_games SET announce_channel = ? WHERE game_id = ?', channelID, gameID)
 
-        _event << "Channel updated successfully for #{_gameAlias}"
-
+        embed = Discordrb::Webhooks::Embed.new(
+            title: "Channel Updated Successfully for #{_gameAlias}",
+            footer: {
+              text: "~help to view a list of available commands"
+            }
+        )
+        embed.colour = "#35f904"
+        RTBot.send_message(_event.channel.id, "", false, embed)
       end # end command body
     end # end SetGameAlias module
   end

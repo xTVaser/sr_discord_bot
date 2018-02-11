@@ -1,4 +1,4 @@
-# Speedrun Tracking Discord Bot test
+# Speedrun Tracking Discord Bot
 A Discord Bot specialising in supporting speedrunning related discord chat rooms.
 
 ## Notice
@@ -9,7 +9,6 @@ Bot provided AS-IS, I won't be fixing issues for a while if ever, if you make a 
 * [Features](#features)
 * [Installation](#installation)
   * [Adding Bot to Server](#adding-bot-to-server)
-  * [Setting up Heroku](#setting-up-heroku)
 * [Commands](#commands)
   * [Admin Only Commands](#admin-only-commands)
   * [Moderator Only Commands](#moderator-only-commands)
@@ -29,25 +28,15 @@ Bot provided AS-IS, I won't be fixing issues for a while if ever, if you make a 
 ## Installation
 ### Adding Bot to Server
 * Clone this repo, install ruby `2.4.2` or the latest through rvm
-* Install bundle
-* run `rake update`
+* Install bundle `gem install bundle`
+* run `bundle update && bundle install`
 * create a `vars.env` file in the root directory
 * Log into the web version of discord, and go to [this page](https://discordapp.com/developers/applications/me)
 * Create a new app, give it a name, this bot does not require OAuth2 Authorization.
 * To the `vars.env` file add `CLIENT_ID=<your client_id>` and `TOKEN=<your token>`
 * Next use the following link to add the bot to your server, replacing `CLIENT_ID` appropriately `discordapp.com/oauth2/authorize?&client_id=CLIENT_ID&scope=bot&permissions=0`
 * You should now see the bot offline in your server
-
-### Setting up Heroku
-* Create a heroku account and link with a credit card to get a full 1000 free hours every month, otherwise you will not be able to run this bot 24/7
-* Create a new app with a Postgres data-addon, as well as a `worker` dyno, enable this dyno
-* You can either set it to work off the local git CLI, or fork (or not) the repo and let it build from that
-* Go into settings and then configure the environment variables
-* Add the `CLIENT_ID` and `TOKEN` vars.
-* Get the Postgres Database credentials and add them to the environment variables as `DATABASE_URL`
-* Heroku should spin up the process and you should see the bot come online in your server
-* If not, look for problems by going to the `more` dropdown and clicking `view logs` sometimes restarting all dynos is required.
-* The reason this works is due to the `Procfile` in the root directory, fyi.
+* run `rake run` or `make start` if you are on a unix environment.
 
 ## Commands
 * Commands have 3 tiers of permissions and users can be granted access.

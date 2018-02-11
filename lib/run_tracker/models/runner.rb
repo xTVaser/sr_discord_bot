@@ -2,17 +2,20 @@ module RunTracker
   class Runner < JSONable
     attr_accessor :src_id,
                   :src_name,
+                  :avatar_url,
                   :historic_runs,
                   :num_submitted_wrs,
                   :num_submitted_runs,
                   :total_time_overall
 
     # If the user is a guest, then src_id = guest and name is their name
-    # TODO periodically check to see if a user has updated
+    # TODO: periodically check to see if a user has updated
     def initialize(id, name)
       self.src_id = id
       self.src_name = name.downcase
+      self.avatar_url = "https://www.speedrun.com/themes/user/#{name}/image.png"
       if src_name.casecmp('guest').zero?
+        self.avatar_url = nil
         self.src_id = self.src_id.downcase
       end
       self.historic_runs = ({}) # Game > Categories

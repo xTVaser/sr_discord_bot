@@ -1,6 +1,6 @@
 module RunTracker
   module CommandLoader
-    module ResetDB # TODO: change
+    module ResetDB
       extend Discordrb::Commands::CommandContainer
 
       # Bucket for rate limiting. Limits to x uses every y seconds at z intervals.
@@ -19,10 +19,18 @@ module RunTracker
           _event << "Enter the right confirmation code."
           next
         end
+        
+        SQLiteDB.destroySchema
+        SQLiteDB.generateSchema
 
-        _event << "Resetting Database"
-        _event <<  SQLiteDB.destroySchema
-        _event <<  SQLiteDB.generateSchema
+        embed = Discordrb::Webhooks::Embed.new(
+            title: "Database Wiped Completely",
+            footer: {
+              text: "~help to view a list of available commands"
+            }
+        )
+        embed.colour = "#ff0000"
+        RTBot.send_message(_event.channel.id, "", false, embed)
 
       end # end of command body
     end

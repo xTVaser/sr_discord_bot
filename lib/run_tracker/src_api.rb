@@ -19,6 +19,10 @@ module RunTracker
       Util.jsonRequest("#{API_URL}users/#{id}")['data']['names']['international']
     end
 
+    def self.getUserInfo(id)
+      Util.jsonRequest("#{API_URL}users/#{id}")['data']
+    end
+
     ##
     # We should only have 1 game information in this case
     # as ID requests only return 1 result
@@ -45,7 +49,7 @@ module RunTracker
       # Add the category aliases to the alias table
       aliasList = categoryResults.last
       aliasList[gameAlias] = ['game', foundGame['id']]
-      # TODO this should be moved, not transactional
+      # TODO: this should be moved, not transactional
       SQLiteDB.insertNewAliases(aliasList)
 
       modList = getGameMods(foundGame['moderators'])
@@ -53,6 +57,7 @@ module RunTracker
 
       [gameAlias, TrackedGame.new(foundGame['id'],
                                   foundGame['names']['international'],
+                                  foundGame['assets']['cover-large']['uri'],
                                   categoryList, modList)]
     end
 
@@ -114,7 +119,7 @@ module RunTracker
     def self.getRunInfo(runID)
 
       info = Util.jsonRequest("#{API_URL}runs/#{runID}")['data']
-      # TODO this doesnt handle 404 not found
+      # TODO: this doesnt handle 404 not found
       # guaranteed to be just one run
 
       runInfo = Hash.new
@@ -138,7 +143,7 @@ module RunTracker
       if !info['date'].nil?
         runDate = Date.strptime(info['date'], '%Y-%m-%d')
       elsif !info['status']['verify-date'].nil?
-        # TODO: cant strp date and time at same time? loses accuracy, fix
+        # TODO:: cant strp date and time at same time? loses accuracy, fix
         runDate = Date.strptime(info['status']['verify-date'].split('T').first, '%Y-%m-%d') 
       end
 

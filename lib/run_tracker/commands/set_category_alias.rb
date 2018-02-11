@@ -32,9 +32,17 @@ module RunTracker
                                   "#{gameAlias}-#{_newAlias}", _oldAlias)
         rescue SQLite3::Exception => e
           puts "oh no fix me"
+          return "oh no fix me"
         end
-        
-        return
+
+        embed = Discordrb::Webhooks::Embed.new(
+            title: "Category Alias Updated Successfully",
+            footer: {
+              text: "~help to view a list of available commands"
+            }
+        )
+        embed.colour = "#35f904"
+        RTBot.send_message(_event.channel.id, "", false, embed)
       end # end command body
     end # end SetGameAlias module
   end

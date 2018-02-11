@@ -10,7 +10,7 @@ module RunTracker
                   :total_time_overall
 
     # If the user is a guest, then src_id = guest and name is their name
-    # TODO periodically check to see if a user has updated
+    # TODO: periodically check to see if a user has updated
     def initialize(id, name)
       self.src_id = id
       self.src_name = name

@@ -11,6 +11,7 @@ module RunTracker
       AddResource,
       BotInfo,
       ClearRunData,
+      ExportDB,
       ListCategories,
       ListGames,
       ListResources,
