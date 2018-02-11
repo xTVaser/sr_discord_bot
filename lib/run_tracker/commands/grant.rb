@@ -23,15 +23,16 @@ module RunTracker
 
         level = 0
         # Sets the level variable to the desired access level.
+        selectedPerm = ""
         case permission
           when 'admin'
            level = 2
-            _event << 'Admin Permission Selected.'
+           selectedPerm = 'Admin Permission Selected.'
           when 'mod'
             level = 1
-            _event << 'Mod Permission Selected.'
+            selectedPerm = 'Mod Permission Selected.'
           else
-            _event << 'Invalid Permission Selected. Please refer to command usage.'
+            selectedPerm = 'Invalid Permission Selected. Please refer to command usage.'
             next
         end
 
@@ -53,7 +54,15 @@ module RunTracker
           end
 
           # Send verbal confirmation of access level setting.
-          _event << "Permission set for user #{user.name}!"
+          embed = Discordrb::Webhooks::Embed.new(
+              title: "Permission set for user #{user.name}",
+              description: selectedPerm,
+              footer: {
+                text: "~help to view a list of available commands"
+              }
+          )
+          embed.colour = "#35f904"
+          RTBot.send_message(_event.channel.id, "", false, embed)
         rescue Exception => e
           _event << "Permission failed to set: #{e.message}"
           puts "[ERROR] #{e.backtrace} + #{e.message}"

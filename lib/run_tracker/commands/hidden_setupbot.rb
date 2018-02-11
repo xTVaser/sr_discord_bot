@@ -19,12 +19,12 @@ module RunTracker
             _event << "Enter the right confirmation code."
             next
           end
-  
-          _event << "Setting up Bot"
-          _event << "Resetting DB"
+          RTBot.send_message(_event.channel.id, "Gotcha")
           sleep(5)
+          RTBot.send_message(_event.channel.id, "Setting up Bot")
+          RTBot.send_message(_event.channel.id, "Resetting DB")
           RTBot.commands[:resetdb].call(_event, ["DOIT"])
-          _event << "Adding Games"
+          RTBot.send_message(_event.channel.id, "Adding Games")
           sleep(5)
           RTBot.commands[:addgame].call(_event, ["name", "jak1"])
           sleep(5)
@@ -41,7 +41,8 @@ module RunTracker
           RTBot.commands[:addgame].call(_event, ["id", "n268l71p"])
           sleep(5)
           RTBot.commands[:addgame].call(_event, ["id", "2680z71p"])
-          _event << "Setting Announce Channels"
+          sleep(5)
+          RTBot.send_message(_event.channel.id, "Setting Announce Channels")
           RTBot.commands[:setannounce].call(_event, ["jak1", "<#183602484621606912>"])
           sleep(5)
           RTBot.commands[:setannounce].call(_event, ["jak2", "<#183602500375543808>"])
@@ -56,13 +57,12 @@ module RunTracker
           sleep(5)
           RTBot.commands[:setannounce].call(_event, ["trifecta", "<#83031186590400512>"])
           sleep(5)
-          RTBot.commands[:setannounce].call(_event, ["jak3tjbge ", "<#276472462001307648>"])
+          RTBot.commands[:setannounce].call(_event, ["jak3tjbge", "<#276472462001307648>"])
           sleep(5)
-          _event << "Granting Admins"
+          RTBot.send_message(_event.channel.id, "Granting Admins")
           RTBot.commands[:grant].call(_event, ["<@83571817779822592>", "admin"])
           sleep(5)
           RTBot.commands[:grant].call(_event, ["<@115998281317875714>", "admin"])
-          sleep(5)
   
         end # end of command body
       end
