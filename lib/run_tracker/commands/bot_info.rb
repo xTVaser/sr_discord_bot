@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:botinfo, description: 'Prints information on the Bot.',
-                          usage: '~botinfo',
+                          usage: "#{PREFIX}botinfo",
                           permission_level: PERM_USER,
                           rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                           bucket: :limiter,
@@ -25,7 +25,7 @@ module RunTracker
             description: "A Discord bot specializing in supporting speedrunning related discord servers.",
             url: "http://www.github.com/xTVaser/sr_discord_bot",
             footer: {
-              text: "~help to view a list of available commands"
+              text: "#{PREFIX}help to view a list of available commands"
             },
             thumbnail: {
               url: "https://raw.githubusercontent.com/xTVaser/sr_discord_bot/master/assets/author_icon.png"

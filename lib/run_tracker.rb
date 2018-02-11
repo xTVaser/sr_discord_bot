@@ -34,7 +34,7 @@ module RunTracker
   RTBot = Discordrb::Commands::CommandBot.new(token: ENV['TOKEN'],
                                               client_id: ENV['CLIENT_ID'],
                                               prefix: PREFIX,
-                                              command_doesnt_exist_message: 'Use ~help to see a list of available commands')
+                                              command_doesnt_exist_message: "Use #{PREFIX}help to see a list of available commands")
 
   # When the bot starts up
   # TODO: Move all logic for databases into the models

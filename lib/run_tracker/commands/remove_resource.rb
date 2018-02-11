@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:removeresource, description: 'Removed a particular games resource',
-                          usage: '~removeresource <gameAlias> <resourceName>',
+                          usage: "#{PREFIX}removeresource <gameAlias> <resourceName>",
                           permission_level: PERM_MOD,
                           rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                           bucket: :limiter,
@@ -26,7 +26,7 @@ module RunTracker
         embed = Discordrb::Webhooks::Embed.new(
             title: "#{_name} Removed From #{_gameAlias} if it Existed",
             footer: {
-              text: "~help to view a list of available commands"
+              text: "#{PREFIX}help to view a list of available commands"
             }
         )
         embed.colour = "#ff0000"

@@ -100,7 +100,7 @@ module RunTracker
               url: trackedGame.cover_url
             },
             footer: {
-              text: "~help to view a list of available commands"
+              text: "#{PREFIX}help to view a list of available commands"
             }
         )
         embed.colour = "#fff200"

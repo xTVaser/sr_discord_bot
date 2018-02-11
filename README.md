@@ -44,31 +44,31 @@ Bot provided AS-IS, I won't be fixing issues for a while if ever, if you make a 
 * By default as well, I have hardcoded my own discord_id to have admin privledges, you should disable this or change to your own ID.
 
 ### Admin Only Commands
-* `~addgame`
-* `~grant` - Use @mention autocomplete
-* `~clearrundata` - Requires confirmation key 'DOIT'
-* `~resetdb` - Requires confirmation key 'DOIT'
-* `~removegame`
+* `$addgame`
+* `$grant` - Use @mention autocomplete
+* `$clearrundata` - Requires confirmation key 'DOIT'
+* `$resetdb` - Requires confirmation key 'DOIT'
+* `$removegame`
 
 ### Moderator Only Commands
-* `~addresource`
-* `~optin` - Must be called by the person wanting to receive the PMs
-* `~optout` - Must be called by the person wanting to stop receiving PMs
-* `~removeresource`
-* `~setannounce` - Use the #channel-name autocomplete
-* `~setcategoryalias` - I dont recommend changing the category alias as this is a pain in the ass
-* `~setgamealias` - This will cascade and modify it's categories ones automatically
+* `$addresource`
+* `$optin` - Must be called by the person wanting to receive the PMs
+* `$optout` - Must be called by the person wanting to stop receiving PMs
+* `$removeresource`
+* `$setannounce` - Use the #channel-name autocomplete
+* `$setcategoryalias` - I dont recommend changing the category alias as this is a pain in the ass
+* `$setgamealias` - This will cascade and modify it's categories ones automatically
 
 ### All User Commands
-* `~botinfo`
-* `~listcategories`
-* `~listgames`
-* `~listmods`
-* `~listresources`
-* `~resource`
-* `~statscategory`
-* `~statsgame`
-* `~statsrunner`
+* `$botinfo`
+* `$listcategories`
+* `$listgames`
+* `$listmods`
+* `$listresources`
+* `$resource`
+* `$statscategory`
+* `$statsgame`
+* `$statsrunner`
 
 ## Known Issues and Short Comings
 * Too many things are case sensitive

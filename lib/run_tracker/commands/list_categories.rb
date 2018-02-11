@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:listcategories, description: 'Lists all categories for a specific tracked game.',
-                          usage: '~listcategories',
+                          usage: "#{PREFIX}listcategories",
                           permission_level: PERM_USER,
                           rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                           bucket: :limiter,
@@ -17,7 +17,7 @@ module RunTracker
         # Command Body
         gameID = SQLiteDB.findID(_gameAlias)
         if gameID == nil
-          _event << "No game with that alias, use `~listgames` to view current aliases"
+          _event << "No game with that alias, use `#{PREFIX}listgames` to view current aliases"
           next
         end
         trackedGame = SQLiteDB.getTrackedGame(gameID)
@@ -26,7 +26,7 @@ module RunTracker
         embed = Discordrb::Webhooks::Embed.new(
             title: "Categories for #{_gameAlias}, Sorted by Name",
             footer: {
-              text: "~help to view a list of available commands"
+              text: "#{PREFIX}help to view a list of available commands"
             }
         )
         embed.colour = "#1AB5FF"

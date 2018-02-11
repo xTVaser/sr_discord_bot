@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:setannounce, description: 'Allows the changing of what channel new runs should be announced on for a game',
-                         usage: "~setannounce <gameAlias> <#channel>",
+                         usage: "#{PREFIX}setannounce <gameAlias> <#channel>",
                          permission_level: PERM_MOD,
                          rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                          bucket: :limiter,
@@ -26,7 +26,7 @@ module RunTracker
         embed = Discordrb::Webhooks::Embed.new(
             title: "Channel Updated Successfully for #{_gameAlias}",
             footer: {
-              text: "~help to view a list of available commands"
+              text: "#{PREFIX}help to view a list of available commands"
             }
         )
         embed.colour = "#35f904"

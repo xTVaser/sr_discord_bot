@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:statsrunner, description: 'Displays all or a particular stat for a given runner',
-                        usage: "~statsrunner <runnerName> <game/category> <gameAlias/categoryAlias>",
+                        usage: "#{PREFIX}statsrunner <runnerName> <game/category> <gameAlias/categoryAlias>",
                         permission_level: PERM_USER,
                         rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                         bucket: :limiter,
@@ -39,9 +39,9 @@ module RunTracker
           thumbnail: {
             url: theRunner.avatar_url
           },
-          description: "To View Category Information `~statsrunner #{_runnerName} <categoryAlias>`",
+          description: "To View Category Information `#{PREFIX}statsrunner #{_runnerName} <categoryAlias>`",
           footer: {
-            text: "~help to view a list of available commands"
+            text: "#{PREFIX}help to view a list of available commands"
           }
         )
 
@@ -130,7 +130,7 @@ module RunTracker
           # Check to see if they've done the category
           categoryID = SQLiteDB.findID(_alias)
           if categoryID == nil
-            _event << "Category Alias not found use ~listcategories <gameAlias> to see the current aliases"
+            _event << "Category Alias not found use #{PREFIX}listcategories <gameAlias> to see the current aliases"
             next
           end
 
@@ -184,7 +184,7 @@ module RunTracker
             inline: true
           )
         else
-          _event << "~statsrunner <runnerName> <game/category> <gameAlias/categoryAlias>"
+          _event << "#{PREFIX}statsrunner <runnerName> <game/category> <gameAlias/categoryAlias>"
           next
         end
         RTBot.send_message(_event.channel.id, "", false, embed)
