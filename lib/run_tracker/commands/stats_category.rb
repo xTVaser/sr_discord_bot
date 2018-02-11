@@ -40,42 +40,58 @@ module RunTracker
         end
 
         # else, we can do things with it.
-        message = Array.new
+        embed = Discordrb::Webhooks::Embed.new(
+            title: "Category Summary for - #{category.category_name} in #{game.name}",
+            thumbnail: {
+              url: game.cover_url
+            },
+            footer: {
+              text: "~help to view a list of available commands"
+            }
+        )
+        embed.colour = "#1AB5FF"
 
         # Name
-        message.push(">Category Summary for - #{category.category_name} for game: #{game.name}:\n")
+        message.push(">:\n")
 
         # Current WR
         runInfo = SrcAPI.getRunInfo(category.current_wr_run_id)
-        message.push("Current WR")
-        message.push("============")
-        message.push("<Runner #{runInfo['name']}> <Time #{Util.secondsToTime(category.current_wr_time)}>")
         dateDiff = (Date.today).jd - runInfo['date'].jd
-        message.push("<Date #{runInfo['date'].to_s}> <#{dateDiff}> days ago")
-        message.push("[Speedrun.com Link](#{runInfo['srcLink']})")
-        message.push("[Video Link](#{runInfo['videoLink']})\n")
-
+        embed.add_field(
+          name: "Current WR",
+          value: "_Runner_: #{runInfo['name']}\n_Time_: `#{Util.secondsToTime(category.current_wr_time)}`\n_Date_: #{runInfo['date'].to_s} - #{dateDiff} days ago\n_Speedrun.com Link_:#{runInfo['srcLink']}\n_Video Link_:#{runInfo['videoLink']}",
+          inline: false
+        )
+        embed.colour = "#1AB5FF"
         # Longest Held WR
-        message.push("Longest Held WR")
-        message.push("============")
+        runner = ""
+        time = ""
         if category.longest_held_wr_id == ""
           runInfo = SrcAPI.getRunInfo(category.current_wr_run_id) # no one has broken the record yet
-          message.push("<Runner #{runInfo['name']}> <Time #{runInfo['time']}> < Still Counting >")
+          runner = runInfo['name']
+          time = "#{runInfo['time']}, days Still Counting..."
         else
           runInfo = SrcAPI.getRunInfo(category.longest_held_wr_id)
-          message.push("<Runner #{runInfo['name']}> <Time #{runInfo['time']}> <Lasting #{category.longest_held_wr_time} days>")
+          runner = runInfo['name']
+          time = "#{runInfo['time']}, Lasting #{category.longest_held_wr_time} days"
         end
         dateDiff = (Date.today).jd - runInfo['date'].jd
-        message.push("<Date #{runInfo['date'].to_s}> <#{dateDiff}> days ago")
-        message.push("[Speedrun.com Link](#{runInfo['srcLink']})")
-        message.push("[Video Link](#{runInfo['videoLink']})\n")
-
-        # Number of submitted WRs
-        # Number of submitted runs
-        message.push(">Number of Submitted World Records: <#{category.number_submitted_wrs}>")
-        message.push(">Number of Submitted Runs: <#{category.number_submitted_runs}>")
-
-        _event << Util.arrayToCodeBlock(message, highlighting: 'md')
+        embed.add_field(
+          name: "Longest Held WR",
+          value: "_Runner_: #{runner}\n_Time_: `#{time}`\n_Date_: #{runInfo['date'].to_s} - #{dateDiff} days ago\n_Speedrun.com Link_:#{runInfo['srcLink']}\n_Video Link_:#{runInfo['videoLink']}",
+          inline: false
+        )
+        embed.add_field(
+          name: "Number of Submitted World Records",
+          value: category.number_submitted_wrs,
+          inline: true
+        )
+        embed.add_field(
+          name: "Number of Submitted Runs",
+          value: category.number_submitted_runs,
+          inline: true
+        )
+        RTBot.send_message(_event.channel.id, "", false, embed)
 
       end # end of command body
     end

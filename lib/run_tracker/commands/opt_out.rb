@@ -15,9 +15,6 @@ module RunTracker
                          max_args: 1) do |_event, _srcName|
 
         # Command Body
-
-        # TODO change this because separate table now
-
         # First check to see if the moderator exists for one of the games
         mod = nil
         moderatorResults = SQLiteDB::Conn('SELECT * FROM moderators WHERE "src_name"=?', _srcName.downcase)
@@ -47,9 +44,15 @@ module RunTracker
                                 _event.message.user.id,
                                 0,
                                 _srcName.downcase)
-
-        _event << "Moderator successfully opted-out, use ~optin #{_srcName} to opt-back-in at any time."
-
+        embed = Discordrb::Webhooks::Embed.new(
+            title: "Moderator Successfully Opted-Out",
+            description: "Use `~optout #{_srcName}` to opt-back-in at any time.",
+            footer: {
+              text: "~help to view a list of available commands"
+            }
+        )
+        embed.colour = "#ff0000"
+        RTBot.send_message(_event.channel.id, "", false, embed)
       end # end of command body
     end # end of module
   end

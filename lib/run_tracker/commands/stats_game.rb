@@ -24,27 +24,39 @@ module RunTracker
         game = SQLiteDB.getTrackedGame(gameID)
 
         # else, we can do things with it.
-        message = Array.new
+        embed = Discordrb::Webhooks::Embed.new(
+          title: "Game Summary for - #{_gameAlias}",
+          description: "To View Category Information `~statscategory categoryAlias`",
+          thumbnail: {
+            url: game.cover_url
+          },
+          footer: {
+            text: "To View Category Aliases `~listcategories #{_gameAlias}`\n~help to view a list of available commands"
+          }
+        )
+        embed.colour = "#1AB5FF"
 
         # Name
-        message.push(">Game Summary for: <#{_gameAlias}>:\n")
-        message.push("Categories <~statscategory categoryAlias>:")
-        message.push("============")
         # games have done runs in
         totalSubmittedRuns = 0
         totalSubmittedWRs = 0
         game.categories.each do |key, category|
-          message.push("< #{category.category_name} >")
           totalSubmittedRuns += category.number_submitted_runs
           totalSubmittedWRs += category.number_submitted_wrs
         end
         # Number of submitted WRs
         # Number of submitted runs
-        message.push("\n>Number of Submitted World Records: <#{totalSubmittedWRs}>")
-        message.push(">Number of Submitted Runs: <#{totalSubmittedRuns}>")
-
-        _event << Util.arrayToCodeBlock(message, highlighting: 'md')
-
+        embed.add_field(
+          name: "Number of Submitted World Records",
+          value: totalSubmittedWRs,
+          inline: true
+        )
+        embed.add_field(
+          name: "Number of Submitted Runs",
+          value: totalSubmittedRuns,
+          inline: true
+        )
+        RTBot.send_message(_event.channel.id, "", false, embed)
       end # end of command body
     end
   end

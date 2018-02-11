@@ -35,8 +35,14 @@ module RunTracker
           _event << "Already a resource for that game defined with the name `#{_name}`"
           return
         end
-
-        _event << "Resource added."
+        embed = Discordrb::Webhooks::Embed.new(
+            title: "Resource Added",
+            footer: {
+              text: "~help to view a list of available commands"
+            }
+        )
+        embed.colour = "#35f904"
+        RTBot.send_message(_event.channel.id, "", false, embed)
 
       end # end of command body
     end # end of module

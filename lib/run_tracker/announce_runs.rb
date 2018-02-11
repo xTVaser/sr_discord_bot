@@ -63,20 +63,13 @@ module RunTracker
           puts "[ERROR] Something went wrong finding the category"
         end
 
-        message = Array.new
-        message.push("Newly Verified Run for - #{trackedGame.name} - #{category.category_name}")
-        message.push("============")
-        message.push("[Runner]: #{runnerName}")
-        message.push("[Time]: #{Util.secondsToTime(run['times']['primary_t'])}")
-
         # Handle non video links
         videoLink = "No Video"
         if run['videos'].key?('links')
           videoLink = run['videos']['links'].first['uri']
         end
 
-        # TODO alot of the stuff below should be moved to a seperate method, but it works and im afraid
-
+        # TODO: alot of the stuff below should be moved to a seperate method, but it works and im afraid
         # Try to get the runner object from database
         runner = SQLiteDB.getCurrentRunner(run['players'].first['id'])
         addNewRunner = false
@@ -85,10 +78,42 @@ module RunTracker
           runner = Runner.new(runnerKey, runnerName)
           runner.historic_runs[trackedGame.id] = RunnerGame.new(trackedGame.id, trackedGame.name)
           runner.historic_runs[trackedGame.id].categories[category.category_id] = RunnerCategory.new(category.category_id, category.category_name)
-          message.push("This is this runner's first run in this category!")
-
+          embed.add_field(
+            name: "Time Save from Previous Run",
+            value: "This is this runner's first run in this category!",
+            inline: false
+          )
           addNewRunner = true
         end
+
+        embed = Discordrb::Webhooks::Embed.new(
+            # TODO: author information = runner
+            # thumbnail = game avatar
+            title: "Newly Verified Run for - #{trackedGame.name} in #{category.category_name}",
+            url: run['weblink'],
+            author: { 
+              name: runnerName,
+              url: "https://www.speedrun.com/user/#{runnerName}",
+              icon_url: runner.avatar_url
+            },
+            thumbnail: {
+              url: trackedGame.cover_url
+            },
+            footer: {
+              text: "~help to view a list of available commands"
+            }
+        )
+        embed.colour = "#fff200"
+        embed.add_field(
+          name: "Runner",
+          value: runnerName,
+          inline: false
+        )
+        embed.add_field(
+          name: "Time",
+          value: Util.secondsToTime(run['times']['primary_t']),
+          inline: false
+        )
 
         # Has this runner ran this game before, init the game and category
         if !runner.historic_runs.key?(trackedGame.id)
@@ -142,7 +167,7 @@ module RunTracker
           if !run['date'].nil?
             runDate = Date.strptime(run['date'], '%Y-%m-%d')
           elsif !run['status']['verify-date'].nil?
-            # TODO: cant strp date and time at same time? loses accuracy, fix
+            # TODO:: cant strp date and time at same time? loses accuracy, fix
             runDate = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d') 
           end
 
@@ -154,7 +179,7 @@ module RunTracker
           if !oldWR['date'].nil?
             oldWRDate = Date.strptime(oldWR['date'], '%Y-%m-%d')
           elsif !oldWR['status']['verify-date'].nil?
-            # TODO: cant strp date and time at same time? loses accuracy, fix
+            # TODO:: cant strp date and time at same time? loses accuracy, fix
             oldWRDate = Date.strptime(oldWR['status']['verify-date'].split('T').first, '%Y-%m-%d') 
           end
 
@@ -198,16 +223,19 @@ module RunTracker
           SQLiteDB.insertNewRunner(runner)
         else
           if newPB == true
-            message.push("< New Personal Best by - #{Util.secondsToTime(pbDiff)} >")
+            embed.add_field(
+              name: "Time Save from Previous Run",
+              value: Util.secondsToTime(pbDiff),
+              inline: false
+            )
           end
           SQLiteDB.updateCurrentRunner(runner)
         end
         SQLiteDB.updateTrackedGame(trackedGame)
-        highlightedText = Util.arrayToCodeBlock(message, highlighting: "md")
-        highlightedText += "\nVideo Link - #{videoLink}"
         # Add run to the announcements table so we dont duplicate the messages
         SQLiteDB::Conn.execute("INSERT INTO announcements (run_id) VALUES ('#{run['id']}')")
-        RTBot.send_message(trackedGame.announce_channel, highlightedText)
+        RTBot.send_message(_event.channel.id, "", false, embed)
+        RTBot.send_message(_event.channel.id, "Video Link - #{videoLink}", false, embed)
         next
       end # end of tracked games loop
     end # end announce runs

@@ -78,15 +78,33 @@ module RunTracker
         end
 
         # Announce to user
-        message = Array.new
-        message.push("Game Added!")
-        message.push("============")
-        message.push("Found <#{trackedGame.name}> with ID: <#{trackedGame.id}>")
-        message.push("Found <#{trackedGame.categories.length}> categories and <#{trackedGame.moderators.length}> current moderators")
-        message.push("To change the alias <~setgamealias #{gameAlias} <newAlias>>")
-        message.push("To change the announce channel <~setannounce #{gameAlias} <#channel_name>>")
-        message.push("If incorrect, remove with <~removegame #{gameAlias}>")
-        _event << Util.arrayToCodeBlock(message, highlighting: 'md')
+        embed = Discordrb::Webhooks::Embed.new(
+            title: "Game Added",
+            description: "Found **#{trackedGame.name}** with Speedrun.com ID: **#{trackedGame.id}**.\nArchived **#{trackedGame.categories.length}** categories and **#{trackedGame.moderators.length}** moderators.",
+            thumbnail: {
+              url: trackedGame.cover_url
+            },
+            footer: {
+              text: "~help to view a list of available commands"
+            }
+        )
+        embed.colour = "#35f904"
+        embed.add_field(
+          name: "To Change Alias",
+          value: "~setgamealias #{gameAlias} <newAlias>",
+          inline: false
+        )
+        embed.add_field(
+          name: "To Change Announce Channel",
+          value: "~setannounce #{gameAlias} <#channel_name>",
+          inline: false
+        )
+        embed.add_field(
+          name: "To Remove",
+          value: "~removegame #{gameAlias}",
+          inline: false
+        )
+        RTBot.send_message(_event.channel.id, "", false, embed)
 
       end # end self.trackGame
     end

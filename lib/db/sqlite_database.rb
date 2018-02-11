@@ -48,6 +48,7 @@ module RunTracker
       createTrackedRunnersCmd = 'CREATE TABLE IF NOT EXISTS "tracked_runners" (' \
                                 '"user_id" TEXT NOT NULL,' \
                                 '"user_name" TEXT NOT NULL,' \
+                                '"avatar_url" TEXT,' \
                                 '"historic_runs" TEXT,' \
                                 '"num_submitted_wrs" INTEGER, ' \
                                 '"num_submitted_runs" INTEGER, ' \
@@ -116,7 +117,6 @@ module RunTracker
       Conn.execute('DROP TABLE IF EXISTS resources')
       Conn.execute('DROP TABLE IF EXISTS aliases')
       puts "[INFO] Dropped Every Non-Manager & Notification Table"
-      return 'Only Game-Related Tables Dropped!'
     end
 
     def self.getCurrentRunners
@@ -125,6 +125,7 @@ module RunTracker
         queryResults = Conn.execute('SELECT * FROM "tracked_runners"')
         queryResults.each do |runner|
           currentRunner = Runner.new(runner['user_id'], runner['user_name'])
+          currentRunner.avatar_url = runner['avatar_url']
           currentRunner.num_submitted_runs = Integer(runner['num_submitted_runs'])
           currentRunner.num_submitted_wrs = Integer(runner['num_submitted_wrs'])
           currentRunner.total_time_overall = Integer(runner['total_time_overall'])
@@ -145,6 +146,7 @@ module RunTracker
           return nil
         end
         currentRunner = Runner.new(runner['user_id'], runner['user_name'])
+        currentRunner.avatar_url = runner['avatar_url']
         currentRunner.num_submitted_runs = Integer(runner['num_submitted_runs'])
         currentRunner.num_submitted_wrs = Integer(runner['num_submitted_wrs'])
         currentRunner.total_time_overall = Integer(runner['total_time_overall'])
@@ -155,7 +157,7 @@ module RunTracker
       return currentRunner
     end
 
-    # TODO historic runs table needs to be implemented, as of right now leaving it JSON
+    # TODO: historic runs table needs to be implemented, as of right now leaving it JSON
 
     ##
     # Updates current runners with the new objects
@@ -197,12 +199,13 @@ module RunTracker
     # Inserts brand new runners into DB
     def self.insertNewRunners(newRunners)
       # Update Statement
+      pp newRunners
       newRunners.each do |_key, runner|
         insertNewRunner(runner)
       end
     end
 
-    # TODO perhaps these should be moved into the models as static methods?
+    # TODO: perhaps these should be moved into the models as static methods?
 
     ##
     # Inserts brand new runner into DB
@@ -212,13 +215,15 @@ module RunTracker
         Conn.execute('insert into "tracked_runners"
                         (user_id, 
                         user_name, 
+                        avatar_url,
                         historic_runs, 
                         num_submitted_runs, 
                         num_submitted_wrs, 
                         total_time_overall)
-                      values (?, ?, ?, ?, ?, ?)',
+                      values (?, ?, ?, ?, ?, ?, ?)',
                       runner.src_id, 
                       runner.src_name, 
+                      runner.avatar_url,
                       JSON.generate(runner.historic_runs), 
                       runner.num_submitted_runs, 
                       runner.num_submitted_wrs,
@@ -260,10 +265,12 @@ module RunTracker
         Conn.execute('insert into "tracked_games"
                         ("game_id", 
                         "game_name", 
+                        "cover_url",
                         "announce_channel")
-                      values (?, ?, ?)',
+                      values (?, ?, ?, ?)',
                       trackedGame.id,
                       trackedGame.name,
+                      trackedGame.cover_url,
                       trackedGame.announce_channel.id)
         categories = trackedGame.categories
         categories.each do |key, category|
@@ -280,7 +287,7 @@ module RunTracker
                           "number_submitted_runs",
                           "number_submitted_wrs")
                           values (?,?,?,?,?,?,?,?,?,?,?)',
-                          key, # TODO why use key?
+                          key, # TODO: why use key?
                           trackedGame.id,
                           category.category_name,
                           category.rules,
@@ -326,7 +333,7 @@ module RunTracker
 
     ##
     # Given an alias, return the ID equivalent
-    # TODO add type argument here and fix usages throughout codebase
+    # TODO: add type argument here and fix usages throughout codebase
     def self.findID(theAlias)
       results = Conn.execute("SELECT * FROM aliases WHERE alias=?", theAlias)
       if results.length < 1
@@ -345,6 +352,7 @@ module RunTracker
       gameResult = gameResults.first
       game = TrackedGame.new(gameResult['game_id'], 
                               gameResult['game_name'], 
+                              gameResult['cover_url'],
                               getCategories(gameResult['game_id']), 
                               getModerators(gameResult['game_id']))
       game.announce_channel = gameResult['announce_channel']
@@ -362,6 +370,7 @@ module RunTracker
       gameResults.each do |gameResult|
         game = TrackedGame.new(gameResult['game_id'], 
                                gameResult['game_name'], 
+                               gameResult['cover_url'],
                                getCategories(gameResult['game_id']), 
                                getModerators(gameResult['game_id']))
         game.announce_channel = gameResult['announce_channel']
@@ -403,7 +412,7 @@ module RunTracker
         moderator.discord_id = row['discord_id']
         moderator.should_notify = row['should_notify']
         moderator.secret_key = row['secret_key']
-        # TODO still a problem
+        # TODO: still a problem
         moderator.last_verified_run_date = Date.strptime(row['last_verified_run_date'], '%Y-%m-%d')
         moderator.total_verified_runs = row['total_verified_runs']
         moderator.past_moderator = row['past_moderator']
@@ -416,13 +425,16 @@ module RunTracker
     # Updates tracked game based on it's ID
     def self.updateTrackedGame(game)
       Conn.execute("update tracked_games 
-                    set game_id = :id, 
-                        game_name = :name,
-                        announce_channel = :channel 
-                    where game_id = :id",
-                    :id => game.id,
-                    :name => game.name,
-                    :channel => game.announce_channel)
+                    set game_id = ?, 
+                        game_name = ?,
+                        cover_url = ?,
+                        announce_channel = ? 
+                    where game_id = ?",
+                    game.id, 
+                    game.name, 
+                    game.cover_url, 
+                    game.announce_channel, 
+                    game.id)
     end
 
     ##

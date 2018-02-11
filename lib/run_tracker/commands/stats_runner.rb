@@ -28,33 +28,56 @@ module RunTracker
 
         # didnt find it
         if theRunner == nil
-          # TODO add fuzzy search with API to get the id if cant find anything
+          # TODO: add fuzzy search with API to get the id if cant find anything
           _event << "No runner found with that name, try again"
           next
         end
 
         # else, we can do things with it.
-        message = Array.new
+        embed = Discordrb::Webhooks::Embed.new(
+          title: "Runner Summary for - #{_runnerName}",
+          thumbnail: {
+            url: theRunner.avatar_url
+          },
+          description: "To View Category Information `~statscategory categoryAlias`",
+          footer: {
+            text: "~help to view a list of available commands"
+          }
+        )
+
+        pp theRunner.avatar_url
+        embed.colour = "#1AB5FF"
         # If only the runner name was supplied, print out a summary of the runner
         if _type == nil and _alias == nil
           # Name
-          message.push(">Runner Summary for <#{_runnerName}>:\n")
-          message.push("Runs of Games That are Tracked")
-          message.push("============")
           # games have done runs in
+          runnersGames = Array.new
           theRunner.historic_runs.each do |key, game|
-            message.push("< #{game.src_name} >")
+            runnersGames.push(game.src_name)
           end
-          # Number of submitted WRs
-          # Number of submitted runs
-          message.push("\n>Number of Submitted World Records: <#{theRunner.num_submitted_wrs}>")
-          message.push(">Number of Submitted Runs: <#{theRunner.num_submitted_runs}>")
-          # Total time convert to hours across all runs
-          message.push(">Total Time spent across all runs: <#{(theRunner.total_time_overall/3600.0).round(2)}> hrs")
+          embed.add_field(
+            name: "Runs of Games that are Tracked",
+            value: runnersGames.join('\n'),
+            inline: false
+          )
+          embed.add_field(
+            name: "Number of Submitted World Records",
+            value: theRunner.num_submitted_wrs,
+            inline: true
+          )
+          embed.add_field(
+            name: "Number of Submitted Runs",
+            value: theRunner.num_submitted_runs,
+            inline: true
+          )
+          embed.add_field(
+            name: "Total Time Spent Across all runs",
+            value: "#{(theRunner.total_time_overall/3600.0).round(2)} hours",
+            inline: true
+          )
         # If we are only given the game alias
         elsif _type.downcase.casecmp('game').zero? and _alias != nil
           # Check to see if alias even exists
-          # TODO untested
           gameID = SQLiteDB.findID(_alias)
           if gameID == nil
             _event << "Game Alias not found use !listgames to see the current aliases"
@@ -73,27 +96,38 @@ module RunTracker
             next
           end
 
-          # Name
-          message.push(">Runner Summary for <#{_runnerName}> in Game <#{_alias}>:\n")
           # categories have done runs in
-          message.push("Categories That Have Done Runs in:")
-          message.push("============")
+          runnersCategories = Array.new
           foundGame.categories.each do |key, category|
             if category.num_submitted_runs > 0
-              message.push("< #{category.src_name} >")
+              runnersCategories.push(category.src_name)
             end
           end
-          # Number of submitted WRs
-          # Number of submitted runs
-          message.push("\n>Number of Submitted World Records: <#{foundGame.num_previous_wrs}>") # TODO refactor this across later
-          message.push(">Number of Submitted Runs: <#{foundGame.num_submitted_runs}>")
-          # Total time convert to hours across all runs
-          message.push(">Total Time spent across all runs: <#{(foundGame.total_time_overall/3600.0).round(2)}> hrs")
+          embed.title = "Runner Summary for #{_runnerName} in Game #{_alias}"
+          embed.add_field(
+            name: "Categories that have done Runs in",
+            value: runnersCategories.join('\n'),
+            inline: false
+          )
+          embed.add_field(
+            name: "Number of Submitted World Records",
+            value: foundGame.num_previous_wrs,
+            inline: true
+          )
+          embed.add_field(
+            name: "Number of Submitted Runs",
+            value: foundGame.num_submitted_runs,
+            inline: true
+          )
+          embed.add_field(
+            name: "Total Time Spent Across all runs",
+            value: "#{(foundGame.total_time_overall/3600.0).round(2)} hours",
+            inline: true
+          )
 
         # Otherwise print category information
         elsif _type.downcase.casecmp('category').zero? and _alias != nil
           # Check to see if alias even exists
-          # TODO cleant his up with postgres util fundtion findID
           # Check to see if they've done the category
           categoryID = SQLiteDB.findID(_alias)
           if categoryID == nil
@@ -124,27 +158,37 @@ module RunTracker
           end
 
           # Name
-          message.push(">Runner Summary for <#{_runnerName}> in Game <#{gameAlias}> in Category <#{_alias}>:\n")
           # milestones
-          message.push("Milestones for this Category")
-          message.push("============")
-          milestoneList = ""
+          milestoneList = Array.new
           category.milestones.each do |label, runID|
-            message.push("[#{label}](#{runID})")
+            milestoneList.push("_#{label}_: #{runID}")
           end
-          # Number of submitted WRs
-          # Number of submitted runs
-          message.push("\n>Number of Submitted World Records: <#{category.num_previous_wrs}>") # TODO refactor this across later
-          message.push(">Number of Submitted Runs: <#{category.num_submitted_runs}>")
-          # Total time convert to hours across all runs
-          message.push(">Total Time spent across all runs: <#{(category.total_time_overall/3600.0).round(2)}> hrs")
+          embed.title = "Runner Summary for #{_runnerName} in Game #{gameAlias} in Category #{_alias}"
+          embed.add_field(
+            name: "Milestones for this Category",
+            value: milestoneList.join('\n'),
+            inline: false
+          )
+          embed.add_field(
+            name: "Number of Submitted World Records",
+            value: category.num_previous_wrs,
+            inline: true
+          )
+          embed.add_field(
+            name: "Number of Submitted Runs",
+            value: category.num_submitted_runs,
+            inline: true
+          )
+          embed.add_field(
+            name: "Total Time Spent Across all runs",
+            value: "#{(category.total_time_overall/3600.0).round(2)} hours",
+            inline: true
+          )
         else
           _event << "~statsrunner <runnerName> <game/category> <gameAlias/categoryAlias>"
           next
         end
-
-        _event << Util.arrayToCodeBlock(message, highlighting: 'md')
-
+        RTBot.send_message(_event.channel.id, "", false, embed)
       end # end of command body
     end
   end

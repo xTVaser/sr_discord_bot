@@ -1,14 +1,14 @@
 module RunTracker
   module SeedDB
     ##
-    # TODO this needs to be significantly refactored after it works
+    # TODO: this needs to be significantly refactored after it works
     # Gathers all of the runners, their runs, their current stats
     # At the same time it also counts the moderators verified runs, and last verified run date
     # Also determines the current stats for each category
     # Will pull all current data from a game's leaderboard
     # categoryList and modList are expected to be hashes keyed with their respective SRC ids
     def self.getGameRunners(gameID, gameName, categoryList, modList)
-      currentRunnerList = SQLiteDB.getCurrentRunners # NOTE unverified implementation
+      currentRunnerList = SQLiteDB.getCurrentRunners
       newRunnerList = {}
 
       categoryList.each do |_key, category| # Loop through every category
@@ -106,7 +106,7 @@ module RunTracker
             end
 
             # Check if new WR
-            # TODO, support ties
+            # TODO:, support ties
             if currentWRTime > Integer(run['times']['primary_t'])
 
               category.number_submitted_wrs += 1
@@ -122,7 +122,7 @@ module RunTracker
               if !run['date'].nil?
                 runDate = Date.strptime(run['date'], '%Y-%m-%d')
               elsif !run['status']['verify-date'].nil?
-                runDate = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d') # TODO: cant strp date and time at same time? loses accuracy, fix
+                runDate = Date.strptime(run['status']['verify-date'].split('T').first, '%Y-%m-%d') # TODO:: cant strp date and time at same time? loses accuracy, fix
               end
 
               # Before we scrap the old date, see if it's the new longest WR

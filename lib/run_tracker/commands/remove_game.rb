@@ -59,10 +59,15 @@ module RunTracker
             next
         end # end of begin
 
-        _event << "Game removed successfully"
-
+        embed = Discordrb::Webhooks::Embed.new(
+            title: "Game Removed Successfully",
+            footer: {
+              text: "~help to view a list of available commands"
+            }
+        )
+        embed.colour = "#ff0000"
+        RTBot.send_message(_event.channel.id, "", false, embed)
       end # end of command body
-
     end
   end
 end
