@@ -187,7 +187,7 @@ module RunTracker
                       runner.src_name,
                       JSON.generate(runner.historic_runs),
                       runner.num_submitted_runs,
-                      runner.num_submitted_runs,
+                      runner.num_submitted_wrs,
                       runner.total_time_overall,
                       runner.src_id)
       rescue SQLite3::Exception => e
@@ -412,8 +412,9 @@ module RunTracker
         moderator.discord_id = row['discord_id']
         moderator.should_notify = row['should_notify']
         moderator.secret_key = row['secret_key']
-        # TODO: still a problem
-        moderator.last_verified_run_date = Date.strptime(row['last_verified_run_date'], '%Y-%m-%d')
+        if row['last_verified_run_date'] != ""
+          moderator.last_verified_run_date = Date.strptime(row['last_verified_run_date'], '%Y-%m-%d')
+        end
         moderator.total_verified_runs = row['total_verified_runs']
         moderator.past_moderator = row['past_moderator']
         moderators[row['src_id']] = moderator

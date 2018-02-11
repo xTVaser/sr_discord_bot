@@ -36,7 +36,7 @@ module RunTracker
           embed.add_field(
             name: game['game_name'],
             value: "_Alias_ : `#{gameAlias}`\n_Announce Channel_ : #{channel['name']}",
-            inline: true
+            inline: false
           )
         end
         RTBot.send_message(_event.channel.id, "", false, embed)

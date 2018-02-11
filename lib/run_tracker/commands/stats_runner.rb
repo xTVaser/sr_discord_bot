@@ -39,7 +39,7 @@ module RunTracker
           thumbnail: {
             url: theRunner.avatar_url
           },
-          description: "To View Category Information `~statscategory categoryAlias`",
+          description: "To View Category Information `~statsrunner #{_runnerName} <categoryAlias>`",
           footer: {
             text: "~help to view a list of available commands"
           }
@@ -57,17 +57,17 @@ module RunTracker
           end
           embed.add_field(
             name: "Runs of Games that are Tracked",
-            value: runnersGames.join('\n'),
+            value: runnersGames.join("\n"),
             inline: false
-          )
-          embed.add_field(
-            name: "Number of Submitted World Records",
-            value: theRunner.num_submitted_wrs,
-            inline: true
           )
           embed.add_field(
             name: "Number of Submitted Runs",
             value: theRunner.num_submitted_runs,
+            inline: true
+          )
+          embed.add_field(
+            name: "Number of Submitted World Records",
+            value: theRunner.num_submitted_wrs,
             inline: true
           )
           embed.add_field(
@@ -106,13 +106,8 @@ module RunTracker
           embed.title = "Runner Summary for #{_runnerName} in Game #{_alias}"
           embed.add_field(
             name: "Categories that have done Runs in",
-            value: runnersCategories.join('\n'),
+            value: runnersCategories.join("\n"),
             inline: false
-          )
-          embed.add_field(
-            name: "Number of Submitted World Records",
-            value: foundGame.num_previous_wrs,
-            inline: true
           )
           embed.add_field(
             name: "Number of Submitted Runs",
@@ -120,11 +115,15 @@ module RunTracker
             inline: true
           )
           embed.add_field(
+            name: "Number of Submitted World Records",
+            value: foundGame.num_previous_wrs,
+            inline: true
+          )
+          embed.add_field(
             name: "Total Time Spent Across all runs",
             value: "#{(foundGame.total_time_overall/3600.0).round(2)} hours",
             inline: true
           )
-
         # Otherwise print category information
         elsif _type.downcase.casecmp('category').zero? and _alias != nil
           # Check to see if alias even exists
@@ -166,17 +165,17 @@ module RunTracker
           embed.title = "Runner Summary for #{_runnerName} in Game #{gameAlias} in Category #{_alias}"
           embed.add_field(
             name: "Milestones for this Category",
-            value: milestoneList.join('\n'),
+            value: milestoneList.join("\n"),
             inline: false
-          )
-          embed.add_field(
-            name: "Number of Submitted World Records",
-            value: category.num_previous_wrs,
-            inline: true
           )
           embed.add_field(
             name: "Number of Submitted Runs",
             value: category.num_submitted_runs,
+            inline: true
+          )
+          embed.add_field(
+            name: "Number of Submitted World Records",
+            value: category.num_previous_wrs,
             inline: true
           )
           embed.add_field(
