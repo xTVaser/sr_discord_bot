@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:resource, description: 'Displays the content of a particular games resource',
-                         usage: '~resource <gameAlias> <name>',
+                         usage: "#{PREFIX}resource <gameAlias> <name>",
                          permission_level: PERM_USER,
                          rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                          bucket: :limiter,
@@ -27,7 +27,7 @@ module RunTracker
             title: "#{_name} Resource for #{_gameAlias}",
             description: resource['content'],
             footer: {
-              text: "~help to view a list of available commands"
+              text: "#{PREFIX}help to view a list of available commands"
             }
         )
         embed.colour = "#1AB5FF"

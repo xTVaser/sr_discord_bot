@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:optout, description: 'Allows a speedrun.com leaderboard mod to opt-out to stop receiving notifications from the games they moderate',
-                         usage: '~optout <speedrunComName> *must be the user themselves',
+                         usage: "#{PREFIX}optout <speedrunComName> *must be the user themselves",
                          permission_level: PERM_MOD,
                          rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                          bucket: :limiter,
@@ -32,7 +32,7 @@ module RunTracker
 
         # Otherwise, let's check to see if the moderator has already opted in
         if mod['should_notify'] != true
-          _event << "#{_srcName} has not opted in, ~optin #{_srcName} to opt-in"
+          _event << "#{_srcName} has not opted in, #{PREFIX}optin #{_srcName} to opt-in"
           next
         end
 
@@ -46,9 +46,9 @@ module RunTracker
                                 _srcName.downcase)
         embed = Discordrb::Webhooks::Embed.new(
             title: "Moderator Successfully Opted-Out",
-            description: "Use `~optout #{_srcName}` to opt-back-in at any time.",
+            description: "Use `#{PREFIX}optout #{_srcName}` to opt-back-in at any time.",
             footer: {
-              text: "~help to view a list of available commands"
+              text: "#{PREFIX}help to view a list of available commands"
             }
         )
         embed.colour = "#ff0000"

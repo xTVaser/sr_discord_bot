@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:listresources, description: 'Lists all resources for a specific tracked game.',
-                          usage: '~listresources <gameAlias>',
+                          usage: "#{PREFIX}listresources <gameAlias>",
                           permission_level: PERM_USER,
                           rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                           bucket: :limiter,
@@ -20,7 +20,7 @@ module RunTracker
         embed = Discordrb::Webhooks::Embed.new(
             title: "Resources for #{_gameAlias}",
             footer: {
-              text: "~viewresource #{_gameAlias} <name> to view content\n~help to view a list of available commands"
+              text: "#{PREFIX}viewresource #{_gameAlias} <name> to view content\n#{PREFIX}help to view a list of available commands"
             }
         )
         embed.colour = "#1AB5FF"

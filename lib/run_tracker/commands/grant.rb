@@ -8,7 +8,7 @@ module RunTracker
 
       command(:grant, bucket: :limiter,
                     description: 'Allows the setting and changing of access levels for users of the server through @ mentions.',
-                    usage: '~grant <@user> <permission> (permission levels: `admin`, `mod`).',
+                    usage: "#{PREFIX}grant <@user> <permission> (permission levels: `admin`, `mod`).",
                     permission_level: PERM_ADMIN,
                     min_args: 2,
                     max_args: 2) do |_event, mention, permission|
@@ -58,7 +58,7 @@ module RunTracker
               title: "Permission set for user #{user.name}",
               description: selectedPerm,
               footer: {
-                text: "~help to view a list of available commands"
+                text: "#{PREFIX}help to view a list of available commands"
               }
           )
           embed.colour = "#35f904"

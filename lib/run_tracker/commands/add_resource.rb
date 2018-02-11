@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 1, delay: 1
 
       command(:addresource, description: 'Lists all categories for a specific tracked game.',
-                          usage: '~addresource <gameAlias> <resource name> <content>',
+                          usage: "#{PREFIX}addresource <gameAlias> <resource name> <content>",
                           permission_level: PERM_MOD,
                           min_args: 3,
                           max_args: 3,
@@ -17,7 +17,7 @@ module RunTracker
         # Check to see if alias even exists
         aliasResults = SQLiteDB::Conn.execute('SELECT * FROM "aliases" WHERE alias=? and type="game"', _gameAlias)
         if aliasResults.length < 1
-          _event << "Game Alias not found use ~listgames to see the current aliases"
+          _event << "Game Alias not found use #{PREFIX}listgames to see the current aliases"
           return
         end
 
@@ -38,7 +38,7 @@ module RunTracker
         embed = Discordrb::Webhooks::Embed.new(
             title: "Resource Added",
             footer: {
-              text: "~help to view a list of available commands"
+              text: "#{PREFIX}help to view a list of available commands"
             }
         )
         embed.colour = "#35f904"

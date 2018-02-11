@@ -18,12 +18,6 @@ module RunTracker
 
   Dotenv.load('vars.env')
 
-  # Establish Discord Bot Connection
-  RTBot = Discordrb::Commands::CommandBot.new(token: ENV['TOKEN'],
-                                              client_id: ENV['CLIENT_ID'],
-                                              prefix: '~',
-                                              command_doesnt_exist_message: 'Use ~help to see a list of available commands')
-
   # Permission Constants
   PERM_ADMIN = 2
   PERM_MOD = 1
@@ -34,10 +28,20 @@ module RunTracker
 
   DEBUG_CHANNEL = ENV['DEBUG_CHANNEL']
 
+  PREFIX = '$'
+
+  # Establish Discord Bot Connection
+  RTBot = Discordrb::Commands::CommandBot.new(token: ENV['TOKEN'],
+                                              client_id: ENV['CLIENT_ID'],
+                                              prefix: PREFIX,
+                                              command_doesnt_exist_message: "Use #{PREFIX}help to see a list of available commands")
+
   # When the bot starts up
   # TODO: Move all logic for databases into the models
   # TODO: replace puts with actual logging statements
   RTBot.ready do |_event|
+    RTBot.game = "#{PREFIX}help for commands"
+    # TODO: remove
     # Stackdriver.log("test")
     # Create the database tables
     SQLiteDB.generateSchema

@@ -1,8 +1,6 @@
 *.7z
 *.7z.*
 
-db/database.db
-
 # Created by https://www.gitignore.io/api/ruby
 
 ### Ruby ###
