@@ -23,8 +23,14 @@ module RunTracker
           return
         end
 
-        _event << "#{_name} removed from #{_gameAlias} if it existed."
-
+        embed = Discordrb::Webhooks::Embed.new(
+            title: "#{_name} Removed From #{_gameAlias} if it Existed",
+            footer: {
+              text: "~help to view a list of available commands"
+            }
+        )
+        embed.colour = "#ff0000"
+        RTBot.send_message(_event.channel.id, "", false, embed)
       end # end of command body
     end # end of module
   end

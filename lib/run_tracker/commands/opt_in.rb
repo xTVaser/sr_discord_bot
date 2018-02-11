@@ -15,8 +15,8 @@ module RunTracker
                          max_args: 1) do |_event, _srcName|
 
         # Command Body
-        # TODO this command wipes the moderators stats
-        # TODO what does ^ mean
+        # TODO: this command wipes the moderators stats
+        # TODO: what does ^ mean
 
         # First check to see if the moderator exists for one of the games
         mod = nil
@@ -41,9 +41,15 @@ module RunTracker
                                 _event.message.user.id,
                                 1,
                                 _srcName.downcase)
-
-        _event << "Moderator successfully opted-in, use `~optout #{_srcName}` to opt-out at any time."
-
+        embed = Discordrb::Webhooks::Embed.new(
+            title: "Moderator Successfully Opted-In",
+            description: "Use `~optout #{_srcName}` to opt-out at any time",
+            footer: {
+              text: "~help to view a list of available commands"
+            }
+        )
+        embed.colour = "#35f904"
+        RTBot.send_message(_event.channel.id, "", false, embed)
       end # end of command body
     end # end of module
   end

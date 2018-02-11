@@ -53,7 +53,14 @@ module RunTracker
           end
 
           # Send verbal confirmation of access level setting.
-          _event << "Permission set for user #{user.name}!"
+          embed = Discordrb::Webhooks::Embed.new(
+              title: "Permission set for user #{user.name}",
+              footer: {
+                text: "~help to view a list of available commands"
+              }
+          )
+          embed.colour = "#35f904"
+          RTBot.send_message(_event.channel.id, "", false, embed)
         rescue Exception => e
           _event << "Permission failed to set: #{e.message}"
           puts "[ERROR] #{e.backtrace} + #{e.message}"

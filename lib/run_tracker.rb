@@ -1,7 +1,11 @@
-#  Gemfile plugins
+# Gemfile plugins
+# Windows Patch for libsodium
+# ::RBNACL_LIBSODIUM_GEM_LIB_PATH = "E:/libsodium.dll"
+
 require 'dotenv'
 require 'discordrb'
 require 'pp'
+# require "google/cloud/logging"
 
 # Bot Documentation - http://www.rubydoc.info/gems/discordrb
 
@@ -31,12 +35,10 @@ module RunTracker
   DEBUG_CHANNEL = ENV['DEBUG_CHANNEL']
 
   # When the bot starts up
-  # TODO Move all logic for databases into the models
-  # TODO replace puts with actual logging statements
-  # TODO replace all markdown messages with embeds
-  # TODO embeds will require me to also store the image!
+  # TODO: Move all logic for databases into the models
+  # TODO: replace puts with actual logging statements
   RTBot.ready do |_event|
-    
+    # Stackdriver.log("test")
     # Create the database tables
     SQLiteDB.generateSchema
     # Initialize any permissions that have previously been set

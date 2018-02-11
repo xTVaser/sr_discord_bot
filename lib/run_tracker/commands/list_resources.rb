@@ -17,19 +17,20 @@ module RunTracker
         # Command Body
         resources = SQLiteDB::Conn.execute('SELECT * FROM resources WHERE game_alias=?', _gameAlias)
 
-        message = Array.new
-        message.push("Resources for #{_gameAlias}:")
-        message.push("============")
-
+        embed = Discordrb::Webhooks::Embed.new(
+            title: "Resources for #{_gameAlias}",
+            footer: {
+              text: "~viewresource #{_gameAlias} <name> to view content\n~help to view a list of available commands"
+            }
+        )
+        embed.colour = "#1AB5FF"
         resources.each do |resource|
-          message.push("< #{resource['resource']} >")
+          embed.add_field(
+            name: resource['resource'],
+            inline: true
+          )
         end
-
-        message.push("")
-        message.push("Use <~viewresource #{_gameAlias} name> to view content")
-
-        _event << Util.arrayToCodeBlock(message, highlighting: 'md')
-
+        RTBot.send_message(_event.channel.id, "", false, embed)
       end # end of command body
     end # end of module
   end
