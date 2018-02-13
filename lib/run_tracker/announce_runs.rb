@@ -61,7 +61,7 @@ module RunTracker
         end # end of category loop
 
         if category == nil
-          Stackdriver.exception(e)
+          Stackdriver.exception("Category was nil when trying to announce runs")
           return #TODO: i feel like this is bad, why would the category be nil?
         end
 
@@ -239,8 +239,8 @@ module RunTracker
         SQLiteDB.updateTrackedGame(trackedGame)
         # Add run to the announcements table so we dont duplicate the messages
         SQLiteDB::Conn.execute("INSERT INTO announcements (run_id) VALUES ('#{run['id']}')")
-        RTBot.send_message(_event.channel.id, "", false, embed)
-        RTBot.send_message(_event.channel.id, "Video Link - #{videoLink}", false, embed)
+        RTBot.send_message(trackedGame.announce_channel, "", false, embed)
+        RTBot.send_message(trackedGame.announce_channel, "Video Link - #{videoLink}", false, embed)
         next
       end # end of tracked games loop
     end # end announce runs
