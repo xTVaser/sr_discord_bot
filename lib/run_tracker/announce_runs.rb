@@ -61,7 +61,7 @@ module RunTracker
         end # end of category loop
 
         if category == nil
-          Stackdriver.exception("Category was nil when trying to announce runs")
+          Stackdriver.log("Category was null when looking for it when announcing new run #{run['category']}", :ERROR)
           return #TODO: i feel like this is bad, why would the category be nil?
         end
 
