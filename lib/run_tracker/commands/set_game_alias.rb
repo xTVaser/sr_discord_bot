@@ -23,7 +23,6 @@ module RunTracker
           SQLiteDB::Conn.transaction
           # Check to see if alias even exists
           aliasResults = SQLiteDB::Conn.execute('SELECT * FROM "aliases" WHERE alias= ? and type="game"', _oldAlias)
-          pp aliasResults
           if aliasResults.length < 1
             return "Game Alias not found use `!listgames` to see the current aliases"
           end
@@ -48,8 +47,8 @@ module RunTracker
           SQLiteDB::Conn.commit
         rescue SQLite3::Exception => e
           SQLiteDB::Conn.rollback
-          puts "oh no"
-          return "oh no"
+          Stackdriver.exception(e)
+          return "Error when setting the game alias!"
         end
 
         embed = Discordrb::Webhooks::Embed.new(

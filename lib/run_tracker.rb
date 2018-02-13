@@ -1,14 +1,15 @@
 # Gemfile plugins
 # Windows Patch for libsodium
-# ::RBNACL_LIBSODIUM_GEM_LIB_PATH = "E:/libsodium.dll"
+if Gem.win_platform?
+  ::RBNACL_LIBSODIUM_GEM_LIB_PATH = "D:/Repos/sr_discord_bot/sodium.dll"
+end
 
+require "google/cloud/logging"
 require 'dotenv'
 require 'discordrb'
 require 'pp'
-# require "google/cloud/logging"
 
 # Bot Documentation - http://www.rubydoc.info/gems/discordrb
-
 # All code in the gem is namespaced under this module.
 module RunTracker
   require_relative 'run_tracker/version'
@@ -38,11 +39,8 @@ module RunTracker
 
   # When the bot starts up
   # TODO: Move all logic for databases into the models
-  # TODO: replace puts with actual logging statements
   RTBot.ready do |_event|
     RTBot.game = "#{PREFIX}help for commands"
-    # TODO: remove
-    # Stackdriver.log("test")
     # Create the database tables
     SQLiteDB.generateSchema
     # Initialize any permissions that have previously been set
@@ -53,7 +51,7 @@ module RunTracker
     # NOTE disable this line if you dont want me to have full access!
     RTBot.set_user_permission(140194315518345216, PERM_ADMIN)
 
-    puts "[INFO] Bot Online and Connected to Server"
+    Stackdriver.log("Bot Online and Connected to Server")
   end
 
   # Require all files in run_tracker folder

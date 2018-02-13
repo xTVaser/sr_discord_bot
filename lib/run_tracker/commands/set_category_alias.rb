@@ -31,8 +31,8 @@ module RunTracker
           SQLiteDB::Conn.execute('update aliases set alias = ? where alias = ? and type = "category"', 
                                   "#{gameAlias}-#{_newAlias}", _oldAlias)
         rescue SQLite3::Exception => e
-          puts "oh no fix me"
-          return "oh no fix me"
+          Stackdriver.exception(e)
+          return "Error when setting the category alias!"
         end
 
         embed = Discordrb::Webhooks::Embed.new(

@@ -85,10 +85,10 @@ module RunTracker
       Conn.execute(createCommandPermissionsCmd)
       Conn.execute(createNotificationTable)
       Conn.execute(createAnnouncementsTable)
-      puts "[INFO] Tables Created Successfully"
+      Stackdriver.log("Tables Created Successfully")
       return 'Tables Created Succesfully'
     rescue SQLite3::Exception => e
-      puts "[ERROR] #{e.message} #{e.backtrace}"
+      Stackdriver.exception(e)
       return 'Table Creation Unsuccessful'
     end
 
@@ -102,10 +102,10 @@ module RunTracker
       Conn.execute('DROP TABLE IF EXISTS managers')
       Conn.execute('DROP TABLE IF EXISTS notifications')
       Conn.execute('DROP TABLE IF EXISTS announcements')
-      puts "[INFO] Tables Dropped"
+      Stackdriver.log("Tables Dropped")
       return 'Schema Destroyed!'
     rescue SQLite3::Exception => e
-      puts "[ERROR] #{e.message} #{e.backtrace}"
+      Stackdriver.exception(e)
       return 'Schema Destruction Unsuccessful'
     end
 
@@ -116,7 +116,7 @@ module RunTracker
       Conn.execute('DROP TABLE IF EXISTS tracked_runners')
       Conn.execute('DROP TABLE IF EXISTS resources')
       Conn.execute('DROP TABLE IF EXISTS aliases')
-      puts "[INFO] Dropped Every Non-Manager & Notification Table"
+      Stackdriver.log("Dropped Every Non-Manager & Notification Table")
     end
 
     def self.getCurrentRunners
@@ -133,7 +133,7 @@ module RunTracker
           runners[(runner['user_id']).to_s] = currentRunner
         end
       rescue SQLite3::Exception => e
-        puts "[ERROR] #{e.message} #{e.backtrace}"
+        Stackdriver.exception(e)
       end
       return runners
     end
@@ -152,7 +152,7 @@ module RunTracker
         currentRunner.total_time_overall = Integer(runner['total_time_overall'])
         currentRunner.fromJSON(runner['historic_runs'])
       rescue SQLite3::Exception => e
-        puts "[ERROR] #{e.message} #{e.backtrace}"
+        Stackdriver.exception(e)
       end
       return currentRunner
     end
@@ -191,7 +191,7 @@ module RunTracker
                       runner.total_time_overall,
                       runner.src_id)
       rescue SQLite3::Exception => e
-        puts "[ERROR] #{e.message} #{e.backtrace}"
+        Stackdriver.exception(e)
       end # end of transaction
     end # end of loop
 
@@ -199,7 +199,6 @@ module RunTracker
     # Inserts brand new runners into DB
     def self.insertNewRunners(newRunners)
       # Update Statement
-      pp newRunners
       newRunners.each do |_key, runner|
         insertNewRunner(runner)
       end
@@ -229,7 +228,7 @@ module RunTracker
                       runner.num_submitted_wrs,
                       runner.total_time_overall)
       rescue Exception => e
-        puts "[ERROR] #{e.message} #{e.backtrace}"
+        Stackdriver.exception(e)
       end
     end
 
@@ -253,7 +252,7 @@ module RunTracker
                       value.first,
                       value.last)
       rescue SQLite3::Exception => e
-        puts "[ERROR] #{e.message} #{e.backtrace}"
+        Stackdriver.exception(e)
         return false
       end
       return true
@@ -324,7 +323,7 @@ module RunTracker
         end
         Conn.commit
       rescue SQLite3::Exception => e
-        puts "[ERROR] #{e.message} #{e.backtrace}"
+        Stackdriver.exception(e)
         Conn.rollback
         return false
       end
@@ -451,14 +450,14 @@ module RunTracker
     ##
     # Initialize everyones permissions
     def self.initPermissions
-      puts "[INFO] Initializing Permissions"
+      Stackdriver.log("[INFO] Initializing Permissions")
       begin
         userPermissions = Conn.execute('select * from managers') # Grab each user ID from the database
         userPermissions.each do |user|
           RTBot.set_user_permission(Integer(user['user_id']), Integer(user['access_level']))
         end
       rescue SQLite3::Exception => e
-        puts "[ERROR] #{e.message} #{e.backtrace}"
+        Stackdriver.exception(e)
       end
     end # end of func
   end # end of module

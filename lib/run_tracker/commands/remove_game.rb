@@ -54,7 +54,7 @@ module RunTracker
             SQLiteDB::Conn.commit
           rescue Exception => e
             SQLiteDB::Conn.rollback
-            puts "[ERROR] #{e.message} #{e.backtrace}"
+            Stackdriver.exception(e)
             _event << "Error while deleting the game."
             next
         end # end of begin

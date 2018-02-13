@@ -65,7 +65,7 @@ module RunTracker
           RTBot.send_message(_event.channel.id, "", false, embed)
         rescue Exception => e
           _event << "Permission failed to set: #{e.message}"
-          puts "[ERROR] #{e.backtrace} + #{e.message}"
+          Stackdriver.exception(e)
           next
         end
       end
