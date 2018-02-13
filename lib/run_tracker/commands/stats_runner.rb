@@ -39,13 +39,12 @@ module RunTracker
           thumbnail: {
             url: theRunner.avatar_url
           },
-          description: "To View Category Information `#{PREFIX}statsrunner #{_runnerName} <categoryAlias>`",
+          description: "To View Category Information:\n`#{PREFIX}statsrunner #{_runnerName} <categoryAlias>`",
           footer: {
             text: "#{PREFIX}help to view a list of available commands"
           }
         )
 
-        pp theRunner.avatar_url
         embed.colour = "#1AB5FF"
         # If only the runner name was supplied, print out a summary of the runner
         if _type == nil and _alias == nil
@@ -134,8 +133,7 @@ module RunTracker
             next
           end
 
-          gameAlias = aliasResults.first['alias'].split('-').first
-          gameID = SQLiteDB.findID(gameAlias)
+          gameID = SQLiteDB.categoryAliasToGameID(_alias)
 
           # Check to see if that runner has done runs of that game
           foundGame = nil
@@ -150,7 +148,7 @@ module RunTracker
           end
 
           # Check to see if that runner has done runs of that category
-          category = foundGame.categories[aliasResults.first['id']]
+          category = foundGame.categories[categoryID]
           if category.num_submitted_runs <= 0
             _event << "That runner has not done a run of that category for that category!"
             next
@@ -162,7 +160,8 @@ module RunTracker
           category.milestones.each do |label, runID|
             milestoneList.push("_#{label}_: #{runID}")
           end
-          embed.title = "Runner Summary for #{_runnerName} in Game #{gameAlias} in Category #{_alias}"
+          # TODO: add back game name
+          embed.title = "Runner Summary for #{_runnerName} in Category #{_alias}"
           embed.add_field(
             name: "Milestones for this Category",
             value: milestoneList.join("\n"),

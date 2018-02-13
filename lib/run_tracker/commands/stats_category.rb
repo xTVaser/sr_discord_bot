@@ -34,7 +34,7 @@ module RunTracker
           end
         end
         if category == nil
-          puts "[ERROR] Something went wrong stats category command finding category"
+          Stackdriver.log("Something went wrong stats category command finding category", :ERROR)
           _event << "No category found with that alias, use !listcategories <gameAlias> to view current aliases"
           next
         end

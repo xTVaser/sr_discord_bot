@@ -16,11 +16,10 @@ module RunTracker
 
         # Command Body
         # TODO: this command wipes the moderators stats
-        # TODO: what does ^ mean
 
         # First check to see if the moderator exists for one of the games
         mod = nil
-        moderatorResults = SQLiteDB::Conn('SELECT * FROM moderators WHERE "src_name"=?', _srcName.downcase)
+        moderatorResults = SQLiteDB::Conn.execute('SELECT * FROM moderators WHERE "src_name"=? COLLATE NOCASE', _srcName.downcase)
         mod = moderatorResults.first
 
         if mod == nil
@@ -36,7 +35,7 @@ module RunTracker
 
         SQLiteDB::Conn.execute('update moderators
                                 set discord_id = ?,
-                                    should_notify = ?,
+                                    should_notify = ?
                                 where "src_name" = ?',
                                 _event.message.user.id,
                                 1,

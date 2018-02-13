@@ -67,7 +67,7 @@ module RunTracker
           trackedGame = addGameResults.last
           gameAlias = addGameResults.first
         rescue Exception => e
-          puts "[ERROR] #{e.message} #{e.backtrace}"
+          Stackdriver.exception(e)
           return
         end
         trackedGame.announce_channel = _event.channel
