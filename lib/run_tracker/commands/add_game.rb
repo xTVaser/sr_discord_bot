@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 1, delay: 1
 
       command(:addgame, description: 'Add a game to the list of tracked games.',
-                        usage: '~addgame <id/name> <game-name/game-id>',
+                        usage: "#{PREFIX}addgame <id/name> <game-name/game-id>",
                         permission_level: PERM_ADMIN,
                         min_args: 2,
                         max_args: 2,
@@ -17,7 +17,7 @@ module RunTracker
         # Check to see if the command syntax was valid
         unless type.casecmp('id').zero? || type.casecmp('name').zero?
           _event << 'Invalid syntax for command `addgame`!'
-          _event << 'Usage: `~addgame <id/name> <game-name/game-id>`'
+          _event << "Usage: `#{PREFIX}addgame <id/name> <game-name/game-id>`"
           next
         end
 
@@ -47,7 +47,7 @@ module RunTracker
             trackGame(_event, results.first['id'])
           end
         else
-          _event << 'Usage: `~addgame <id/name> <game-name/game-id>`'
+          _event << "Usage: `#{PREFIX}addgame <id/name> <game-name/game-id>`"
           next
         end
       end # end command body
@@ -67,7 +67,7 @@ module RunTracker
           trackedGame = addGameResults.last
           gameAlias = addGameResults.first
         rescue Exception => e
-          puts "[ERROR] #{e.message} #{e.backtrace}"
+          Stackdriver.exception(e)
           return
         end
         trackedGame.announce_channel = _event.channel
@@ -85,23 +85,23 @@ module RunTracker
               url: trackedGame.cover_url
             },
             footer: {
-              text: "~help to view a list of available commands"
+              text: "#{PREFIX}help to view a list of available commands"
             }
         )
         embed.colour = "#35f904"
         embed.add_field(
           name: "To Change Alias",
-          value: "~setgamealias #{gameAlias} <newAlias>",
+          value: "#{PREFIX}setgamealias #{gameAlias} <newAlias>",
           inline: false
         )
         embed.add_field(
           name: "To Change Announce Channel",
-          value: "~setannounce #{gameAlias} <#channel_name>",
+          value: "#{PREFIX}setannounce #{gameAlias} <#channel_name>",
           inline: false
         )
         embed.add_field(
           name: "To Remove",
-          value: "~removegame #{gameAlias}",
+          value: "#{PREFIX}removegame #{gameAlias}",
           inline: false
         )
         RTBot.send_message(_event.channel.id, "", false, embed)

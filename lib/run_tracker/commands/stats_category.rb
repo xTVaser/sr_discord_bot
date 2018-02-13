@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:statscategory, description: 'Displays stats for a given tracked games category',
-                        usage: "~statscategory <alias>",
+                        usage: "#{PREFIX}statscategory <alias>",
                         permission_level: PERM_USER,
                         rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                         bucket: :limiter,
@@ -18,7 +18,7 @@ module RunTracker
 
         gameID = SQLiteDB.categoryAliasToGameID(_categoryAlias)
         if gameID == nil
-          _event << "No category found with that alias, use ~listcategories <gameAlias> to view current aliases"
+          _event << "No category found with that alias, use #{PREFIX}listcategories <gameAlias> to view current aliases"
           next
         end
         categoryID = SQLiteDB.findID(_categoryAlias)
@@ -34,7 +34,7 @@ module RunTracker
           end
         end
         if category == nil
-          puts "[ERROR] Something went wrong stats category command finding category"
+          Stackdriver.log("Something went wrong stats category command finding category", :ERROR)
           _event << "No category found with that alias, use !listcategories <gameAlias> to view current aliases"
           next
         end
@@ -46,7 +46,7 @@ module RunTracker
               url: game.cover_url
             },
             footer: {
-              text: "~help to view a list of available commands"
+              text: "#{PREFIX}help to view a list of available commands"
             }
         )
         embed.colour = "#1AB5FF"

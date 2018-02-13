@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:setgamealias, description: '',
-                         usage: "~setgamealias <old alias> <new alias>\nAlias must be unique.",
+                         usage: "#{PREFIX}setgamealias <old alias> <new alias>\nAlias must be unique.",
                          permission_level: PERM_MOD,
                          rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                          bucket: :limiter,
@@ -16,14 +16,13 @@ module RunTracker
 
         # check if the newly provided alias is valid
         if !/[^a-zA-Z0-9\-()&:%]./.match(_newAlias).nil?
-          return "`~setgamealias <old alias> <new alias>`\nAlias must be unique."
+          return "`#{PREFIX}setgamealias <old alias> <new alias>`\nAlias must be unique."
         end
 
         begin
           SQLiteDB::Conn.transaction
           # Check to see if alias even exists
           aliasResults = SQLiteDB::Conn.execute('SELECT * FROM "aliases" WHERE alias= ? and type="game"', _oldAlias)
-          pp aliasResults
           if aliasResults.length < 1
             return "Game Alias not found use `!listgames` to see the current aliases"
           end
@@ -48,14 +47,14 @@ module RunTracker
           SQLiteDB::Conn.commit
         rescue SQLite3::Exception => e
           SQLiteDB::Conn.rollback
-          puts "oh no"
-          return "oh no"
+          Stackdriver.exception(e)
+          return "Error when setting the game alias!"
         end
 
         embed = Discordrb::Webhooks::Embed.new(
             title: "Game Alias Updated Successfully",
             footer: {
-              text: "~help to view a list of available commands"
+              text: "#{PREFIX}help to view a list of available commands"
             }
         )
         embed.colour = "#35f904"

@@ -26,7 +26,7 @@ module RunTracker
         embed = Discordrb::Webhooks::Embed.new(
             title: "Database Wiped Completely",
             footer: {
-              text: "~help to view a list of available commands"
+              text: "#{PREFIX}help to view a list of available commands"
             }
         )
         embed.colour = "#ff0000"

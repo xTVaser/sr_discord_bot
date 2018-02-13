@@ -13,6 +13,7 @@ module RunTracker
         requestLink = "#{SrcAPI::API_URL}runs" \
                       "?game=#{trackedGame.id}" \
                       '&status=verified&orderby=verify-date&direction=desc&max=1' # get the latest run in each game
+                      # TODO: get more than 1 run at a time
 
         run = Util.jsonRequest(requestLink)['data'].first
 
@@ -60,7 +61,8 @@ module RunTracker
         end # end of category loop
 
         if category == nil
-          puts "[ERROR] Something went wrong finding the category"
+          Stackdriver.exception("Category was nil when trying to announce runs")
+          return #TODO: i feel like this is bad, why would the category be nil?
         end
 
         # Handle non video links
@@ -74,15 +76,12 @@ module RunTracker
         runner = SQLiteDB.getCurrentRunner(run['players'].first['id'])
         addNewRunner = false
         # If new runner or first run in this category, say this is his first run
+        firstRun = false
         if runner == nil
           runner = Runner.new(runnerKey, runnerName)
           runner.historic_runs[trackedGame.id] = RunnerGame.new(trackedGame.id, trackedGame.name)
           runner.historic_runs[trackedGame.id].categories[category.category_id] = RunnerCategory.new(category.category_id, category.category_name)
-          embed.add_field(
-            name: "Time Save from Previous Run",
-            value: "This is this runner's first run in this category!",
-            inline: false
-          )
+          firstRun = true
           addNewRunner = true
         end
 
@@ -100,7 +99,7 @@ module RunTracker
               url: trackedGame.cover_url
             },
             footer: {
-              text: "~help to view a list of available commands"
+              text: "#{PREFIX}help to view a list of available commands"
             }
         )
         embed.colour = "#fff200"
@@ -222,10 +221,16 @@ module RunTracker
         if addNewRunner == true
           SQLiteDB.insertNewRunner(runner)
         else
-          if newPB == true
+          if newPB == true and firstRun == false
             embed.add_field(
               name: "Time Save from Previous Run",
               value: Util.secondsToTime(pbDiff),
+              inline: false
+            )
+          elsif firstRun == true
+            embed.add_field(
+              name: "Time Save from Previous Run",
+              value: "This is this runner's first run in this category!",
               inline: false
             )
           end
@@ -234,8 +239,8 @@ module RunTracker
         SQLiteDB.updateTrackedGame(trackedGame)
         # Add run to the announcements table so we dont duplicate the messages
         SQLiteDB::Conn.execute("INSERT INTO announcements (run_id) VALUES ('#{run['id']}')")
-        RTBot.send_message(_event.channel.id, "", false, embed)
-        RTBot.send_message(_event.channel.id, "Video Link - #{videoLink}", false, embed)
+        RTBot.send_message(trackedGame.announce_channel, "", false, embed)
+        RTBot.send_message(trackedGame.announce_channel, "Video Link - #{videoLink}", false, embed)
         next
       end # end of tracked games loop
     end # end announce runs

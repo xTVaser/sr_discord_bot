@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:statsrunner, description: 'Displays all or a particular stat for a given runner',
-                        usage: "~statsrunner <runnerName> <game/category> <gameAlias/categoryAlias>",
+                        usage: "#{PREFIX}statsrunner <runnerName> <game/category> <gameAlias/categoryAlias>",
                         permission_level: PERM_USER,
                         rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                         bucket: :limiter,
@@ -39,13 +39,12 @@ module RunTracker
           thumbnail: {
             url: theRunner.avatar_url
           },
-          description: "To View Category Information `~statscategory categoryAlias`",
+          description: "To View Category Information:\n`#{PREFIX}statsrunner #{_runnerName} <categoryAlias>`",
           footer: {
-            text: "~help to view a list of available commands"
+            text: "#{PREFIX}help to view a list of available commands"
           }
         )
 
-        pp theRunner.avatar_url
         embed.colour = "#1AB5FF"
         # If only the runner name was supplied, print out a summary of the runner
         if _type == nil and _alias == nil
@@ -57,17 +56,17 @@ module RunTracker
           end
           embed.add_field(
             name: "Runs of Games that are Tracked",
-            value: runnersGames.join('\n'),
+            value: runnersGames.join("\n"),
             inline: false
-          )
-          embed.add_field(
-            name: "Number of Submitted World Records",
-            value: theRunner.num_submitted_wrs,
-            inline: true
           )
           embed.add_field(
             name: "Number of Submitted Runs",
             value: theRunner.num_submitted_runs,
+            inline: true
+          )
+          embed.add_field(
+            name: "Number of Submitted World Records",
+            value: theRunner.num_submitted_wrs,
             inline: true
           )
           embed.add_field(
@@ -106,13 +105,8 @@ module RunTracker
           embed.title = "Runner Summary for #{_runnerName} in Game #{_alias}"
           embed.add_field(
             name: "Categories that have done Runs in",
-            value: runnersCategories.join('\n'),
+            value: runnersCategories.join("\n"),
             inline: false
-          )
-          embed.add_field(
-            name: "Number of Submitted World Records",
-            value: foundGame.num_previous_wrs,
-            inline: true
           )
           embed.add_field(
             name: "Number of Submitted Runs",
@@ -120,23 +114,26 @@ module RunTracker
             inline: true
           )
           embed.add_field(
+            name: "Number of Submitted World Records",
+            value: foundGame.num_previous_wrs,
+            inline: true
+          )
+          embed.add_field(
             name: "Total Time Spent Across all runs",
             value: "#{(foundGame.total_time_overall/3600.0).round(2)} hours",
             inline: true
           )
-
         # Otherwise print category information
         elsif _type.downcase.casecmp('category').zero? and _alias != nil
           # Check to see if alias even exists
           # Check to see if they've done the category
           categoryID = SQLiteDB.findID(_alias)
           if categoryID == nil
-            _event << "Category Alias not found use ~listcategories <gameAlias> to see the current aliases"
+            _event << "Category Alias not found use #{PREFIX}listcategories <gameAlias> to see the current aliases"
             next
           end
 
-          gameAlias = aliasResults.first['alias'].split('-').first
-          gameID = SQLiteDB.findID(gameAlias)
+          gameID = SQLiteDB.categoryAliasToGameID(_alias)
 
           # Check to see if that runner has done runs of that game
           foundGame = nil
@@ -151,7 +148,7 @@ module RunTracker
           end
 
           # Check to see if that runner has done runs of that category
-          category = foundGame.categories[aliasResults.first['id']]
+          category = foundGame.categories[categoryID]
           if category.num_submitted_runs <= 0
             _event << "That runner has not done a run of that category for that category!"
             next
@@ -163,20 +160,21 @@ module RunTracker
           category.milestones.each do |label, runID|
             milestoneList.push("_#{label}_: #{runID}")
           end
-          embed.title = "Runner Summary for #{_runnerName} in Game #{gameAlias} in Category #{_alias}"
+          # TODO: add back game name
+          embed.title = "Runner Summary for #{_runnerName} in Category #{_alias}"
           embed.add_field(
             name: "Milestones for this Category",
-            value: milestoneList.join('\n'),
+            value: milestoneList.join("\n"),
             inline: false
-          )
-          embed.add_field(
-            name: "Number of Submitted World Records",
-            value: category.num_previous_wrs,
-            inline: true
           )
           embed.add_field(
             name: "Number of Submitted Runs",
             value: category.num_submitted_runs,
+            inline: true
+          )
+          embed.add_field(
+            name: "Number of Submitted World Records",
+            value: category.num_previous_wrs,
             inline: true
           )
           embed.add_field(
@@ -185,7 +183,7 @@ module RunTracker
             inline: true
           )
         else
-          _event << "~statsrunner <runnerName> <game/category> <gameAlias/categoryAlias>"
+          _event << "#{PREFIX}statsrunner <runnerName> <game/category> <gameAlias/categoryAlias>"
           next
         end
         RTBot.send_message(_event.channel.id, "", false, embed)

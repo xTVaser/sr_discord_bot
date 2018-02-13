@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:setcategoryalias, description: '',
-                         usage: "~setcategoryalias <old alias> <new alias>\nAlias must be unique.\nDo not need to enter the game-alias prefix in the new alias.",
+                         usage: "#{PREFIX}setcategoryalias <old alias> <new alias>\nAlias must be unique.\nDo not need to enter the game-alias prefix in the new alias.",
                          permission_level: PERM_MOD,
                          rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                          bucket: :limiter,
@@ -16,12 +16,12 @@ module RunTracker
 
         # check if the newly provided alias is valid
         if !/[^a-zA-Z0-9\-()&:%]./.match(_newAlias).nil?
-          return "`~setcategoryalias <old alias> <new alias>`\nAlias must be unique.\nDo not need to enter the game-alias prefix in the new alias."
+          return "`#{PREFIX}setcategoryalias <old alias> <new alias>`\nAlias must be unique.\nDo not need to enter the game-alias prefix in the new alias."
         end
         # Check to see if alias even exists
         aliasResults = SQLiteDB::Conn.execute('SELECT * FROM "aliases" WHERE alias="?" and type="category"', _oldAlias)
         if aliasResults.length < 1
-          return "Category Alias not found use `~listcategories <game_alias>` to see the current aliases"
+          return "Category Alias not found use `#{PREFIX}listcategories <game_alias>` to see the current aliases"
         end
 
         gameAlias = _oldAlias.split('-').first
@@ -31,14 +31,14 @@ module RunTracker
           SQLiteDB::Conn.execute('update aliases set alias = ? where alias = ? and type = "category"', 
                                   "#{gameAlias}-#{_newAlias}", _oldAlias)
         rescue SQLite3::Exception => e
-          puts "oh no fix me"
-          return "oh no fix me"
+          Stackdriver.exception(e)
+          return "Error when setting the category alias!"
         end
 
         embed = Discordrb::Webhooks::Embed.new(
             title: "Category Alias Updated Successfully",
             footer: {
-              text: "~help to view a list of available commands"
+              text: "#{PREFIX}help to view a list of available commands"
             }
         )
         embed.colour = "#35f904"

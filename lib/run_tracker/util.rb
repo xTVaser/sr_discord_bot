@@ -2,11 +2,15 @@ module RunTracker
   module Util
     MaxInteger = 2**(64 - 2) - 1
 
+    # TODO: throttle myself
+    API_CALLS = 0 # if we reach 50 requests, pause for the amount to each 1 minute
+    LAST_API_CALL = nil # once we exceed 1 minute, reset this
+
     ##
     # Retrives JSON given a url
     # Returns the parsed JSON object
     def self.jsonRequest(url)
-      pp "[JSON] #{url}"
+      Stackdriver.log("[JSON] #{url}")
       jsonURI = URI(url)
       response = Net::HTTP.get(jsonURI)
       response = JSON.parse(response)

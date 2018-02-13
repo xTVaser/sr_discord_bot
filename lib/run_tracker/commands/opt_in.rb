@@ -7,7 +7,7 @@ module RunTracker
       bucket :limiter, limit: 1, time_span: 5, delay: 1
 
       command(:optin, description: 'Allows a speedrun.com leaderboard mod to opt-in to receiving notifications from the games they moderate',
-                         usage: '~optin <speedrunComName> *must be the user themselves',
+                         usage: "#{PREFIX}optin <speedrunComName> *must be the user themselves",
                          permission_level: PERM_MOD,
                          rate_limit_message: 'Command Rate-Limited to Once every 5 seconds!',
                          bucket: :limiter,
@@ -16,11 +16,10 @@ module RunTracker
 
         # Command Body
         # TODO: this command wipes the moderators stats
-        # TODO: what does ^ mean
 
         # First check to see if the moderator exists for one of the games
         mod = nil
-        moderatorResults = SQLiteDB::Conn('SELECT * FROM moderators WHERE "src_name"=?', _srcName.downcase)
+        moderatorResults = SQLiteDB::Conn.execute('SELECT * FROM moderators WHERE "src_name"=? COLLATE NOCASE', _srcName.downcase)
         mod = moderatorResults.first
 
         if mod == nil
@@ -30,22 +29,22 @@ module RunTracker
 
         # Otherwise, let's check to see if the moderator has already opted in
         if mod['should_notify'] == true
-          _event << "#{_srcName} has already opted in, `~optout #{_srcName}` to opt-out"
+          _event << "#{_srcName} has already opted in, `#{PREFIX}optout #{_srcName}` to opt-out"
           next
         end
 
         SQLiteDB::Conn.execute('update moderators
                                 set discord_id = ?,
-                                    should_notify = ?,
+                                    should_notify = ?
                                 where "src_name" = ?',
                                 _event.message.user.id,
                                 1,
                                 _srcName.downcase)
         embed = Discordrb::Webhooks::Embed.new(
             title: "Moderator Successfully Opted-In",
-            description: "Use `~optout #{_srcName}` to opt-out at any time",
+            description: "Use `#{PREFIX}optout #{_srcName}` to opt-out at any time",
             footer: {
-              text: "~help to view a list of available commands"
+              text: "#{PREFIX}help to view a list of available commands"
             }
         )
         embed.colour = "#35f904"
