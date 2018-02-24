@@ -450,7 +450,7 @@ module RunTracker
     ##
     # Initialize everyones permissions
     def self.initPermissions
-      Stackdriver.log("[INFO] Initializing Permissions")
+      Stackdriver.log("Initializing Permissions")
       begin
         userPermissions = Conn.execute('select * from managers') # Grab each user ID from the database
         userPermissions.each do |user|

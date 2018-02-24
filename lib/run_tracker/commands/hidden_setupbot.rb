@@ -23,7 +23,7 @@ module RunTracker
           sleep(5)
           RTBot.send_message(_event.channel.id, "Setting up Bot")
           RTBot.send_message(_event.channel.id, "Resetting DB")
-          RTBot.commands[:resetdb].call(_event, ["DOIT"])
+          RTBot.commands[:clearruns].call(_event, ["DOIT"])
           RTBot.send_message(_event.channel.id, "Adding Games")
           sleep(5)
           RTBot.commands[:addgame].call(_event, ["name", "jak1"])

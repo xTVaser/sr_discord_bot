@@ -36,7 +36,7 @@ module RunTracker
         SQLiteDB::Conn.execute('update moderators
                                 set discord_id = ?,
                                     should_notify = ?
-                                where "src_name" = ?',
+                                where "src_name" = ? COLLATE NOCASE',
                                 _event.message.user.id,
                                 1,
                                 _srcName.downcase)
