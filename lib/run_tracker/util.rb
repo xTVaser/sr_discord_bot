@@ -10,9 +10,6 @@ module RunTracker
     # Retrives JSON given a url
     # Returns the parsed JSON object
     def self.jsonRequest(url)
-      pp @API_CALLS
-      pp @LAST_API_CALL
-      pp secondDifference(DateTime.now, @LAST_API_CALL)
       if secondDifference(DateTime.now, @LAST_API_CALL) > 60
         # Reset the throttle
         @LAST_API_CALL = DateTime.now
