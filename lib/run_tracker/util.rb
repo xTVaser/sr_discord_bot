@@ -2,19 +2,44 @@ module RunTracker
   module Util
     MaxInteger = 2**(64 - 2) - 1
 
-    # TODO: throttle myself
-    API_CALLS = 0 # if we reach 50 requests, pause for the amount to each 1 minute
-    LAST_API_CALL = nil # once we exceed 1 minute, reset this
+    @API_CALLS = 0 
+    @LAST_API_CALL = DateTime.now # once we exceed >=1 minute, reset throttle
+    LIMIT_CALLS = 75
 
     ##
     # Retrives JSON given a url
     # Returns the parsed JSON object
     def self.jsonRequest(url)
+      if secondDifference(DateTime.now, @LAST_API_CALL) > 60
+        # Reset the throttle
+        @LAST_API_CALL = DateTime.now
+        @API_CALLS = 0
+      elsif @API_CALLS > LIMIT_CALLS
+        Stackdriver.log("Waiting so API can catch back up")
+        # Sleep the required number of seconds to reset the counter
+        sleep(secondDifference(DateTime.now, @LAST_API_CALL))
+        @LAST_API_CALL = DateTime.now
+        @API_CALLS = 0
+      end
+
       Stackdriver.log("[JSON] #{url}")
       jsonURI = URI(url)
       response = Net::HTTP.get(jsonURI)
-      response = JSON.parse(response)
+      begin
+        response = JSON.parse(response)
+      rescue JSON::ParserError => e
+        # Failure, try again
+        Stackdriver.log("Speedrun.com API Failure, responded with Invalid JSON", level = :ERROR)
+        return jsonRequest(url)
+      end
+      @API_CALLS += 1
       return response
+    end
+
+    ##
+    # Returns the number of seconds between two DateTime objects
+    def self.secondDifference(new_time, old_time)
+      ((new_time - old_time) * 24 * 60 * 60).to_i
     end
 
     ##

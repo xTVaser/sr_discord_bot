@@ -29,7 +29,7 @@ module RunTracker
         end
 
         def self.exception(exception)
-            self.log("#{e.message} #{e.backtrace}", :ERROR)
+            self.log("#{exception.message} #{exception.backtrace}", :ERROR)
         end
     end
 end
