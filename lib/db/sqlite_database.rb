@@ -74,6 +74,8 @@ module RunTracker
       createAnnouncementsTable = 'CREATE TABLE IF NOT EXISTS announcements(' \
                                  '"run_id" TEXT NOT NULL,' \
                                  'PRIMARY KEY ("run_id"));'
+      createSettingsTable = 'CREATE TABLE IF NOT EXISTS settings(' \
+                            '"stream_channel_id" TEXT NOT NULL);'
       # information tables
       Conn.execute(createTrackedGamesCmd)
       Conn.execute(createCategoriesCmd)
@@ -85,6 +87,7 @@ module RunTracker
       Conn.execute(createCommandPermissionsCmd)
       Conn.execute(createNotificationTable)
       Conn.execute(createAnnouncementsTable)
+      Conn.execute(createSettingsTable)
       Stackdriver.log("Tables Created Successfully")
       return 'Tables Created Succesfully'
     rescue SQLite3::Exception => e
@@ -102,6 +105,7 @@ module RunTracker
       Conn.execute('DROP TABLE IF EXISTS managers')
       Conn.execute('DROP TABLE IF EXISTS notifications')
       Conn.execute('DROP TABLE IF EXISTS announcements')
+      Conn.execute('DROP TABLE IF EXISTS settings')
       Stackdriver.log("Tables Dropped")
       return 'Schema Destroyed!'
     rescue SQLite3::Exception => e

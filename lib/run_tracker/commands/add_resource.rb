@@ -6,7 +6,7 @@ module RunTracker
       # Bucket for rate limiting. Limits to x uses every y seconds at z intervals.
       bucket :limiter, limit: 1, time_span: 1, delay: 1
 
-      command(:addresource, description: 'Lists all categories for a specific tracked game.',
+      command(:addresource, description: 'Adds a new resource for a specific tracked game.',
                           usage: "#{PREFIX}addresource <gameAlias> <resource name> <content>",
                           permission_level: PERM_MOD,
                           min_args: 3,
