@@ -1,7 +1,7 @@
 module RunTracker
     module Stackdriver
         @LOCAL_LOGGING = false
-	@logging = nil
+	    @logging = nil
         begin
             @logging = Google::Cloud::Logging.new
         rescue Exception

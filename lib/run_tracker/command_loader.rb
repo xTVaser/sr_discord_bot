@@ -22,6 +22,7 @@ module RunTracker
       SetAnnounce,
       SetCategoryAlias,
       SetGameAlias,
+      SetStreamChannel,
       SetupBot,
       StatsCategory,
       StatsGame,

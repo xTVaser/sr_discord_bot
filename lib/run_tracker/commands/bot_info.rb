@@ -33,7 +33,7 @@ module RunTracker
         )
         embed.colour = "#FFFFFF"
         embed.add_field(
-          name: "Technical Info",
+          name: "Running Version #{VERSION}",
           value: "Written in Ruby with **discordrb**"
         )
         RTBot.send_message(_event.channel.id, "", false, embed)

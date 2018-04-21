@@ -1,7 +1,7 @@
 # Gemfile plugins
 # Windows Patch for libsodium
 if Gem.win_platform?
-  ::RBNACL_LIBSODIUM_GEM_LIB_PATH = "D:/Repos/sr_discord_bot/sodium.dll"
+  ::RBNACL_LIBSODIUM_GEM_LIB_PATH = "F:/Repos/sr_discord_bot/sodium.dll"
 end
 
 require "google/cloud/logging"
@@ -17,8 +17,6 @@ module RunTracker
   # Require jsonable first because some of the models depend on it
   require_relative 'run_tracker/models/jsonable.rb'
 
-  Dotenv.load('vars.env')
-
   # Permission Constants
   PERM_ADMIN = 2
   PERM_MOD = 1
@@ -27,9 +25,22 @@ module RunTracker
   HEARTBEAT_CHECKRUNS = 1 # 1 heartbeat approximately every 1 minute
   HEARTBEAT_NOTIFYMODS = 1
 
-  DEBUG_CHANNEL = ENV['DEBUG_CHANNEL']
-
   PREFIX = '$'
+
+  # Require all files in run_tracker folder
+  Dir["#{File.dirname(__FILE__)}/run_tracker/*.rb"].each do |file|
+    require file
+  end
+
+  # Require all model files
+  Dir["#{File.dirname(__FILE__)}/run_tracker/models/*.rb"].each do |file|
+    require file
+  end
+
+  Dotenv.load('vars.env')
+
+  DEBUG_CHANNEL = ENV['DEBUG_CHANNEL']
+  SETTINGS = Settings.new(DEBUG_CHANNEL)
 
   # Establish Discord Bot Connection
   RTBot = Discordrb::Commands::CommandBot.new(token: ENV['TOKEN'],
@@ -50,18 +61,13 @@ module RunTracker
     # Hardcode to give me permissions
     # NOTE disable this line if you dont want me to have full access!
     RTBot.set_user_permission(140194315518345216, PERM_ADMIN)
+    # As more settings are added, make a generic function for this
+    queryResults = SQLiteDB::Conn.execute('SELECT * FROM "settings" LIMIT 1')
+    unless queryResults.empty?
+      SETTINGS.stream_channel_id = queryResults.first['stream_channel_id'].to_i
+    end
 
     Stackdriver.log("Bot Online and Connected to Server")
-  end
-
-  # Require all files in run_tracker folder
-  Dir["#{File.dirname(__FILE__)}/run_tracker/*.rb"].each do |file|
-    require file
-  end
-
-  # Require all model files
-  Dir["#{File.dirname(__FILE__)}/run_tracker/models/*.rb"].each do |file|
-    require file
   end
 
   # Load up all the commands
@@ -85,6 +91,29 @@ module RunTracker
     end
     announceCounter += 1
     notifyModCounter += 1
+  end
+
+  RTBot.playing do |_event|
+    if _event.type == 1
+      # TODO check title for exclude keywords [NOSRL], etc
+      # NOTE, could check the twitch api to see what game they are playing
+      embed = Discordrb::Webhooks::Embed.new(
+          author: {
+            name: "Stream Notification",
+            url: _event.url,
+            icon_url: "https://raw.githubusercontent.com/xTVaser/sr_discord_bot/master/assets/author_icon.png"
+          },
+          title: "#{_event.user.username} Just Started Streaming!",
+          description: _event.game, # title
+          url: _event.url,
+          thumbnail: {
+            url: _event.user.avatar_url
+          }
+      )
+      embed.colour = "#6441A4"
+      puts SETTINGS.stream_channel_id
+      RTBot.send_message(SETTINGS.stream_channel_id, "", false, embed)
+    end
   end
 
   RTBot.run
