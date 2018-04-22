@@ -8,6 +8,7 @@ module RunTracker
     # Add Command module names here
     @commands = [
       AddGame,
+      AddExcludeKeyword,
       AddResource,
       BotInfo,
       ClearRunData,
@@ -23,6 +24,7 @@ module RunTracker
       SetCategoryAlias,
       SetGameAlias,
       SetStreamChannel,
+      SetStreamerRole,
       SetupBot,
       StatsCategory,
       StatsGame,

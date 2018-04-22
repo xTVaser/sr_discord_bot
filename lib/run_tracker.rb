@@ -65,6 +65,10 @@ module RunTracker
     queryResults = SQLiteDB::Conn.execute('SELECT * FROM "settings" LIMIT 1')
     unless queryResults.empty?
       SETTINGS.stream_channel_id = queryResults.first['stream_channel_id'].to_i
+      SETTINGS.streamer_role = queryResults.first['streamer_role'].to_i
+      unless queryResults.first['exclude_keywords'].nil?
+        SETTINGS.exclude_keywords = queryResults.first['exclude_keywords'].split(",")
+      end
     end
 
     Stackdriver.log("Bot Online and Connected to Server")
@@ -93,26 +97,38 @@ module RunTracker
     notifyModCounter += 1
   end
 
+  currently_streaming = Hash.new
+
   RTBot.playing do |_event|
-    if _event.type == 1
-      # TODO check title for exclude keywords [NOSRL], etc
-      # NOTE, could check the twitch api to see what game they are playing
-      embed = Discordrb::Webhooks::Embed.new(
+    pp currently_streaming[_event.user.id]
+    pp SETTINGS.streamer_role
+    pp SETTINGS.stream_channel_id
+    if _event.type == 0
+      if currently_streaming[_event.user.id] == true && _event.url.nil?
+        currently_streaming[_event.user.id] = nil
+      end
+      member = _event.server.member(_event.user.id)
+      if currently_streaming[_event.user.id].nil? && (member.role?(SETTINGS.streamer_role) || SETTINGS.streamer_role == 0)
+        # TODO PR to discordrb to add details? https://discordapp.com/developers/docs/topics/gateway#activity-object-activity-types
+        embed = Discordrb::Webhooks::Embed.new(
           author: {
             name: "Stream Notification",
             url: _event.url,
             icon_url: "https://raw.githubusercontent.com/xTVaser/sr_discord_bot/master/assets/author_icon.png"
           },
           title: "#{_event.user.username} Just Started Streaming!",
-          description: _event.game, # title
+          description: _event.game,
           url: _event.url,
           thumbnail: {
             url: _event.user.avatar_url
           }
-      )
-      embed.colour = "#6441A4"
-      puts SETTINGS.stream_channel_id
-      RTBot.send_message(SETTINGS.stream_channel_id, "", false, embed)
+        )
+        currently_streaming[_event.user.id] = true
+        embed.colour = "#6441A4"
+        unless SETTINGS.stream_channel_id == 0 || SETTINGS.exclude_keywords.any? { |str| _event.game.include? str }
+          RTBot.send_message(SETTINGS.stream_channel_id, "", false, embed)
+        end
+      end
     end
   end
 
