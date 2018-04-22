@@ -75,7 +75,9 @@ module RunTracker
                                  '"run_id" TEXT NOT NULL,' \
                                  'PRIMARY KEY ("run_id"));'
       createSettingsTable = 'CREATE TABLE IF NOT EXISTS settings(' \
-                            '"stream_channel_id" TEXT NOT NULL);'
+                            '"stream_channel_id" TEXT NOT NULL,' \
+                            '"streamer_role" TEXT NOT NULL,' \
+                            '"exclude_keywords" TEXT);'
       # information tables
       Conn.execute(createTrackedGamesCmd)
       Conn.execute(createCategoriesCmd)

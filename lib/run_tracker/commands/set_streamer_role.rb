@@ -1,20 +1,21 @@
 module RunTracker
     module CommandLoader
-      module SetStreamChannel
+      module SetStreamerRole
         extend Discordrb::Commands::CommandContainer
   
         # Bucket for rate limiting. Limits to x uses every y seconds at z intervals.
         bucket :limiter, limit: 1, time_span: 1, delay: 1
   
-        command(:setstreamchannel, description: 'Sets the channel that will be used for stream announcements.',
-                                   usage: "#{PREFIX}setstreamchannel <#channel>",
-                                   permission_level: PERM_MOD,
-                                   min_args: 1,
-                                   max_args: 1,
-                                   bucket: :limiter) do |_event, _channel|
+        command(:setstreamerrole, description: 'Sets the role that will be required for stream announcements.',
+                                  usage: "#{PREFIX}setstreamerrole <@role>",
+                                  permission_level: PERM_MOD,
+                                  min_args: 1,
+                                  max_args: 1,
+                                  bucket: :limiter) do |_event, _role|
 
           # Command Body
-          channelID = Integer(_channel[2..-2])
+          roleID = Integer(_role[3..-2])
+
           begin
             # Get first row
             queryResults = SQLiteDB::Conn.execute('SELECT * FROM "settings" LIMIT 1')
@@ -23,20 +24,20 @@ module RunTracker
                 SQLiteDB::Conn.execute('insert into "settings"
                                       ("stream_channel_id", "streamer_role")
                                       values (?, ?)',
-                                      channelID, 0)
+                                      0, roleID)
             else
                 SQLiteDB::Conn.execute('update "settings"
-                                        set stream_channel_id = ?',
-                                        channelID)
+                                        set streamer_role = ?',
+                                        roleID)
             end
           rescue SQLite3::Exception => e
             Stackdriver.exception(e)
             return
           end
 
-          SETTINGS.stream_channel_id = channelID
+          SETTINGS.streamer_role = roleID
           embed = Discordrb::Webhooks::Embed.new(
-              title: "Stream Channel Updated",
+              title: "Streamer Role Updated",
               footer: {
                 text: "#{PREFIX}help to view a list of available commands"
               }
