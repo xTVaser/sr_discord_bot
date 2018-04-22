@@ -100,16 +100,14 @@ module RunTracker
   currently_streaming = Hash.new
 
   RTBot.playing do |_event|
-    pp currently_streaming[_event.user.id]
-    pp SETTINGS.streamer_role
-    pp SETTINGS.stream_channel_id
-    if _event.type == 0
+    if _event.type == 1
       if currently_streaming[_event.user.id] == true && _event.url.nil?
         currently_streaming[_event.user.id] = nil
       end
       member = _event.server.member(_event.user.id)
       if currently_streaming[_event.user.id].nil? && (member.role?(SETTINGS.streamer_role) || SETTINGS.streamer_role == 0)
         # TODO PR to discordrb to add details? https://discordapp.com/developers/docs/topics/gateway#activity-object-activity-types
+        # https://github.com/meew0/discordrb/blob/master/lib/discordrb/events/presence.rb#L74
         embed = Discordrb::Webhooks::Embed.new(
           author: {
             name: "Stream Notification",
