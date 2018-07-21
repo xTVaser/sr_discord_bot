@@ -4,7 +4,7 @@ if Gem.win_platform?
   ::RBNACL_LIBSODIUM_GEM_LIB_PATH = "F:/Repos/sr_discord_bot/sodium.dll"
 end
 
-require "google/cloud/logging"
+# require "google/cloud/logging"
 require 'dotenv'
 require 'discordrb'
 require 'pp'
