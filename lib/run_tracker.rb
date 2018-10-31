@@ -112,12 +112,21 @@ module RunTracker
             url: _event.url,
             icon_url: "https://raw.githubusercontent.com/xTVaser/sr_discord_bot/master/assets/author_icon.png"
           },
-          title: "#{_event.user.username} Just Started Streaming", # #{_event.details} waiting on discordrb release
-          description: _event.game,
+          title: "#{_event.user.username} Just Started Streaming",
           url: _event.url,
           thumbnail: {
             url: _event.user.avatar_url
           }
+        )
+        embed.add_field(
+          name: "Stream Title",
+          value: _event.details,
+          inline: false
+        )
+        embed.add_field(
+          name: "Game Name",
+          value: _event.game,
+          inline: false
         )
         currently_streaming[_event.user.id] = true
         embed.colour = "#6441A4"
