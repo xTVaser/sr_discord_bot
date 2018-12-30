@@ -10,7 +10,7 @@ gemspec
 gem 'rake'
 
 # Added at 2017-07-20 18:53:29 -0400 by tyler:
-gem 'discordrb', '~> 3.2'
+gem 'discordrb', '~> 3.3'
 
 # Added at 2017-07-22 17:55:56 -0400 by tyler:
 gem 'dotenv', '~> 2.2'

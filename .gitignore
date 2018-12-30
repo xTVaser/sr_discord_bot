@@ -1,5 +1,6 @@
 *.7z
 *.7z.*
+.vscode/
 
 libsodium.dll
 sodium.dll
