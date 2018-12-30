@@ -51,6 +51,7 @@ module RunTracker
   # When the bot starts up
   # TODO: Move all logic for databases into the models
   RTBot.ready do |_event|
+    RTBot.user(140194315518345216).pm("Bot Online")
     RTBot.game = "#{PREFIX}help for commands"
     # Create the database tables
     SQLiteDB.generateSchema
@@ -79,6 +80,7 @@ module RunTracker
 
   announceCounter = 1
   notifyModCounter = 1
+  previousDay = Date.today.day
 
   RTBot.heartbeat do |_event|
 
@@ -89,9 +91,14 @@ module RunTracker
     end
 
     # Every 10th heartbeat, notify the moderators
+    # Also check if it's a new day, send a health-check message
     if notifyModCounter >= HEARTBEAT_NOTIFYMODS
       NotifyMods.notifyMods
       notifyModCounter = 1
+      if previousDay != Date.today.day
+        RTBot.user(140194315518345216).pm("Bot Online - Assumed Healthy")
+        previousDay = Date.today.day
+      end
     end
     announceCounter += 1
     notifyModCounter += 1
