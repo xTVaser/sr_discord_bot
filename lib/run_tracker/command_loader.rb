@@ -20,6 +20,7 @@ module RunTracker
       Grant,
       OptIn,
       OptOut,
+      SetAllowedGameList,
       SetAnnounce,
       SetCategoryAlias,
       SetGameAlias,
