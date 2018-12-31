@@ -6,12 +6,12 @@ module RunTracker
         # Bucket for rate limiting. Limits to x uses every y seconds at z intervals.
         bucket :limiter, limit: 1, time_span: 1, delay: 1
   
-        command(:setstreamchannel, description: 'Sets the allowed list of games that should be announced, comma separated, must match the game name on Twitch.',
-                                   usage: "#{PREFIX}setallowedgamelist <#channel>",
-                                   permission_level: PERM_MOD,
-                                   min_args: 1,
-                                   max_args: 1,
-                                   bucket: :limiter) do |_event, _list|
+        command(:setallowedgamelist, description: 'Sets the allowed list of games that should be announced, comma separated, must match the game name on Twitch.',
+                                     usage: "#{PREFIX}setallowedgamelist <#channel>",
+                                     permission_level: PERM_MOD,
+                                     min_args: 1,
+                                     max_args: 1,
+                                     bucket: :limiter) do |_event, _list|
 
           # Command Body
           gameList = _list
