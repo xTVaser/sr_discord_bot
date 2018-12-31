@@ -40,13 +40,26 @@ module RunTracker
   Dotenv.load('vars.env')
 
   DEBUG_CHANNEL = ENV['DEBUG_CHANNEL']
+  if DEBUG_CHANNEL.nil?
+    DEBUG_CHANNEL = 351320655540781066
+  end
   SETTINGS = Settings.new(DEBUG_CHANNEL)
+
+  rescue_proc = proc do |event, exception|
+    embed = Discordrb::Webhooks::Embed.new(
+      description: "#{exception}\n\n#{exception.backtrace}",
+      title: "Uncaught Exception Occurred!"
+    )
+    embed.colour = "#ff0000"
+    RTBot.send_message(SETTINGS.debug_channel_id, "", false, embed)
+  end
 
   # Establish Discord Bot Connection
   RTBot = Discordrb::Commands::CommandBot.new(token: ENV['TOKEN'],
                                               client_id: ENV['CLIENT_ID'],
                                               prefix: PREFIX,
-                                              command_doesnt_exist_message: "Use #{PREFIX}help to see a list of available commands")
+                                              command_doesnt_exist_message: "Use #{PREFIX}help to see a list of available commands",
+                                              rescue: rescue_proc)
 
   # When the bot starts up
   # TODO: Move all logic for databases into the models
@@ -69,6 +82,9 @@ module RunTracker
       SETTINGS.streamer_role = queryResults.first['streamer_role'].to_i
       unless queryResults.first['exclude_keywords'].nil?
         SETTINGS.exclude_keywords = queryResults.first['exclude_keywords'].split(",")
+      end
+      unless queryResults.first['allowed_game_list'].nil?
+        SETTINGS.announce_game_list = queryResults.first['allowed_game_list'].split(",")
       end
     end
 
@@ -137,7 +153,7 @@ module RunTracker
         )
         currently_streaming[_event.user.id] = true
         embed.colour = "#6441A4"
-        unless SETTINGS.stream_channel_id == 0 || SETTINGS.exclude_keywords.any? { |str| _event.game.include? str }
+        unless SETTINGS.stream_channel_id == 0 || SETTINGS.exclude_keywords.any? { |str| _event.game.include? str } || (!SETTINGS.allowed_game_list.include? _event.game)
           RTBot.send_message(SETTINGS.stream_channel_id, "", false, embed)
         end
       end
