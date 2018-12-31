@@ -22,8 +22,8 @@ module RunTracker
   PERM_MOD = 1
   PERM_USER = 0
 
-  HEARTBEAT_CHECKRUNS = 1 # 1 heartbeat approximately every 1 minute
-  HEARTBEAT_NOTIFYMODS = 1
+  HEARTBEAT_CHECKRUNS = 15 # 1 heartbeat approximately every 1 minute
+  HEARTBEAT_NOTIFYMODS = 15
 
   PREFIX = '$'
 
