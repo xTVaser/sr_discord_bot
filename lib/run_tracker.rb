@@ -47,7 +47,7 @@ module RunTracker
 
   rescue_proc = proc do |event, exception|
     embed = Discordrb::Webhooks::Embed.new(
-      description: "#{exception}\n\n#{exception.backtrace}",
+      description: "#{exception}\n\n```#{exception.backtrace}```",
       title: "Uncaught Exception Occurred!"
     )
     embed.colour = "#ff0000"
