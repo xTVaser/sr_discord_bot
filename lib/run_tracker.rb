@@ -84,7 +84,7 @@ module RunTracker
         SETTINGS.exclude_keywords = queryResults.first['exclude_keywords'].split(",")
       end
       unless queryResults.first['allowed_game_list'].nil?
-        SETTINGS.announce_game_list = queryResults.first['allowed_game_list'].split(",")
+        SETTINGS.allowed_game_list = queryResults.first['allowed_game_list'].split(",")
       end
     end
 
@@ -153,8 +153,10 @@ module RunTracker
         )
         currently_streaming[_event.user.id] = true
         embed.colour = "#6441A4"
-        unless SETTINGS.stream_channel_id == 0 || SETTINGS.exclude_keywords.any? { |str| _event.game.include? str } # || (!SETTINGS.allowed_game_list.include? _event.game)
-          RTBot.send_message(SETTINGS.stream_channel_id, "", false, embed)
+        unless SETTINGS.stream_channel_id == 0 || SETTINGS.exclude_keywords.any? { |str| _event.game.include? str }
+          if (_event.game.downcase.include? "jak") || (_event.game.downcase.include? "daxter") # || (!SETTINGS.allowed_game_list.include? _event.game)
+            RTBot.send_message(SETTINGS.stream_channel_id, "", false, embed)
+          end
         end
       end
     end
