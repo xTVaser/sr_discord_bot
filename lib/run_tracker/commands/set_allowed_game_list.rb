@@ -11,10 +11,10 @@ module RunTracker
                                      permission_level: PERM_MOD,
                                      min_args: 1,
                                      max_args: 1,
-                                     bucket: :limiter) do |_event, _list|
+                                     bucket: :limiter) do |_event, *text|
 
           # Command Body
-          gameList = _list
+          gameList = text.join(' ')
           begin
             # Get first row
             queryResults = SQLiteDB::Conn.execute('SELECT * FROM "settings" LIMIT 1')

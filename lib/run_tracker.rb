@@ -153,7 +153,7 @@ module RunTracker
         )
         currently_streaming[_event.user.id] = true
         embed.colour = "#6441A4"
-        unless SETTINGS.stream_channel_id == 0 || SETTINGS.exclude_keywords.any? { |str| _event.game.include? str } || (!SETTINGS.allowed_game_list.include? _event.game)
+        unless SETTINGS.stream_channel_id == 0 || SETTINGS.exclude_keywords.any? { |str| _event.game.include? str } # || (!SETTINGS.allowed_game_list.include? _event.game)
           RTBot.send_message(SETTINGS.stream_channel_id, "", false, embed)
         end
       end
