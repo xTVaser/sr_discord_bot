@@ -128,6 +128,8 @@ module RunTracker
     end
     if _event.type == 1
       member = _event.server.member(_event.user.id)
+      stream_title = _event.game
+      game_name = _event.details
       if currently_streaming[_event.user.id].nil? && (member.role?(SETTINGS.streamer_role) || SETTINGS.streamer_role == 0)
         embed = Discordrb::Webhooks::Embed.new(
           author: {
@@ -143,18 +145,18 @@ module RunTracker
         )
         embed.add_field(
           name: "Stream Title",
-          value: _event.details,
+          value: stream_title,
           inline: false
         )
         embed.add_field(
           name: "Game Name",
-          value: _event.game,
+          value: game_name,
           inline: false
         )
         currently_streaming[_event.user.id] = true
         embed.colour = "#6441A4"
-        unless SETTINGS.stream_channel_id == 0 || SETTINGS.exclude_keywords.any? { |str| _event.game.include? str }
-          if (_event.game.downcase.include? "jak") || (_event.game.downcase.include? "daxter") # || (!SETTINGS.allowed_game_list.include? _event.game)
+        unless SETTINGS.stream_channel_id == 0 || SETTINGS.exclude_keywords.any? { |str| game_name.include? str }
+          if (game_name.downcase.include? "jak") || (game_name.downcase.include? "daxter") # || (!SETTINGS.allowed_game_list.include? game_name)
             RTBot.send_message(SETTINGS.stream_channel_id, "", false, embed)
           end
         end
