@@ -98,27 +98,27 @@ module RunTracker
   notifyModCounter = 1
   previousDay = Date.today.day
 
-  RTBot.heartbeat do |_event|
+  # RTBot.heartbeat do |_event|
 
-    # Every 5th heartbeat, check for new runs
-    if announceCounter >= HEARTBEAT_CHECKRUNS
-      AnnounceRuns.announceRuns
-      announceCounter = 1
-    end
+  #   # Every 5th heartbeat, check for new runs
+  #   if announceCounter >= HEARTBEAT_CHECKRUNS
+  #     AnnounceRuns.announceRuns
+  #     announceCounter = 1
+  #   end
 
-    # Every 10th heartbeat, notify the moderators
-    # Also check if it's a new day, send a health-check message
-    if notifyModCounter >= HEARTBEAT_NOTIFYMODS
-      NotifyMods.notifyMods
-      notifyModCounter = 1
-      if previousDay != Date.today.day
-        RTBot.user(140194315518345216).pm("Bot Online - Assumed Healthy")
-        previousDay = Date.today.day
-      end
-    end
-    announceCounter += 1
-    notifyModCounter += 1
-  end
+  #   # Every 10th heartbeat, notify the moderators
+  #   # Also check if it's a new day, send a health-check message
+  #   if notifyModCounter >= HEARTBEAT_NOTIFYMODS
+  #     NotifyMods.notifyMods
+  #     notifyModCounter = 1
+  #     if previousDay != Date.today.day
+  #       RTBot.user(140194315518345216).pm("Bot Online - Assumed Healthy")
+  #       previousDay = Date.today.day
+  #     end
+  #   end
+  #   announceCounter += 1
+  #   notifyModCounter += 1
+  # end
 
   currently_streaming = Hash.new
 

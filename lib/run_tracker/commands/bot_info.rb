@@ -22,7 +22,7 @@ module RunTracker
               icon_url: "https://avatars0.githubusercontent.com/u/13153231?s=460&v=4"
             },
             title: "Bot Information",
-            description: "A Discord bot specializing in supporting speedrunning related discord servers.",
+            description: "The bot at this point is abandoned and will be replaced by something much better, hopefully soon.  It will continue to announce streams, and that is it.",
             url: "http://www.github.com/xTVaser/sr_discord_bot",
             footer: {
               text: "#{PREFIX}help to view a list of available commands"
