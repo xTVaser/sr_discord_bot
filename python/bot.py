@@ -59,7 +59,7 @@ async def on_member_update(before, after):
 
         # find the streaming activity
         for activity in after.activities:
-            if activity.type == ActivityType.streaming:
+            if activity.type == discord.ActivityType.streaming:
                 stream = activity
                 break
 
