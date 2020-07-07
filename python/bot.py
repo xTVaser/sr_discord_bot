@@ -51,7 +51,7 @@ async def on_member_update(before, after):
     exclude_keywords = ["nosrl"]
     try:
         # Verify they are a streamer
-        if not any(role["id"] == streamer_role for role in after.roles):
+        if not any(role.id == streamer_role for role in after.roles):
             return
 
         stream = None
@@ -89,11 +89,11 @@ async def on_member_update(before, after):
         embedVar.set_thumbnail(url=after.avatar_url)
         embedVar.add_field(name="Stream Title", value=stream.name)
         embedVar.add_field(name="Game Name", value=stream.game)
-        await ctx.send(embed=embedVar)
+        channel = bot.get_channel(stream_channel_id)
+        await channel.send(embed=embedVar)
         currently_streaming[after.id] = True
-    except:
-        print("Caught unknown exception in on_member_update")
-        print(traceback.format_exc())
+    except Exception as e:
+        print(e)
 
 
 bot.run(token)
