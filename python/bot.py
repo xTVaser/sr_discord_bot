@@ -68,9 +68,18 @@ async def on_member_update(before, after):
                 del currently_streaming[after.id]
             return
 
-        # Check to see if they are streaming a game thats worth announcing
-        if stream.game.lower() not in allowed_game_list:
+        if after.id in currently_streaming and currently_streaming[after.id]:
             return
+
+        # Check to see if they are streaming a game thats worth announcing
+        game_match = False
+        for keyword in allowed_game_list:
+            if keyword in stream.game.lower():
+                game_match = True
+                break
+        if not game_match:
+            return
+
         # Check to see if their title should exclude announcments
         for keyword in exclude_keywords:
             if keyword in stream.name.lower():
@@ -78,7 +87,7 @@ async def on_member_update(before, after):
 
         embedVar = discord.Embed(
             title="%s Just Started Streaming" % after.display_name,
-            description="The bot at this point is abandoned and will be replaced by something much better, hopefully soon.  It will continue to announce streams, and that is it.",
+            description="%s Just Started Streaming" % after.display_name,
             color=0x6441A4,
             url=stream.url,
         )
