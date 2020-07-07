@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import random
 import os
+import traceback
 
 token = os.getenv("TOKEN")
 
@@ -92,8 +93,8 @@ async def on_member_update(before, after):
         channel = bot.get_channel(stream_channel_id)
         await channel.send(embed=embedVar)
         currently_streaming[after.id] = True
-    except Exception as e:
-        print(e)
+    except Exception:
+        traceback.print_exc()
 
 
 bot.run(token)
