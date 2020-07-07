@@ -46,7 +46,7 @@ currently_streaming = {}
 @bot.event
 async def on_member_update(before, after):
     allowed_game_list = ["jak", "daxter"]
-    stream_channel_id = 215655895202398209
+    stream_channel_id = 351320655540781066  # 215655895202398209
     streamer_role = 208395430130614272
     exclude_keywords = ["nosrl"]
     try:
